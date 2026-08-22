@@ -1,0 +1,328 @@
+{
+  "results": [
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+        "symbol": "ABX.TO",
+        "raw_symbol": "ABX",
+        "description": "BARRICK MINING CORP Common Stock (ABR0)",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000CZ63C2",
+          "figi_share_class": "BBG001S5N9P3"
+        }
+      },
+      "units": "100",
+      "price": "65.56",
+      "cost_basis": "57.656",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+        "symbol": "BLDP.TO",
+        "raw_symbol": "BLDP",
+        "description": "BALLARD POWER SYSTEMS INC Common Stock",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000BBJBD3",
+          "figi_share_class": "BBG001S5Y1D1"
+        }
+      },
+      "units": "2700",
+      "price": "3.31",
+      "cost_basis": "4.039081481481481481481481481",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "5163c606-d73c-4728-bc1f-088731bcaae1",
+        "symbol": "BTE.TO",
+        "raw_symbol": "BTE",
+        "description": "Baytex Energy Corp",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000BLVSQ6",
+          "figi_share_class": "BBG001S998N5"
+        }
+      },
+      "units": "2500",
+      "price": "6.61",
+      "cost_basis": "5.143888888888888888888888889",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "5a3587d3-e678-4c3d-a24d-ca1f61e72cdd",
+        "symbol": "CJ.TO",
+        "raw_symbol": "CJ",
+        "description": "Cardinal Energy Ltd.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG005M8S0S5",
+          "figi_share_class": "BBG005M8S0P8"
+        }
+      },
+      "units": "1000",
+      "price": "12.05",
+      "cost_basis": "6.103275",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "c4f9ba5e-60a6-4077-80d3-0be514d674e6",
+        "symbol": "CNQ.TO",
+        "raw_symbol": "CNQ",
+        "description": "Canadian Natural Resources Limited",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG0014HPGP5",
+          "figi_share_class": "BBG001S5YC56"
+        }
+      },
+      "units": "70",
+      "price": "70.81",
+      "cost_basis": "41.89142857142857142857142857",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "06e2ce4e-a086-4ba8-86a9-ce157d9a30ad",
+        "symbol": "CVE.TO",
+        "raw_symbol": "CVE",
+        "description": "Cenovus Energy Inc.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000FT8787",
+          "figi_share_class": "BBG001T2PJV8"
+        }
+      },
+      "units": "1079.5705",
+      "price": "45.39",
+      "cost_basis": "21.44511935169663467498127628",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+        "symbol": "EQX.TO",
+        "raw_symbol": "EQX",
+        "description": "Equinox Gold Corp.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000QSLBP4",
+          "figi_share_class": "BBG001SSK0K0"
+        }
+      },
+      "units": "600",
+      "price": "18.62",
+      "cost_basis": "13.26066666666666666666666667",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+        "symbol": "IVN.TO",
+        "raw_symbol": "IVN",
+        "description": "Ivanhoe Mines Ltd.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG003CSCHJ7",
+          "figi_share_class": "BBG003CSCJ30"
+        }
+      },
+      "units": "460",
+      "price": "12.37",
+      "cost_basis": "10.34152173913043478260869565",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "9b4c75cb-fd26-4e96-b914-a16b886654d1",
+        "symbol": "LAC.TO",
+        "raw_symbol": "LAC",
+        "description": "Lithium Americas Corp.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG01JM3HBK1",
+          "figi_share_class": "BBG01JLDH8P2"
+        }
+      },
+      "units": "2400",
+      "price": "4.33",
+      "cost_basis": "6.216625",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+        "symbol": "LAR.TO",
+        "raw_symbol": "LAR",
+        "description": "Lithium Argentina AG",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG01JM3BMR6",
+          "figi_share_class": "BBG01JLDJ7S9"
+        }
+      },
+      "units": "660",
+      "price": "9.42",
+      "cost_basis": "8.256363636363636363636363636",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "e5535b19-86ee-4f17-a650-8ee7aa04abc1",
+        "symbol": "LSPD.TO",
+        "raw_symbol": "LSPD",
+        "description": "Lightspeed Commerce Inc.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG00NG48SM9",
+          "figi_share_class": "BBG00B0JR9Q6"
+        }
+      },
+      "units": "445",
+      "price": "14.59",
+      "cost_basis": "12.77865168539325842696629213",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "71c336b1-77ec-4448-85f5-33a9f37b192b",
+        "symbol": "LUN.TO",
+        "raw_symbol": "LUN",
+        "description": "Lundin Mining Corporation",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000K1XG93",
+          "figi_share_class": "BBG001SC6W94"
+        }
+      },
+      "units": "610",
+      "price": "38.07",
+      "cost_basis": "12.62262295081967213114754098",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "619d6fe8-75ff-4df6-a590-b5df1fdefdba",
+        "symbol": "NPI.TO",
+        "raw_symbol": "NPI",
+        "description": "Northland Power Inc.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000C0R3W4",
+          "figi_share_class": "BBG001S8TCM7"
+        }
+      },
+      "units": "660",
+      "price": "21.34",
+      "cost_basis": "19.84757575757575757575757576",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "19d043d1-034b-4fd4-bcf1-9cc198b91685",
+        "symbol": "NXE.TO",
+        "raw_symbol": "NXE",
+        "description": "NexGen Energy Ltd.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG00334PDS5",
+          "figi_share_class": "BBG00334PFM6"
+        }
+      },
+      "units": "140",
+      "price": "14.91",
+      "cost_basis": "13.93857142857142857142857143",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "dff8cc39-bb53-470b-add0-a9d24edb7f89",
+        "symbol": "SU.TO",
+        "raw_symbol": "SU",
+        "description": "Suncor Energy Inc.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000BC1N80",
+          "figi_share_class": "BBG001S5YSF0"
+        }
+      },
+      "units": "440",
+      "price": "94.25",
+      "cost_basis": "39.37533333333333333333333333",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "84d22ddd-8b8f-46fa-93fd-d1e394c62fb2",
+        "symbol": "T.TO",
+        "raw_symbol": "T",
+        "description": "TELUS Corporation",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG000BZYZZ6",
+          "figi_share_class": "BBG001S60K53"
+        }
+      },
+      "units": "1000",
+      "price": "13.61",
+      "cost_basis": "17.6364",
+      "currency": "CAD"
+    },
+    {
+      "instrument": {
+        "kind": "stock",
+        "id": "eab8c9bc-e26a-44da-a138-e974991e1966",
+        "symbol": "WELL.TO",
+        "raw_symbol": "WELL",
+        "description": "Well Health Technologies Corp.",
+        "currency": "CAD",
+        "exchange": "XTSE",
+        "figi_instrument": {
+          "figi_code": "BBG002Z98CN7",
+          "figi_share_class": "BBG002Z98D73"
+        }
+      },
+      "units": "3400",
+      "price": "4.53",
+      "cost_basis": "3.935",
+      "currency": "CAD"
+    }
+  ],
+  "data_freshness": { "as_of": "2026-08-22T22:04:37Z" }
+}
