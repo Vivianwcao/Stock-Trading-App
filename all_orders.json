@@ -1,0 +1,3002 @@
+[
+  {
+    "brokerage_order_id": "order-359e745c-7f9f-4239-8b8c-b6d4ae0c0c23",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.2200000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-20T13:59:29.980000Z",
+    "time_updated": "2026-08-20T13:59:29.980000Z",
+    "time_executed": "2026-08-20T13:59:29.980000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-ff614f9a-0933-4073-aeb7-e5ddfa89786d",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.1900000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-20T13:58:44.620000Z",
+    "time_updated": "2026-08-20T13:58:44.620000Z",
+    "time_executed": "2026-08-20T13:58:44.620000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-7f4ed08d-ec6c-4223-b887-8ad8d452903c",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.2500000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-20T13:52:07.147000Z",
+    "time_updated": "2026-08-20T13:52:07.147000Z",
+    "time_executed": "2026-08-20T13:52:07.147000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-34c0fa74-a468-40ff-ae9f-23f756c6da4b",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "8.3700000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-20T13:46:36.172000Z",
+    "time_updated": "2026-08-20T13:46:36.172000Z",
+    "time_executed": "2026-08-20T13:46:36.172000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-fb720926-eb6d-4cff-9d8c-8b8f27218925",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "9d197d6c-087e-4696-a203-cbd310766446",
+    "universal_symbol": {
+      "id": "9b4c75cb-fd26-4e96-b914-a16b886654d1",
+      "symbol": "LAC.TO",
+      "description": "Lithium Americas Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAC",
+      "logo_url": "https://api.twelvedata.com/logo/lithiumamericas.com",
+      "figi_code": "BBG01JM3HBK1",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3HBK1",
+        "figi_share_class": "BBG01JLDH8P2"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "4.1450000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-18T19:49:35.927000Z",
+    "time_updated": "2026-08-18T19:49:35.927000Z",
+    "time_executed": "2026-08-18T19:49:35.927000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-9e70157b-b004-4d6e-b3dd-546eb2664d56",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "c30edd21-fe9d-4b0f-914c-ae0b1592d171",
+    "universal_symbol": {
+      "id": "19d043d1-034b-4fd4-bcf1-9cc198b91685",
+      "symbol": "NXE.TO",
+      "description": "NexGen Energy Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "NXE",
+      "logo_url": "https://api.twelvedata.com/logo/nexgenenergy.ca",
+      "figi_code": "BBG00334PDS5",
+      "figi_instrument": {
+        "figi_code": "BBG00334PDS5",
+        "figi_share_class": "BBG00334PFM6"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "14.2600000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-18T19:46:13.473000Z",
+    "time_updated": "2026-08-18T19:46:13.473000Z",
+    "time_executed": "2026-08-18T19:46:13.473000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-93a1ba6a-fff5-41b7-9310-c0ec11e55a73",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.4050000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-18T18:26:12.474000Z",
+    "time_updated": "2026-08-18T18:26:12.474000Z",
+    "time_executed": "2026-08-18T18:26:12.474000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-d38fb6cb-8557-4be0-89c9-8af538c2eccf",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "216d8046-34b3-4027-8565-bde3c52dbe19",
+    "universal_symbol": {
+      "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+      "symbol": "ABX.TO",
+      "description": "BARRICK MINING CORP Common Stock (ABR0)",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "ABX",
+      "logo_url": "https://api.twelvedata.com/logo/barrick.com",
+      "figi_code": "BBG000CZ63C2",
+      "figi_instrument": {
+        "figi_code": "BBG000CZ63C2",
+        "figi_share_class": "BBG001S5N9P3"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "56.5900000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-13T16:10:29.896000Z",
+    "time_updated": "2026-08-13T16:10:29.896000Z",
+    "time_executed": "2026-08-13T16:10:29.896000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-511f4209-d340-47ad-903a-7a969769e76f",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "216d8046-34b3-4027-8565-bde3c52dbe19",
+    "universal_symbol": {
+      "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+      "symbol": "ABX.TO",
+      "description": "BARRICK MINING CORP Common Stock (ABR0)",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "ABX",
+      "logo_url": "https://api.twelvedata.com/logo/barrick.com",
+      "figi_code": "BBG000CZ63C2",
+      "figi_instrument": {
+        "figi_code": "BBG000CZ63C2",
+        "figi_share_class": "BBG001S5N9P3"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "57.5300000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-12T19:55:08.057000Z",
+    "time_updated": "2026-08-12T19:55:08.057000Z",
+    "time_executed": "2026-08-12T19:55:08.057000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-f16ede11-4a60-4ff5-a87c-09fc0e7302db",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "216d8046-34b3-4027-8565-bde3c52dbe19",
+    "universal_symbol": {
+      "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+      "symbol": "ABX.TO",
+      "description": "BARRICK MINING CORP Common Stock (ABR0)",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "ABX",
+      "logo_url": "https://api.twelvedata.com/logo/barrick.com",
+      "figi_code": "BBG000CZ63C2",
+      "figi_instrument": {
+        "figi_code": "BBG000CZ63C2",
+        "figi_share_class": "BBG001S5N9P3"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "57.6600000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-12T19:50:34.893000Z",
+    "time_updated": "2026-08-12T19:50:34.893000Z",
+    "time_executed": "2026-08-12T19:50:34.893000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-5452dd9f-9a74-465c-837f-ad37e6d891f8",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "216d8046-34b3-4027-8565-bde3c52dbe19",
+    "universal_symbol": {
+      "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+      "symbol": "ABX.TO",
+      "description": "BARRICK MINING CORP Common Stock (ABR0)",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "ABX",
+      "logo_url": "https://api.twelvedata.com/logo/barrick.com",
+      "figi_code": "BBG000CZ63C2",
+      "figi_instrument": {
+        "figi_code": "BBG000CZ63C2",
+        "figi_share_class": "BBG001S5N9P3"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "57.7900000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-12T19:44:26.995000Z",
+    "time_updated": "2026-08-12T19:44:26.995000Z",
+    "time_executed": "2026-08-12T19:44:26.995000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-17600e7d-c9a9-4f56-8784-4a82409b2d94",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "216d8046-34b3-4027-8565-bde3c52dbe19",
+    "universal_symbol": {
+      "id": "93b6b1c1-838c-4590-b797-8e3750912506",
+      "symbol": "ABX.TO",
+      "description": "BARRICK MINING CORP Common Stock (ABR0)",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "ABX",
+      "logo_url": "https://api.twelvedata.com/logo/barrick.com",
+      "figi_code": "BBG000CZ63C2",
+      "figi_instrument": {
+        "figi_code": "BBG000CZ63C2",
+        "figi_share_class": "BBG001S5N9P3"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "57.8400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-12T19:41:04.234000Z",
+    "time_updated": "2026-08-12T19:41:04.234000Z",
+    "time_executed": "2026-08-12T19:41:04.234000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-9ddf3863-7444-4a81-89ed-85d73ca33d18",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.5000000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-07T14:45:50.536000Z",
+    "time_updated": "2026-08-07T14:45:50.536000Z",
+    "time_executed": "2026-08-07T14:45:50.536000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-07ca7597-7aa2-4f96-ba5a-8ec6c64f2a3f",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.6000000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-07T13:50:32.778000Z",
+    "time_updated": "2026-08-07T13:50:32.778000Z",
+    "time_executed": "2026-08-07T13:50:32.778000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-10f6fc44-25d0-4525-bfa4-53686ec5ae47",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.7050000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T19:53:14.941000Z",
+    "time_updated": "2026-08-05T19:53:14.941000Z",
+    "time_executed": "2026-08-05T19:53:14.941000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-fe977e71-9715-4f89-9791-8af02cbb5b43",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.7100000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T19:04:15.933000Z",
+    "time_updated": "2026-08-05T19:04:15.933000Z",
+    "time_executed": "2026-08-05T19:04:15.933000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-435a3cde-12a1-423f-b48a-9336ec95725b",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "c30edd21-fe9d-4b0f-914c-ae0b1592d171",
+    "universal_symbol": {
+      "id": "19d043d1-034b-4fd4-bcf1-9cc198b91685",
+      "symbol": "NXE.TO",
+      "description": "NexGen Energy Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "NXE",
+      "logo_url": "https://api.twelvedata.com/logo/nexgenenergy.ca",
+      "figi_code": "BBG00334PDS5",
+      "figi_instrument": {
+        "figi_code": "BBG00334PDS5",
+        "figi_share_class": "BBG00334PFM6"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "13.9100000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T18:40:12.943000Z",
+    "time_updated": "2026-08-05T18:40:12.943000Z",
+    "time_executed": "2026-08-05T18:40:12.943000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-a141c94f-7ff4-4a82-ae59-f8127f651b3f",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "c30edd21-fe9d-4b0f-914c-ae0b1592d171",
+    "universal_symbol": {
+      "id": "19d043d1-034b-4fd4-bcf1-9cc198b91685",
+      "symbol": "NXE.TO",
+      "description": "NexGen Energy Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "NXE",
+      "logo_url": "https://api.twelvedata.com/logo/nexgenenergy.ca",
+      "figi_code": "BBG00334PDS5",
+      "figi_instrument": {
+        "figi_code": "BBG00334PDS5",
+        "figi_share_class": "BBG00334PFM6"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "13.9100000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T18:35:31.710000Z",
+    "time_updated": "2026-08-05T18:35:31.710000Z",
+    "time_executed": "2026-08-05T18:35:31.710000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-ba91eb22-e856-4371-ae17-6a0d4d1a5069",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "c30edd21-fe9d-4b0f-914c-ae0b1592d171",
+    "universal_symbol": {
+      "id": "19d043d1-034b-4fd4-bcf1-9cc198b91685",
+      "symbol": "NXE.TO",
+      "description": "NexGen Energy Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "NXE",
+      "logo_url": "https://api.twelvedata.com/logo/nexgenenergy.ca",
+      "figi_code": "BBG00334PDS5",
+      "figi_instrument": {
+        "figi_code": "BBG00334PDS5",
+        "figi_share_class": "BBG00334PFM6"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "13.9150000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T18:34:30.116000Z",
+    "time_updated": "2026-08-05T18:34:30.116000Z",
+    "time_executed": "2026-08-05T18:34:30.116000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-67c8bd2c-4776-4b6a-9e66-acc9a17d3774",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.7800000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-05T13:39:13.114000Z",
+    "time_updated": "2026-08-05T13:39:13.114000Z",
+    "time_executed": "2026-08-05T13:39:13.114000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-87d5bdf1-b15d-411e-a368-25b23c404788",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.8650000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T19:55:11.879000Z",
+    "time_updated": "2026-08-04T19:55:11.879000Z",
+    "time_executed": "2026-08-04T19:55:11.879000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-9c41517e-fa0e-479d-b512-fa711f8893e2",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "6554507c-21c1-4bf2-ae79-63bdff5853a7",
+    "universal_symbol": {
+      "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+      "symbol": "EQX.TO",
+      "description": "Equinox Gold Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "EQX",
+      "logo_url": "https://api.twelvedata.com/logo/equinoxgold.com",
+      "figi_code": "BBG000QSLBP4",
+      "figi_instrument": {
+        "figi_code": "BBG000QSLBP4",
+        "figi_share_class": "BBG001SSK0K0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "40.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "40.000000000000000000",
+    "execution_price": "13.3500000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T18:47:52.972000Z",
+    "time_updated": "2026-08-04T18:47:52.972000Z",
+    "time_executed": "2026-08-04T18:47:52.972000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-60c2f84a-94ed-4e7d-a72c-d3366a19a60a",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.9100000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T18:45:37.132000Z",
+    "time_updated": "2026-08-04T18:45:37.132000Z",
+    "time_executed": "2026-08-04T18:45:37.132000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-e0d461e7-d1a5-4e89-8381-59b79f81bdd3",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.9450000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T16:36:26.479000Z",
+    "time_updated": "2026-08-04T16:36:26.479000Z",
+    "time_executed": "2026-08-04T16:36:26.479000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-af388769-02e9-438a-a353-cdeb401da61e",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "4092c7b0-c5e6-4f37-a2e2-8a80c1ec0c05",
+    "universal_symbol": {
+      "id": "84d22ddd-8b8f-46fa-93fd-d1e394c62fb2",
+      "symbol": "T.TO",
+      "description": "TELUS Corporation",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "T",
+      "logo_url": "https://api.twelvedata.com/logo/telus.com",
+      "figi_code": "BBG000BZYZZ6",
+      "figi_instrument": {
+        "figi_code": "BBG000BZYZZ6",
+        "figi_share_class": "BBG001S60K53"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "13.0400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T16:28:48.409000Z",
+    "time_updated": "2026-08-04T16:28:48.409000Z",
+    "time_executed": "2026-08-04T16:28:48.409000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-f19f31b0-8d56-4dac-8dbc-7f6e7cd62667",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.9700000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-08-04T16:25:51.868000Z",
+    "time_updated": "2026-08-04T16:25:51.868000Z",
+    "time_executed": "2026-08-04T16:25:51.868000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-916aecb4-38bc-4f70-a4c4-ef2ac192f17d",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "10.0300000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-31T15:36:44.329000Z",
+    "time_updated": "2026-07-31T15:36:44.329000Z",
+    "time_executed": "2026-07-31T15:36:44.329000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-c08cef21-1059-44e8-a9c4-1896211270d2",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "10.0400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-31T15:17:49.562000Z",
+    "time_updated": "2026-07-31T15:17:49.562000Z",
+    "time_executed": "2026-07-31T15:17:49.562000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-7f30f93a-f7c9-4211-aa13-edae090b017c",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "10.2100000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-31T13:47:45.559000Z",
+    "time_updated": "2026-07-31T13:47:45.559000Z",
+    "time_executed": "2026-07-31T13:47:45.559000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-f9efb834-ac4a-4bd6-99d1-2f98d1c5b882",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "10.1800000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-31T13:46:48.121000Z",
+    "time_updated": "2026-07-31T13:46:48.121000Z",
+    "time_executed": "2026-07-31T13:46:48.121000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-8cb287bb-03cf-4b30-beda-05234fc50be9",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "30.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "30.000000000000000000",
+    "execution_price": "10.2200000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-31T13:44:38.171000Z",
+    "time_updated": "2026-07-31T13:44:38.171000Z",
+    "time_executed": "2026-07-31T13:44:38.171000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-76873fc3-d2ae-4e34-a661-ce5e8c97e340",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "10.4800000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-30T19:57:59.722000Z",
+    "time_updated": "2026-07-30T19:57:59.722000Z",
+    "time_executed": "2026-07-30T19:57:59.722000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-b28da820-8192-4c63-a69f-2a8cdf363e02",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "10.5000000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-30T19:56:42.726000Z",
+    "time_updated": "2026-07-30T19:56:42.726000Z",
+    "time_executed": "2026-07-30T19:56:42.726000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-4ef8e755-1c69-4ca8-b99b-1bf821ba8c0f",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "016f3de7-56a8-40a0-807b-320619e28095",
+    "universal_symbol": {
+      "id": "3f4b54bf-be8e-48eb-85d1-87437397ee76",
+      "symbol": "BHC.TO",
+      "description": "Bausch Health Companies Inc.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BHC",
+      "logo_url": "https://api.twelvedata.com/logo/bauschhealth.com",
+      "figi_code": "BBG000DC8S17",
+      "figi_instrument": {
+        "figi_code": "BBG000DC8S17",
+        "figi_share_class": "BBG001S7WDP0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "SELL",
+    "total_quantity": "600.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "600.000000000000000000",
+    "execution_price": "8.2950000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-30T15:26:50.199000Z",
+    "time_updated": "2026-07-30T15:26:50.199000Z",
+    "time_executed": "2026-07-30T15:26:50.199000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-a3613fa1-9b85-466d-b7ea-dfb5dffc044d",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.6950000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-29T18:55:18.929000Z",
+    "time_updated": "2026-07-29T18:55:18.929000Z",
+    "time_executed": "2026-07-29T18:55:18.929000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-39705be5-574b-49b0-b7f1-9c735f9b76d8",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "6554507c-21c1-4bf2-ae79-63bdff5853a7",
+    "universal_symbol": {
+      "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+      "symbol": "EQX.TO",
+      "description": "Equinox Gold Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "EQX",
+      "logo_url": "https://api.twelvedata.com/logo/equinoxgold.com",
+      "figi_code": "BBG000QSLBP4",
+      "figi_instrument": {
+        "figi_code": "BBG000QSLBP4",
+        "figi_share_class": "BBG001SSK0K0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "12.3400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-29T14:12:20.585000Z",
+    "time_updated": "2026-07-29T14:12:20.585000Z",
+    "time_executed": "2026-07-29T14:12:20.585000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-0eeb8670-81a8-409f-a11a-1f39c71be675",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "6554507c-21c1-4bf2-ae79-63bdff5853a7",
+    "universal_symbol": {
+      "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+      "symbol": "EQX.TO",
+      "description": "Equinox Gold Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "EQX",
+      "logo_url": "https://api.twelvedata.com/logo/equinoxgold.com",
+      "figi_code": "BBG000QSLBP4",
+      "figi_instrument": {
+        "figi_code": "BBG000QSLBP4",
+        "figi_share_class": "BBG001SSK0K0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "20.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "20.000000000000000000",
+    "execution_price": "12.6600000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-29T13:44:24.399000Z",
+    "time_updated": "2026-07-29T13:44:24.399000Z",
+    "time_executed": "2026-07-29T13:44:24.399000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-15c88af6-da40-4463-848e-cfc57828b60b",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "3.8400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-28T14:50:48.746000Z",
+    "time_updated": "2026-07-28T14:50:48.746000Z",
+    "time_executed": "2026-07-28T14:50:48.746000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-40669163-8145-44a5-8845-5f8f12302e1d",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "7.7600000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-28T14:47:55.449000Z",
+    "time_updated": "2026-07-28T14:47:55.449000Z",
+    "time_executed": "2026-07-28T14:47:55.449000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-727daebb-0c47-4cde-9bd0-5af85ec06eaa",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "6554507c-21c1-4bf2-ae79-63bdff5853a7",
+    "universal_symbol": {
+      "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+      "symbol": "EQX.TO",
+      "description": "Equinox Gold Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "EQX",
+      "logo_url": "https://api.twelvedata.com/logo/equinoxgold.com",
+      "figi_code": "BBG000QSLBP4",
+      "figi_instrument": {
+        "figi_code": "BBG000QSLBP4",
+        "figi_share_class": "BBG001SSK0K0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "12.8250000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-28T14:45:11.390000Z",
+    "time_updated": "2026-07-28T14:45:11.390000Z",
+    "time_executed": "2026-07-28T14:45:11.390000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-b0e7d819-17db-4c08-a880-ef9330e7ff79",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "10.5700000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-27T14:19:16.586000Z",
+    "time_updated": "2026-07-27T14:19:16.586000Z",
+    "time_executed": "2026-07-27T14:19:16.586000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-5de1bf4a-ff68-4540-b471-6741776deefb",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "55995582-3789-4238-931e-71811b0785cb",
+    "universal_symbol": {
+      "id": "9d65c8bd-f922-49d5-a374-85d80c93cdbc",
+      "symbol": "IVN.TO",
+      "description": "Ivanhoe Mines Ltd.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "IVN",
+      "logo_url": "https://api.twelvedata.com/logo/ivanhoemines.com",
+      "figi_code": "BBG003CSCHJ7",
+      "figi_instrument": {
+        "figi_code": "BBG003CSCHJ7",
+        "figi_share_class": "BBG003CSCJ30"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "10.5400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-27T14:17:53.428000Z",
+    "time_updated": "2026-07-27T14:17:53.428000Z",
+    "time_executed": "2026-07-27T14:17:53.428000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-6924f94e-3575-4f99-ba9a-a87ce70f4c1e",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "6554507c-21c1-4bf2-ae79-63bdff5853a7",
+    "universal_symbol": {
+      "id": "3396e020-c740-4fe7-bfdc-68bd8d9caa2f",
+      "symbol": "EQX.TO",
+      "description": "Equinox Gold Corp.",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "EQX",
+      "logo_url": "https://api.twelvedata.com/logo/equinoxgold.com",
+      "figi_code": "BBG000QSLBP4",
+      "figi_instrument": {
+        "figi_code": "BBG000QSLBP4",
+        "figi_share_class": "BBG001SSK0K0"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "10.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "10.000000000000000000",
+    "execution_price": "13.3400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-27T14:15:41.679000Z",
+    "time_updated": "2026-07-27T14:15:41.679000Z",
+    "time_executed": "2026-07-27T14:15:41.679000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-84cb6d25-a3fd-415c-a366-ffd1c451c96b",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "0c9c770d-1352-4c35-926e-26234aaed816",
+    "universal_symbol": {
+      "id": "01c794df-348f-4875-9f79-fd4fed194b00",
+      "symbol": "BLDP.TO",
+      "description": "BALLARD POWER SYSTEMS INC Common Stock",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "BLDP",
+      "logo_url": "https://api.twelvedata.com/logo/ballard.com",
+      "figi_code": "BBG000BBJBD3",
+      "figi_instrument": {
+        "figi_code": "BBG000BBJBD3",
+        "figi_share_class": "BBG001S5Y1D1"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "4.1150000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-27T13:50:13.579000Z",
+    "time_updated": "2026-07-27T13:50:13.579000Z",
+    "time_executed": "2026-07-27T13:50:13.579000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-84025c0f-1c35-4488-aac0-620ef58adf69",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "8.3700000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-27T13:39:21.851000Z",
+    "time_updated": "2026-07-27T13:39:21.851000Z",
+    "time_executed": "2026-07-27T13:39:21.851000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-64a5df8f-1ec3-45cd-8703-a5338407e755",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.2600000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-24T19:43:11.503000Z",
+    "time_updated": "2026-07-24T19:43:11.503000Z",
+    "time_executed": "2026-07-24T19:43:11.503000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-7b8f1045-e016-480c-ac0b-a8632307ca00",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.3700000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-24T16:54:54.451000Z",
+    "time_updated": "2026-07-24T16:54:54.451000Z",
+    "time_executed": "2026-07-24T16:54:54.451000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-3497e9a9-5f6b-4b00-9f3f-c390277ac41d",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.4400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-24T15:38:40.201000Z",
+    "time_updated": "2026-07-24T15:38:40.201000Z",
+    "time_executed": "2026-07-24T15:38:40.201000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-4f4d811d-7919-45aa-b55a-d6aed2d46371",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "50.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "50.000000000000000000",
+    "execution_price": "8.4400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-24T15:36:17.803000Z",
+    "time_updated": "2026-07-24T15:36:17.803000Z",
+    "time_executed": "2026-07-24T15:36:17.803000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  },
+  {
+    "brokerage_order_id": "order-429a31dd-df46-4bc5-b27e-81e2011314c7",
+    "brokerage_group_order_id": null,
+    "order_role": null,
+    "status": "EXECUTED",
+    "symbol": "42be9938-f7a1-4df9-8c61-f53178f0046f",
+    "universal_symbol": {
+      "id": "c7c85cfc-d867-4a7f-ae76-79477d9be950",
+      "symbol": "LAR.TO",
+      "description": "Lithium Argentina AG",
+      "currency": {
+        "code": "CAD",
+        "name": "Canadian Dollar",
+        "id": "f184bfe7-dd89-4abe-9095-6767bfaec387"
+      },
+      "exchange": {
+        "id": "77de8509-63ff-4c73-8d92-98c9fd3e207f",
+        "code": "TSX",
+        "mic_code": "XTSE",
+        "name": "Toronto Stock Exchange",
+        "suffix": "TO",
+        "timezone": "America/New_York",
+        "start_time": "09:30:00",
+        "close_time": "16:00:00"
+      },
+      "currencies": [],
+      "type": {
+        "id": "515c27d1-8471-4dec-a234-af12184c51d4",
+        "code": "cs",
+        "description": "Common Stock",
+        "is_supported": true
+      },
+      "raw_symbol": "LAR",
+      "logo_url": "https://api.twelvedata.com/logo/lithium-argentina.com",
+      "figi_code": "BBG01JM3BMR6",
+      "figi_instrument": {
+        "figi_code": "BBG01JM3BMR6",
+        "figi_share_class": "BBG01JLDJ7S9"
+      }
+    },
+    "quote_universal_symbol": null,
+    "quote_currency": null,
+    "option_symbol": null,
+    "action": "BUY",
+    "total_quantity": "100.000000000000000000",
+    "open_quantity": "0.00",
+    "canceled_quantity": "0.00",
+    "filled_quantity": "100.000000000000000000",
+    "execution_price": "8.4400000000",
+    "limit_price": null,
+    "stop_price": null,
+    "trailing_stop": null,
+    "order_type": "Market",
+    "time_in_force": "Day",
+    "time_placed": "2026-07-24T15:34:27.197000Z",
+    "time_updated": "2026-07-24T15:34:27.197000Z",
+    "time_executed": "2026-07-24T15:34:27.197000Z",
+    "expiry_date": null,
+    "child_brokerage_order_ids": null
+  }
+]
