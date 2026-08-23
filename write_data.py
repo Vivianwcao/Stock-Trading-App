@@ -21,7 +21,7 @@ insert_query = f"""
             insert or ignore into {table_name} (
                 id, account_id, account_name, symbol, type, price, 
                 units, amount, fee, currency, trade_date, API_batch_id
-            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             on conflict(id) do nothing;
         """
 
@@ -122,13 +122,9 @@ def write_data(
             print(f"API fetching on account: {account_id} failed. Error: {e}")
             return
 
-        with conn:
-            cursor = conn.exexute("insert into api_batches default values")
-            batch_id = cursor.lastrowid
-
         for activity in activities_list:
             all_records.append(
-                (
+                [
                     activity["id"],
                     account_id,
                     account["type"],
@@ -140,16 +136,23 @@ def write_data(
                     activity["fee"],
                     activity["currency"]["code"],
                     activity["trade_date"],
-                    batch_id,
-                )
+                ]
             )
 
-        with conn:
-            conn.executemany(
-                insert_query,
-                all_records,
-            )
-        print("inserted all records successfully")
+    with conn:
+        cursor = conn.exexute("insert into api_batches default values")
+        batch_id = cursor.lastrowid
+
+    # append batch id (one for all accounts)
+    for record in all_records:
+        record.append(batch_id)
+
+    with conn:
+        conn.executemany(
+            insert_query,
+            all_records,
+        )
+    print("inserted all records successfully")
 
 
 if __name__ == "__main__":
