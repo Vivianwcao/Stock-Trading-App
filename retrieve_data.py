@@ -24,12 +24,12 @@ def get_accounts():
     print("Retrieved latest accounts data from API.")
 
 
-def get_activities(account_id, start_date=None) -> list[dict]:
+def get_activities(account_id, transaction_types, start_date=None) -> list[dict]:
     # bulk
     arguments = {
         "account_id": account_id,
-        "limit": 1000,
-        "type": "BUY,SELL,INTEREST,DIVIDEND,WITHDRAWAL,REI,STOCK_DIVIDEND,FEE,TAX,TRANSFER,SPLIT,SUBSTITUTE_DIVIDEND,CONTRIBUTION",
+        "limit": 1000,  # 1000 is default also the max
+        "type": transaction_types,
         # start_date is defalted to the first transaction based on trade_date.
         # end_date is defalted to the last transaction based on trade_date.
     }

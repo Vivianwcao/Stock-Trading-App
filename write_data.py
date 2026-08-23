@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime, timedelta, timezone
 import os
 import json
+from xmlrpc.client import TRANSPORT_ERROR
 from retrieve_data import get_accounts, get_activities
 from utils import create_accounts_mapper
 
@@ -15,14 +16,46 @@ def x_days_ago(x):
     return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
+table_name = "activities"
+insert_query = f"""
+            insert or ignore into {table_name} (
+                id, account_id, account_name, symbol, type, price, 
+                units, amount, fee, currency, trade_date, API_batch_id
+            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            on conflict(id) do nothing;
+        """
+
+
+TRANSPORT_TYPES = (
+    "BUY",
+    "SELL",
+    "INTEREST",
+    "DIVIDEND",
+    "WITHDRAWAL",
+    "REI",
+    "STOCK_DIVIDEND",
+    "FEE",
+    "TAX",
+    "TRANSFER",
+    "SPLIT",
+    "SUBSTITUTE_DIVIDEND",
+    "CONTRIBUTION",
+)
+
+
+# one time
 def init_db(conn):
-    conn.execute("""
+    conn.executescript(f"""
+        create table if not exists api_batches (
+            id integer primary key,
+            fetched_at text not null 
+                default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+        );
         create table if not exists activities (
             id text primary key,
             account_id text not null,
             account_name text not null,
-            stock_name text not null,
-            stock_symbol text not null,
+            symbol text not null,
             type text not null,
             price real,
             units real,
@@ -30,7 +63,22 @@ def init_db(conn):
             fee real,
             currency text,
             trade_date text,
-            is_manual integer default 0
+            API_batch_id integer references api_batches(id)
+        );
+        create table if not exists manual_activities (            
+            id text primary key,
+            account_id text not null,
+            account_name text not null,
+            symbol text not null,
+            type text not null check (type in {TRANSPORT_TYPES}),
+            price real,
+            units real,
+            amount real not null,
+            fee real defult 0.00,
+            currency default 'CAD',
+            trade_date text NOT NULL
+                DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+            API_batch_id default null
         )
     """)
 
@@ -56,7 +104,6 @@ def write_data(
                 max(trade_date) latest_date
             from activities
             where account_id = ?
-            and is_manual = 0
         """,
             (account_id,),
         ) as cursor:
@@ -65,18 +112,27 @@ def write_data(
         start_date = (
             None if is_bulk else (to_api_date(latest_transaction_date) or x_days_ago(2))
         )
+        # API fetch per WS account
+        try:
+            activities_list = get_activities(
+                account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
+            )
 
-        activities_list = get_activities(account_id, start_date=start_date)
+        except Exception as e:
+            print(f"API fetching on account: {account_id} failed. Error: {e}")
+            return
+
+        with conn:
+            cursor = conn.exexute("insert into api_batches default values")
+            batch_id = cursor.lastrowid
 
         for activity in activities_list:
-            symbol = activity["symbol"]
             all_records.append(
                 (
                     activity["id"],
                     account_id,
                     account["type"],
-                    symbol["symbol"],
-                    symbol["raw_symbol"],
+                    activity["symbol"]["symbol"],
                     activity["type"],
                     activity["price"],
                     activity["units"],
@@ -84,19 +140,13 @@ def write_data(
                     activity["fee"],
                     activity["currency"]["code"],
                     activity["trade_date"],
-                    0,  # is_manual flag
+                    batch_id,
                 )
             )
 
         with conn:
             conn.executemany(
-                """
-                insert or replace into activities (
-                    id, account_id, account_name, stock_name, 
-                    stock_symbol, type, price, units, amount, 
-                    fee, currency, trade_date, is_manual
-                ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+                insert_query,
                 all_records,
             )
         print("inserted all records successfully")
@@ -105,4 +155,9 @@ def write_data(
 if __name__ == "__main__":
     # 1. Connect to local database file (creates portfolio.db automatically)
     with sqlite3.connect("stocks.db") as conn:
-        init_db(conn)
+        # return query rows as dictionary-like objects
+        conn.row_factory = sqlite3.Row
+        # in SQLite, foreign_keys is a per-connection setting
+        conn.execute("PRAGMA foreign_keys = ON")
+        # conn.executescript("drop table activities; drop table api_batches;")
+        # init_db(conn)
