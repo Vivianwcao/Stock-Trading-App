@@ -1,0 +1,32 @@
+{
+  "tfsa-yrktoxmj": {
+    "account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08",
+    "type": "Wealthsimple Trade TFSA",
+    "balance": 250401.099602,
+    "first_transaction_date": "2022-05-31"
+  },
+  "rrif-An1FrP1AYQ": {
+    "account_id": "12740fda-39c7-4199-b569-c3f8ac982a6c",
+    "type": "Wealthsimple Trade RRIF",
+    "balance": 253741.354995,
+    "first_transaction_date": "2026-02-09"
+  },
+  "rrsp-86mzolsy": {
+    "account_id": "239de7d9-9d92-47a2-826b-498fe25f1211",
+    "type": "Wealthsimple Trade RRSP",
+    "balance": 35995.457486,
+    "first_transaction_date": "2022-06-01"
+  },
+  "tfsa-xzyggujq": {
+    "account_id": "8bbc2e4f-feef-457d-b9a7-476a28f9fbc8",
+    "type": "Wealthsimple Trade TFSA",
+    "balance": 198658.57,
+    "first_transaction_date": "2022-06-01"
+  },
+  "fhsa-JAQ74ecSyw": {
+    "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
+    "type": "Wealthsimple Trade FHSA",
+    "balance": 79461.27,
+    "first_transaction_date": "2023-12-22"
+  }
+}
