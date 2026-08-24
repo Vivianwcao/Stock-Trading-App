@@ -3,8 +3,14 @@ from datetime import datetime, timedelta, timezone
 import os
 import json
 from xmlrpc.client import TRANSPORT_ERROR
-from retrieve_data import get_accounts, get_activities, get_orders_last_24hrs
+from retrieve_data import (
+    get_accounts,
+    get_activities,
+    get_orders_last_24hrs,
+    get_account_positions,
+)
 from utils import create_accounts_mapper
+from snaptrade import get_snaptrade_auth
 
 
 # date helpers
@@ -49,7 +55,7 @@ TRANSPORT_TYPES = (
 
 # one time
 def init_db(conn):
-    conn.executescript(f"""
+    conn.executescript("""
         create table if not exists activities (
             id text primary key,
             account_id text not null,
@@ -66,32 +72,6 @@ def init_db(conn):
 
             unique (trade_date, account_id, symbol, type, price, units)
         );
-        create table if not exists manual_activities (            
-            id text primary key,
-            account_id text not null,
-            account_name text not null,
-            symbol text not null,
-            type text not null check (type in {TRANSPORT_TYPES}),
-            price real,
-            units real,
-            amount real not null,
-            fee real defult 0.00,
-            currency default 'CAD',
-            trade_date text NOT NULL
-                DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-            source text not null,
-
-            unique (trade_date, account_id, symbol, type, price, units)
-        );
-    """)
-
-
-def erase_manual_activities(conn):
-    # keep only non buy/sell activities with the same amount
-    # remove all  buy or sell activities
-    conn.execute("""
-        delete from manual_activities
-        where type in ('BUY', 'SELL');
     """)
 
 
@@ -120,7 +100,7 @@ def fetch_activities(conn, accounts_mapper, is_bulk):
         # API fetch activities per WS account
         try:
             activities_list = get_activities(
-                account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
+                snaptrade, account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
             )
 
         except Exception as e:
@@ -164,7 +144,7 @@ def fetch_recent_orders(conn, accounts_mapper):
 
         # API fetch orders per WS account
         try:
-            orders_list = get_orders_last_24hrs(account_id)
+            orders_list = get_orders_last_24hrs(snaptrade, account_id)
 
         except Exception as e:
             print(
@@ -173,8 +153,8 @@ def fetch_recent_orders(conn, accounts_mapper):
             return
 
         for order in orders_list:
-            price = int(order["execution_price"])
-            qty = int(order["filled_quantity"])
+            price = float(order["execution_price"])
+            qty = float(order["filled_quantity"])
             all_records.append(
                 (
                     order["brokerage_order_id"],
@@ -200,7 +180,7 @@ def fetch_recent_orders(conn, accounts_mapper):
 
 
 def daily_update(conn):
-    get_accounts()
+    get_accounts(snaptrade)
     create_accounts_mapper()
 
     with open("accounts_mapper.json", "r", encoding="utf-8") as f:
@@ -209,8 +189,6 @@ def daily_update(conn):
     fetch_activities(conn, mapper, is_bulk=False)
     fetch_recent_orders(conn, mapper)
 
-    erase_manual_activities(conn)
-
 
 def update_with_orders(conn):
     with open("accounts_mapper.json", "r", encoding="utf-8") as f:
@@ -218,10 +196,11 @@ def update_with_orders(conn):
 
     fetch_recent_orders(conn, mapper)
 
-    erase_manual_activities(conn)
-
 
 if __name__ == "__main__":
+    snaptrade = get_snaptrade_auth()
+    get_account_positions(snaptrade, "12740fda-39c7-4199-b569-c3f8ac982a6c")
+
     # 1. Connect to local database file (creates portfolio.db automatically)
     with sqlite3.connect("stocks.db") as conn:
         # return query rows as dictionary-like objects
