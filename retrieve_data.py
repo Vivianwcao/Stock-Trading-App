@@ -48,6 +48,14 @@ def get_orders_last_24hrs(account_id):
     return res.body["orders"]
 
 
+def get_account_positions(account_id):
+    # List all account positions
+    res3 = snaptrade.account_information.get_all_account_positions(
+        account_id=account_id
+    )
+    return res3.body["results"]
+
+
 # # test get activities
 # arguments = {
 #     "account_id": "12740fda-39c7-4199-b569-c3f8ac982a6c",
@@ -57,14 +65,6 @@ def get_orders_last_24hrs(account_id):
 # res = snaptrade.account_information.get_account_activities(**arguments)
 # with open("./test/activities.json", "w", encoding="utf-8") as f:
 #     json.dump(res.body["data"], f, indent=2, default=str)
-
-
-# # List all account positions
-# res3 = snaptrade.account_information.get_all_account_positions(
-#     account_id="*******"
-# )
-# with open("./test/positions.json", "w", encoding="utf-8") as f:
-#     json.dump(res3.body, f, indent=2, default=str)
 
 # # List all orders - past (30) days
 # res5 = snaptrade.account_information.get_user_account_orders(
