@@ -1,22 +1,7 @@
 import json
-import os
-from pprint import pprint
-
-from dotenv import load_dotenv
-from snaptrade_client import SnapTrade, SnapTradeAuth
-
-load_dotenv()
-
-snaptrade = SnapTrade(
-    # Personal auth means your API key is the user context.
-    auth=SnapTradeAuth.personal_api_key(
-        client_id=os.environ["SNAPTRADE_CLIENT_ID"],
-        consumer_key=os.environ["SNAPTRADE_CONSUMER_KEY"],
-    )
-)
 
 
-def get_accounts():
+def get_accounts(snaptrade):
     # List all accounts
     res2 = snaptrade.account_information.list_user_accounts()
     with open("accounts.json", "w", encoding="utf-8") as f:
@@ -24,7 +9,9 @@ def get_accounts():
     print("Retrieved latest accounts data from API.")
 
 
-def get_activities(account_id, transaction_types, start_date=None) -> list[dict]:
+def get_activities(
+    snaptrade, account_id, transaction_types, start_date=None
+) -> list[dict]:
     # bulk
     arguments = {
         "account_id": account_id,
@@ -40,7 +27,7 @@ def get_activities(account_id, transaction_types, start_date=None) -> list[dict]
     return res.body["data"]
 
 
-def get_orders_last_24hrs(account_id):
+def get_orders_last_24hrs(snaptrade, account_id):
     # List all executed orders (only buy and sell) - last 24 hours
     res = snaptrade.account_information.get_user_account_recent_orders(
         account_id=account_id, only_executed=True
@@ -48,12 +35,14 @@ def get_orders_last_24hrs(account_id):
     return res.body["orders"]
 
 
-def get_account_positions(account_id):
+def get_account_positions(snaptrade, account_id):
     # List all account positions
     res3 = snaptrade.account_information.get_all_account_positions(
         account_id=account_id
     )
-    return res3.body["results"]
+    with open("./test/positions.json", "w", encoding="utf-8") as f:
+        json.dump(res3.body, f, indent=2, default=str)
+    # return res3.body["results"]
 
 
 # # test get activities
