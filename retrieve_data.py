@@ -48,14 +48,16 @@ def get_orders_last_24hrs(account_id):
     return res.body["orders"]
 
 
+# # test get activities
 # arguments = {
 #     "account_id": "12740fda-39c7-4199-b569-c3f8ac982a6c",
 #     "limit": 1000,
-#     "type": "BUY,SELL,INTEREST,DIVIDEND,WITHDRAWAL,REI,STOCK_DIVIDEND,FEE,TAX,TRANSFER,SPLIT,SUBSTITUTE_DIVIDEND,CONTRIBUTION",
-#     "start_date": "2026-08-20",
+#     "type": "BUY,SELL,DIVIDEND,SUBSTITUTE_DIVIDEND,CONTRIBUTION,WITHDRAWAL,REI,STOCK_DIVIDEND,INTEREST,FEE,TAX,OPTIONEXPIRATION,OPTIONASSIGNMENT,OPTIONEXERCISE,TRANSFER,SPLIT",
 # }
 # res = snaptrade.account_information.get_account_activities(**arguments)
-# print(res.body["data"])
+# with open("./test/activities.json", "w", encoding="utf-8") as f:
+#     json.dump(res.body["data"], f, indent=2, default=str)
+
 
 # # List all account positions
 # res3 = snaptrade.account_information.get_all_account_positions(
