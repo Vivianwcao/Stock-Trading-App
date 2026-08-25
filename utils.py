@@ -19,7 +19,7 @@ def create_accounts_mapper():
         if x["meta"]["status"] == "open" and x["balance"]["total"]["amount"] > 10
     }
 
-    with open("accounts_mapper.json", "w", encoding="utf-8") as f:
+    with open("./test/accounts_mapper.json", "w", encoding="utf-8") as f:
         json.dump(accounts_mapper, f, indent=2, default=str)
 
     print("Accounts mapper updated and saved.")
