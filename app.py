@@ -19,14 +19,15 @@ logging.basicConfig(level=logging.INFO)  # required for local
 
 def check_elapsed_timedelta(conn, account_ids=None):
     if account_ids:
+        placeholder = ",".join("?" for _ in account_ids)
         row = conn.execute(
-            """
+            f"""
             select
                 max(fetched_at) 
             from activities
-            where account_id in ?
+            where account_id in ({placeholder})
         """,
-            (account_ids,),
+            account_ids,
         ).fetchone()
     else:
         # all accounts
