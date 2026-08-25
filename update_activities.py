@@ -74,9 +74,11 @@ def init_db(conn):
             currency text,
             trade_date text not null,
             source text not null,
+            fetched_at text not null
+                default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
             foreign key (account_id)
-                references acounts(id)
+                references acounts(id),
             unique (trade_date, account_id, symbol, type, price, units)
         );
     """)
@@ -119,18 +121,17 @@ def fetch_activities(snaptrade, conn, is_bulk):
     accounts_rows = []
     start_date = None
 
-    with conn:
-        accounts_rows = conn.execute("""
+    accounts_rows = conn.execute("""
             select id
             from accounts
             where status='open'
         """).fetchall()
 
     for account in accounts_rows:
-        account_id = account[0]
+        account_id = account["id"]
 
         # find the latest transaction_date obtained from API
-        with conn.execute(
+        latest_transaction_date = conn.execute(
             """
             select 
                 max(trade_date) latest_date
@@ -138,8 +139,7 @@ def fetch_activities(snaptrade, conn, is_bulk):
             where account_id = ?
         """,
             (account_id,),
-        ) as cursor:
-            latest_transaction_date = cursor.fetchone()["latest_date"]
+        ).fetchone()["latest_date"]
 
         start_date = (
             None if is_bulk else (to_api_date(latest_transaction_date) or x_days_ago(2))
