@@ -3,10 +3,8 @@ import json
 
 def get_accounts(snaptrade):
     # List all accounts
-    res2 = snaptrade.account_information.list_user_accounts()
-    with open("accounts.json", "w", encoding="utf-8") as f:
-        json.dump(res2.body, f, indent=2, default=str)
-    print("Retrieved latest accounts data from API.")
+    res = snaptrade.account_information.list_user_accounts()
+    return res.body
 
 
 def get_activities(
