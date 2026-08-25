@@ -1,16 +1,14 @@
-import sqlite3
 from datetime import datetime, timedelta, timezone
-import os
-import json
-from xmlrpc.client import TRANSPORT_ERROR
 from retrieve_data import (
     get_accounts,
     get_activities,
     get_orders_last_24hrs,
     get_account_positions,
 )
-from utils import create_accounts_mapper
-from snaptrade import get_snaptrade_auth
+import logging
+
+# ── Logging ─────────────────────────────────────────────────────────────────
+logger = logging.getLogger(__name__)
 
 
 # date helpers
@@ -84,7 +82,7 @@ def init_db(conn):
     """)
 
 
-def update_accounts(conn):
+def update_accounts(snaptrade, conn):
     accounts_list = get_accounts(snaptrade)
     records = [
         (
@@ -112,15 +110,24 @@ def update_accounts(conn):
         """,
             records,
         )
-    print("Updated accounts table successfully.")
+    logger.info("Updated accounts table successfully.")
 
 
-def fetch_activities(conn, accounts_mapper, is_bulk):
+# get activities on all open accounts
+def fetch_activities(snaptrade, conn, is_bulk):
     all_records = []
+    accounts_rows = []
     start_date = None
 
-    for account in accounts_mapper.items():
-        account_id = account["account_id"]
+    with conn:
+        accounts_rows = conn.execute("""
+            select id
+            from accounts
+            where status='open'
+        """).fetchall()
+
+    for account in accounts_rows:
+        account_id = account[0]
 
         # find the latest transaction_date obtained from API
         with conn.execute(
@@ -143,9 +150,9 @@ def fetch_activities(conn, accounts_mapper, is_bulk):
                 snaptrade, account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
             )
 
-        except Exception as e:
-            print(
-                f"API fetching activities on account: {account_id} failed. Error: {e}"
+        except Exception:
+            logger.exception(
+                f"API fetching activities on account: {account_id} failed."
             )
             return
 
@@ -171,11 +178,11 @@ def fetch_activities(conn, accounts_mapper, is_bulk):
             insert_activities_query,
             all_records,
         )
-    print(f"inserted all activities records from {start_date} successfully")
+    logger.info(f"inserted all activities records from {start_date} successfully")
 
 
 # update activities with recent orders (per WS account)
-def fetch_recent_orders(conn, account_id):
+def fetch_recent_orders(snaptrade, conn, account_id):
     all_records = []
 
     # from orders (real time update)
@@ -183,8 +190,8 @@ def fetch_recent_orders(conn, account_id):
     try:
         orders_list = get_orders_last_24hrs(snaptrade, account_id)
 
-    except Exception as e:
-        print(f"API fetching recent orders on account: {account_id} failed. Error: {e}")
+    except Exception:
+        logger.exception(f"API fetching recent orders on account: {account_id} failed.")
         return
 
     for order in orders_list:
@@ -211,19 +218,4 @@ def fetch_recent_orders(conn, account_id):
             insert_activities_query,
             all_records,
         )
-    print("inserted all order records from last 24 hours successfully")
-
-
-if __name__ == "__main__":
-    snaptrade = get_snaptrade_auth()
-    get_account_positions(snaptrade, "12740fda-39c7-4199-b569-c3f8ac982a6c")
-
-    # 1. Connect to local database file (creates portfolio.db automatically)
-    with sqlite3.connect("stocks.db") as conn:
-        # return query rows as dictionary-like objects
-        conn.row_factory = sqlite3.Row
-        # in SQLite, foreign_keys is a per-connection setting
-        conn.execute("PRAGMA foreign_keys = ON")
-        # conn.executescript("drop table activities
-        # ")
-        # init_db(conn)
+    logger.info("inserted all order records from last 24 hours successfully")
