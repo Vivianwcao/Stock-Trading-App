@@ -58,6 +58,7 @@ def init_db(conn):
             account_name text not null, --tfsa-absvdfh
             account_type text not null,
             status text,
+            balance real,
             first_transaction_date text,
             institution text,
             currency text default 'CAD',
@@ -83,8 +84,12 @@ def init_db(conn):
             unique (trade_date, account_id, symbol, type, price, units)
         );
         create table if not exists last_fetched (
-            api_source text primary key,
+            api_source text not null,
+            account_id text not null,
             fetched_at text not null
+                default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+
+            primary key(api_source, account_id)
         );
     """)
 
@@ -97,6 +102,7 @@ def update_accounts(snaptrade, conn):
             account["number"],
             account["meta"]["type"],
             account["meta"]["status"],
+            account["balance"]["total"]["amount"],
             account["sync_status"]["transactions"]["first_transaction_date"],
             account["institution_name"],
             account["meta"]["currency"],
@@ -108,9 +114,9 @@ def update_accounts(snaptrade, conn):
         conn.executemany(
             """
             insert into accounts (
-            id, account_name, account_type, status, first_transaction_date,
-            institution, currency, last_successful_sync)
-            values(?, ?, ?, ?, ?, ?, ?, ?)
+            id, account_name, account_type, status, balance, 
+            first_transaction_date, institution, currency, last_successful_sync)
+            values(?, ?, ?, ?, ?, ?, ?, ?, ?)
             on conflict(id) do update set
                 status = excluded.status,
                 last_successful_sync = excluded.last_successful_sync;
@@ -120,15 +126,16 @@ def update_accounts(snaptrade, conn):
     logger.info("Updated accounts table successfully.")
 
 
-def update_last_fetched(conn):
-    conn.execute(
+def update_last_fetched(conn, api_source: str, account_ids: list):
+    records = [(api_source, account_id) for account_id in account_ids]
+    conn.executemany(
         """
-                insert into last_fetched (api_source) 
-                values (?)
-                on conflict(api_source)
-                do update set fetched_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-            """,
-        ("activities",),
+            insert into last_fetched (api_source, account_id) 
+            values (?, ?)
+            on conflict(api_source, account_id)
+            do update set fetched_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+        """,
+        records,
     )
 
 
@@ -142,11 +149,12 @@ def fetch_activities(snaptrade, conn, is_bulk=False):
             select id
             from accounts
             where status='open'
+            and balance > 10
         """).fetchall()
 
-    for account in accounts_rows:
-        account_id = account["id"]
+    account_ids = [row["id"] for row in accounts_rows]
 
+    for account_id in account_ids:
         # find the latest transaction_date obtained from API
         row = conn.execute(
             """
@@ -191,14 +199,14 @@ def fetch_activities(snaptrade, conn, is_bulk=False):
                     "api_activities",
                 )
             )
-        time.sleep(30)
+        time.sleep(10)
 
     with conn:
         conn.executemany(
             insert_activities_query,
             all_records,
         )
-        update_last_fetched(conn)
+        update_last_fetched(conn, "activities", account_ids)
 
     logger.info(
         f"inserted all activities records from {start_date} and updated last_fetched successfully"
@@ -242,7 +250,7 @@ def fetch_recent_orders(snaptrade, conn, account_id):
             insert_activities_query,
             all_records,
         )
-        update_last_fetched(conn)
+        update_last_fetched(conn, "orders", [account_id])
     logger.info(
         "inserted all order records from last 24 hours and updated last_fetched successfully"
     )
