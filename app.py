@@ -53,13 +53,15 @@ def handler(event, context):
     logger.info(json.dumps(event))
 
     snaptrade = get_snaptrade_auth()
-
     # 1. Connect to local database file (creates portfolio.db automatically)
     with sqlite3.connect("stocks.db") as conn:
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-        # conn.executescript("drop table activities")
-        # init_db(conn)
+        try:
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            # conn.executescript("drop table activities")
+            # init_db(conn)
+        finally:
+            conn.close()
 
 
 if __name__ == "__main__":
