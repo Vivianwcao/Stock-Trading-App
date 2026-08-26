@@ -131,7 +131,7 @@ def fetch_activities(snaptrade, conn, is_bulk):
         account_id = account["id"]
 
         # find the latest transaction_date obtained from API
-        latest_transaction_date = conn.execute(
+        row = conn.execute(
             """
             select 
                 max(trade_date) latest_date
@@ -139,7 +139,9 @@ def fetch_activities(snaptrade, conn, is_bulk):
             where account_id = ?
         """,
             (account_id,),
-        ).fetchone()["latest_date"]
+        ).fetchone()
+
+        latest_transaction_date = row["latest_date"]
 
         start_date = (
             None if is_bulk else (to_api_date(latest_transaction_date) or x_days_ago(2))
