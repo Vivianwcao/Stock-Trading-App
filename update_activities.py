@@ -6,6 +6,7 @@ from retrieve_data import (
     get_account_positions,
 )
 import logging
+import time
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -116,7 +117,7 @@ def update_accounts(snaptrade, conn):
 
 
 # get activities on all open accounts
-def fetch_activities(snaptrade, conn, is_bulk):
+def fetch_activities(snaptrade, conn, is_bulk=False):
     all_records = []
     accounts_rows = []
     start_date = None
@@ -174,6 +175,7 @@ def fetch_activities(snaptrade, conn, is_bulk):
                     "api_activities",
                 )
             )
+        time.sleep(30)
 
     with conn:
         conn.executemany(
