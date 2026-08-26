@@ -75,12 +75,16 @@ def init_db(conn):
             currency text,
             trade_date text not null,
             source text not null,
-            fetched_at text not null
+            updated_at text not null
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
             foreign key (account_id)
                 references acounts(id),
             unique (trade_date, account_id, symbol, type, price, units)
+        );
+        create table if not exists last_fetched (
+            api_source text primary key,
+            fetched_at text not null
         );
     """)
 
@@ -114,6 +118,18 @@ def update_accounts(snaptrade, conn):
             records,
         )
     logger.info("Updated accounts table successfully.")
+
+
+def update_last_fetched(conn):
+    conn.execute(
+        """
+                insert into last_fetched (api_source) 
+                values (?)
+                on conflict(api_source)
+                do update set fetched_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+            """,
+        ("activities",),
+    )
 
 
 # get activities on all open accounts
@@ -182,7 +198,11 @@ def fetch_activities(snaptrade, conn, is_bulk=False):
             insert_activities_query,
             all_records,
         )
-    logger.info(f"inserted all activities records from {start_date} successfully")
+        update_last_fetched(conn)
+
+    logger.info(
+        f"inserted all activities records from {start_date} and updated last_fetched successfully"
+    )
 
 
 # update activities with recent orders (per WS account)
@@ -222,4 +242,7 @@ def fetch_recent_orders(snaptrade, conn, account_id):
             insert_activities_query,
             all_records,
         )
-    logger.info("inserted all order records from last 24 hours successfully")
+        update_last_fetched(conn)
+    logger.info(
+        "inserted all order records from last 24 hours and updated last_fetched successfully"
+    )
