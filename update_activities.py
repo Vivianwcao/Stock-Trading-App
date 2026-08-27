@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta, timezone
-from retrieve_data import (
+import logging
+import time
+from retrieve_snaptrade_data import (
     get_accounts,
     get_activities,
     get_orders_last_24hrs,
     get_account_positions,
 )
-import logging
-import time
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -80,7 +80,7 @@ def init_db(conn):
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
             foreign key (account_id)
-                references acounts(id),
+                references accounts(id),
             unique (trade_date, account_id, symbol, type, price, units)
         );
         create table if not exists last_fetched (
@@ -140,7 +140,7 @@ def update_last_fetched(conn, api_source: str, account_ids: list):
 
 
 # get activities on all open accounts
-def fetch_activities(snaptrade, conn, is_bulk=False):
+def update_activities(snaptrade, conn, is_bulk=False):
     all_records = []
     accounts_rows = []
     start_date = None
@@ -166,10 +166,12 @@ def fetch_activities(snaptrade, conn, is_bulk=False):
             (account_id,),
         ).fetchone()
 
-        latest_transaction_date = row["latest_date"]
+        latest_transaction_date = row["latest_date"] if row else None
 
         start_date = (
-            None if is_bulk else (to_api_date(latest_transaction_date) or x_days_ago(2))
+            None
+            if is_bulk or not latest_transaction_date
+            else (to_api_date(latest_transaction_date) or x_days_ago(2))
         )
         # API fetch activities per WS account
         try:
@@ -214,7 +216,7 @@ def fetch_activities(snaptrade, conn, is_bulk=False):
 
 
 # update activities with recent orders (per WS account)
-def fetch_recent_orders(snaptrade, conn, account_id):
+def update_recent_orders(snaptrade, conn, account_id):
     all_records = []
 
     # from orders (real time update)
