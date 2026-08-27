@@ -9,27 +9,31 @@ logger = logging.getLogger(__name__)
 
 # The * means everything after it must be passed as named arguments
 # only one of the three (hours, minutes, seconds) should be passed
-def calculate_wait_time(conn, *, account_id=None, hours=0, minutes=0, seconds=0):
+def calculate_wait_time(
+    conn, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
+):
     if account_id is None:
         # activities, check all accounts
         row = conn.execute(
             """
             select
-                max(fetched_at)
+                max(fetched_at) fetched_at
             from last_fetched
-            where api_source = 'activities'
-        """
+            where api_source = ?
+        """,
+            (api_source,),
         ).fetchone()
     else:
         # orders, check by account
         row = conn.execute(
             """
             select
-                max(fetched_at)
+                fetched_at
             from last_fetched
             where account_id = ?
+            and api_source = ?
         """,
-            (account_id,),
+            (account_id, api_source),
         ).fetchone()
 
     # If never fetched before, no wait time is required
