@@ -1,4 +1,4 @@
-import sqlite3
+import libsql_experimental as libsql
 import os
 import json
 from snaptrade import get_snaptrade_auth
@@ -104,19 +104,20 @@ def handler(event, context):
     try:
         logger.info(json.dumps(event))
 
+        snaptrade = get_snaptrade_auth()
+
+        # 1. Connect to remote Turso database
+        conn = libsql.connect(
+            database=os.environ["TURSO_DATABASE_URL"],
+            auth_token=os.environ["TURSO_AUTH_TOKEN"],
+        )
+
         action = event.get("action")
         data = event.get("data")
-
-        snaptrade = get_snaptrade_auth()
-        # 1. Connect to local database file (creates portfolio.db automatically)
-        conn = sqlite3.connect("stocks.db")
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
-
         try:
-            conn.executescript(
-                "drop table activities; drop table accounts; drop table last_fetched;"
-            )
+            # conn.executescript(
+            #     "drop table activities; drop table accounts; drop table last_fetched;"
+            # )
             init_db(conn)  # run once
             if action == "update_all_activities":
                 res = click_update_all_activities(snaptrade, conn, hours=4)
