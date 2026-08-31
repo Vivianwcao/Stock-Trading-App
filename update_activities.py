@@ -1,13 +1,12 @@
 from datetime import datetime, timedelta, timezone
 import logging
-import time
 from retrieve_snaptrade_data import (
     get_accounts,
     get_activities,
     get_orders_last_24hrs,
     get_account_positions,
 )
-from utils import fetch_all_as_dict, fetch_one_as_dict
+from utils import to_dicts, to_dict
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -52,8 +51,8 @@ TRANSPORT_TYPES = (
 
 
 # one time
-def init_db(conn):
-    conn.executescript("""
+def init_db(client):
+    client.executescript("""
         create table if not exists accounts (
             id text primary key, --snaptrade account_id
             account_name text not null, --tfsa-absvdfh
@@ -95,24 +94,10 @@ def init_db(conn):
     """)
 
 
-def update_accounts(snaptrade, conn):
+def update_accounts(snaptrade, client):
     accounts_list = get_accounts(snaptrade)
-    records = [
-        (
-            account["id"],
-            account["number"],
-            account["meta"]["type"],
-            account["meta"]["status"],
-            account["balance"]["total"]["amount"],
-            account["sync_status"]["transactions"]["first_transaction_date"],
-            account["institution_name"],
-            account["meta"]["currency"],
-            account["sync_status"]["holdings"]["last_successful_sync"],
-        )
-        for account in accounts_list
-    ]
-    with conn:
-        conn.executemany(
+    statements = [
+        client.Statement(
             """
             insert into accounts (
             id, account_name, account_type, status, balance, 
@@ -121,14 +106,28 @@ def update_accounts(snaptrade, conn):
             on conflict(id) do update set
                 status = excluded.status,
                 last_successful_sync = excluded.last_successful_sync;
-        """,
-            records,
+            """,
+            (
+                account["id"],
+                account["number"],
+                account["meta"]["type"],
+                account["meta"]["status"],
+                account["balance"]["total"]["amount"],
+                account["sync_status"]["transactions"]["first_transaction_date"],
+                account["institution_name"],
+                account["meta"]["currency"],
+                account["sync_status"]["holdings"]["last_successful_sync"],
+            ),
         )
-    logger.info("Updated accounts table successfully.")
+        for account in accounts_list
+    ]
+    # Executes all statements as a single HTTP batch transaction
+    client.batch(statements)
+    logger.info("Updated accounts table successfully via HTTP batch.")
 
 
-def update_last_fetched(conn, api_source: str, account_id: str):
-    conn.execute(
+def update_last_fetched(client, api_source: str, account_id: str):
+    client.execute(
         """
             insert into last_fetched (api_source, account_id) 
             values (?, ?)
@@ -140,11 +139,11 @@ def update_last_fetched(conn, api_source: str, account_id: str):
 
 
 # get activities by account
-def update_activities(snaptrade, conn, account_id, is_bulk=False):
+def update_activities(snaptrade, client, account_id, is_bulk=False):
     start_date = None
 
     # find the latest transaction_date obtained from API
-    cursor = conn.execute(
+    res = client.execute(
         """
         select 
             max(trade_date) latest_date
@@ -153,7 +152,7 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
     """,
         (account_id,),
     )
-    row = fetch_one_as_dict(cursor)
+    row = to_dict(res)
     latest_transaction_date = row["latest_date"] if row else None
 
     start_date = (
@@ -166,9 +165,9 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
         snaptrade, account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
     )
 
-    account_records = []
-    for activity in activities_list:
-        account_records.append(
+    statements = [
+        client.Statement(
+            insert_activities_query,
             (
                 activity["id"],
                 account_id,
@@ -181,15 +180,12 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
                 activity["currency"]["code"],
                 activity["trade_date"],
                 "api_activities",
-            )
+            ),
         )
-
-    with conn:
-        conn.executemany(
-            insert_activities_query,
-            account_records,
-        )
-        update_last_fetched(conn, "activities", account_id)
+        for activity in activities_list
+    ]
+    client.batch(statements)
+    update_last_fetched(client, "activities", account_id)
 
     logger.info(
         f"Successfully synced activities for account: {account_id} from {start_date}, and updated last_fetched successfully"
@@ -197,7 +193,7 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
 
 
 # update activities with recent orders (per WS account)
-def update_recent_orders(snaptrade, conn, account_id):
+def update_recent_orders(snaptrade, client, account_id):
 
     # from orders (real time update)
     # API fetch orders per WS account
@@ -224,12 +220,15 @@ def update_recent_orders(snaptrade, conn, account_id):
             )
         )
 
-    with conn:
-        conn.executemany(
+    statements = [
+        client.Statement(
             insert_activities_query,
-            all_records,
+            record,
         )
-        update_last_fetched(conn, "orders", account_id)
+        for record in all_records
+    ]
+    client.batch(statements)
+    update_last_fetched(client, "orders", account_id)
     logger.info(
         f"Successfully synced orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
