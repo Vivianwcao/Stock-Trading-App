@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 # The * means everything after it must be passed as named arguments
 # only one of the three (hours, minutes, seconds) should be passed
 def calculate_wait_time(
-    conn, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
+    client, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
 ):
     if account_id is None:
         # activities, check all accounts
-        cursor = conn.execute(
+        res = client.execute(
             """
             select
                 max(fetched_at) fetched_at
@@ -25,7 +25,7 @@ def calculate_wait_time(
         )
     else:
         # orders, check by account
-        cursor = conn.execute(
+        res = client.execute(
             """
             select
                 fetched_at
@@ -35,10 +35,10 @@ def calculate_wait_time(
         """,
             (account_id, api_source),
         )
-    row = fetch_one_as_dict(cursor)
+    row = to_dict(res)
 
     # If never fetched before, no wait time is required
-    if not row or not row["last_fetch"]:
+    if not row or not row["fetched_at"]:
         return 0, 0, 0
 
     current_time = datetime.now(timezone.utc)
@@ -54,19 +54,15 @@ def calculate_wait_time(
     return hrs, mins, secs
 
 
-# Dictionary Conversion Helper Functions for Tursor
-def fetch_all_as_dict(cursor):
-    """Converts a fetchall() result set into a list of dictionaries."""
-    if not cursor.description:
-        return []
-    headers = (col[0] for col in cursor.description)
-    return [dict(zip(headers, row)) for row in cursor.fetchall()]
+# result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
+# result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)]).
+def to_dicts(result_set):
+    """Converts a multi-row ResultSet into a list of dictionaries."""
+    return [dict(zip(result_set.columns, row)) for row in result_set.rows]
 
 
-def fetch_one_as_dict(cursor):
-    """Converts a fetchone() result into a dictionary."""
-    row = cursor.fetchone()
-    if not row or not row.description:
+def to_dict(result_set):
+    """Converts a single-row ResultSet into a dictionary (or None)."""
+    if not result_set.rows:
         return None
-    headers = (col[0] for col in row.description)
-    return dict(zip(headers, row))
+    return dict(zip(result_set.columns, result_set.rows[0]))

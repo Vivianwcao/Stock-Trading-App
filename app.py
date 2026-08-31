@@ -1,17 +1,15 @@
-import sqlite3
-import libsql_experimental as libsql
+import libsql_client
 import os
 import json
 from snaptrade import get_snaptrade_auth
 import logging
-import time
 from update_activities import (
     init_db,
     update_accounts,
     update_activities,
     update_recent_orders,
 )
-from utils import calculate_wait_time, fetch_all_as_dict
+from utils import calculate_wait_time, to_dicts, to_dict
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -33,13 +31,13 @@ HEADERS = {
 }
 
 
-def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
-    hrs, mins, secs = calculate_wait_time(conn, api_source="activities", hours=hours)
+def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
+    hrs, mins, secs = calculate_wait_time(client, api_source="activities", hours=hours)
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_accounts(snaptrade, conn)
+        update_accounts(snaptrade, client)
 
-        accounts = get_all_active_accounts(conn)
+        accounts = get_all_active_accounts(client)
         if not accounts:
             return {
                 "status": "fail",
@@ -49,11 +47,11 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
         for account_id, info in account_ids.items():
             try:
                 hrs, mins, secs = calculate_wait_time(
-                    conn, api_source="activities", account_id=account_id, hours=hours
+                    client, api_source="activities", account_id=account_id, hours=hours
                 )
                 if hrs == mins == secs == 0:
                     # ready tp update:
-                    update_activities(snaptrade, conn, account_id, is_bulk)
+                    update_activities(snaptrade, client, account_id, is_bulk)
                     info["status"] = "success"
                 else:
                     info["status"] = "cooldown"
@@ -74,13 +72,13 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
     }
 
 
-def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
+def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
     hrs, mins, secs = calculate_wait_time(
-        conn, api_source="orders", account_id=account_id, seconds=seconds
+        client, api_source="orders", account_id=account_id, seconds=seconds
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_recent_orders(snaptrade, conn, account_id)
+        update_recent_orders(snaptrade, client, account_id)
         return {
             "status": "success",
         }
@@ -90,26 +88,21 @@ def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
     }
 
 
-def get_all_active_accounts(conn):
-    cursor = conn.execute("""
+def get_all_active_accounts(client):
+    res = client.execute("""
             select id
             from accounts
             where status='open'
             and balance > 10
         """)
-    rows = fetch_all_as_dict(cursor)
-    return [dict(row) for row in rows] if rows else None
+    return to_dicts(res)
 
 
-def get_turso_connection():
-    # 1. Connect to remote Turso database
-    conn = libsql.connect(  # type: ignore
-        database=os.environ["TURSO_DATABASE_URL"],
+def get_turso_client():
+    return libsql_client.create_client_sync(
+        url=os.environ["TURSO_DATABASE_URL"],  # e.g., "libsql://db-name.turso.io"
         auth_token=os.environ["TURSO_AUTH_TOKEN"],
     )
-    # Enforce foreign keys
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
 
 
 def handler(event, context):
@@ -119,24 +112,24 @@ def handler(event, context):
         data = event.get("data")
 
         snaptrade = get_snaptrade_auth()
-        conn = get_turso_connection()
+        client = get_turso_client()
 
         try:
-            # conn.executescript(
+            # client.executescript(
             #     "drop table activities; drop table accounts; drop table last_fetched;"
             # )
-            # init_db(conn)  # run once
+            # init_db(client)  # run once
 
             if action == "update_all_activities":
                 res = click_update_all_activities(
-                    snaptrade, conn, hours=4, is_bulk=True
+                    snaptrade, client, hours=4, is_bulk=True
                 )
             elif action == "update_orders_by_account":
                 res = click_update_orders_by_account(
-                    snaptrade, conn, account_id=data, seconds=30
+                    snaptrade, client, account_id=data, seconds=30
                 )
             elif action == "get_all_account":
-                res = get_all_active_accounts(conn)
+                res = get_all_active_accounts(client)
             else:
                 return {
                     "statusCode": 400,
@@ -146,7 +139,7 @@ def handler(event, context):
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
 
         finally:
-            conn.close()
+            client.close()
 
     except Exception as e:
         logger.exception("Request failed.")
