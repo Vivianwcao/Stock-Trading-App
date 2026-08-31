@@ -7,6 +7,7 @@ from retrieve_snaptrade_data import (
     get_orders_last_24hrs,
     get_account_positions,
 )
+from utils import fetch_all_as_dict, fetch_one_as_dict
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -143,7 +144,7 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
     start_date = None
 
     # find the latest transaction_date obtained from API
-    row = conn.execute(
+    cursor = conn.execute(
         """
         select 
             max(trade_date) latest_date
@@ -151,8 +152,8 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
         where account_id = ?
     """,
         (account_id,),
-    ).fetchone()
-
+    )
+    row = fetch_one_as_dict(cursor)
     latest_transaction_date = row["latest_date"] if row else None
 
     start_date = (

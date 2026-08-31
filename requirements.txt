@@ -1,0 +1,3 @@
+libsql-experimental==0.0.37  # Pin to the exact version you tested locally
+snaptrade-python-sdk==3.0.0
+python-dotenv==1.0.1

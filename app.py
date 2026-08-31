@@ -1,3 +1,4 @@
+import sqlite3
 import libsql_experimental as libsql
 import os
 import json
@@ -10,7 +11,7 @@ from update_activities import (
     update_activities,
     update_recent_orders,
 )
-from utils import calculate_wait_time
+from utils import calculate_wait_time, fetch_all_as_dict
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -90,37 +91,46 @@ def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
 
 
 def get_all_active_accounts(conn):
-    rows = conn.execute("""
+    cursor = conn.execute("""
             select id
             from accounts
             where status='open'
             and balance > 10
-        """).fetchall()
-
+        """)
+    rows = fetch_all_as_dict(cursor)
     return [dict(row) for row in rows] if rows else None
+
+
+def get_turso_connection():
+    # 1. Connect to remote Turso database
+    conn = libsql.connect(  # type: ignore
+        database=os.environ["TURSO_DATABASE_URL"],
+        auth_token=os.environ["TURSO_AUTH_TOKEN"],
+    )
+    # Enforce foreign keys
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 
 def handler(event, context):
     try:
         logger.info(json.dumps(event))
-
-        snaptrade = get_snaptrade_auth()
-
-        # 1. Connect to remote Turso database
-        conn = libsql.connect(
-            database=os.environ["TURSO_DATABASE_URL"],
-            auth_token=os.environ["TURSO_AUTH_TOKEN"],
-        )
-
         action = event.get("action")
         data = event.get("data")
+
+        snaptrade = get_snaptrade_auth()
+        conn = get_turso_connection()
+
         try:
             # conn.executescript(
             #     "drop table activities; drop table accounts; drop table last_fetched;"
             # )
-            init_db(conn)  # run once
+            # init_db(conn)  # run once
+
             if action == "update_all_activities":
-                res = click_update_all_activities(snaptrade, conn, hours=4)
+                res = click_update_all_activities(
+                    snaptrade, conn, hours=4, is_bulk=True
+                )
             elif action == "update_orders_by_account":
                 res = click_update_orders_by_account(
                     snaptrade, conn, account_id=data, seconds=30
@@ -150,4 +160,4 @@ def handler(event, context):
 
 
 if __name__ == "__main__":
-    handler({}, None)
+    handler({"action": "update_all_activities"}, None)
