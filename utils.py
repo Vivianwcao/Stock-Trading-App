@@ -14,7 +14,7 @@ def calculate_wait_time(
 ):
     if account_id is None:
         # activities, check all accounts
-        row = conn.execute(
+        cursor = conn.execute(
             """
             select
                 max(fetched_at) fetched_at
@@ -22,10 +22,10 @@ def calculate_wait_time(
             where api_source = ?
         """,
             (api_source,),
-        ).fetchone()
+        )
     else:
         # orders, check by account
-        row = conn.execute(
+        cursor = conn.execute(
             """
             select
                 fetched_at
@@ -34,7 +34,8 @@ def calculate_wait_time(
             and api_source = ?
         """,
             (account_id, api_source),
-        ).fetchone()
+        )
+    row = fetch_one_as_dict(cursor)
 
     # If never fetched before, no wait time is required
     if not row or not row["last_fetch"]:
@@ -51,3 +52,21 @@ def calculate_wait_time(
     mins = total_seconds % 3600 // 60
     secs = total_seconds % 3600 % 60
     return hrs, mins, secs
+
+
+# Dictionary Conversion Helper Functions for Tursor
+def fetch_all_as_dict(cursor):
+    """Converts a fetchall() result set into a list of dictionaries."""
+    if not cursor.description:
+        return []
+    headers = (col[0] for col in cursor.description)
+    return [dict(zip(headers, row)) for row in cursor.fetchall()]
+
+
+def fetch_one_as_dict(cursor):
+    """Converts a fetchone() result into a dictionary."""
+    row = cursor.fetchone()
+    if not row or not row.description:
+        return None
+    headers = (col[0] for col in row.description)
+    return dict(zip(headers, row))
