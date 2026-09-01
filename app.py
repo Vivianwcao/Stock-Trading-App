@@ -66,8 +66,12 @@ def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
                 )
                 if hrs == mins == secs == 0:
                     # ready tp update:
-                    update_activities(snaptrade, client, account_id, is_bulk)
+
+                    rows_updated = update_activities(
+                        snaptrade, client, account_id, is_bulk
+                    )
                     info["status"] = "success"
+                    info["data"] = {"rows_updated": rows_updated}
                 else:
                     info["status"] = "cooldown"
                     info["data"] = {"hours": hrs, "minutes": mins, "seconds": secs}
@@ -92,10 +96,8 @@ def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_recent_orders(snaptrade, client, account_id)
-        return {
-            "status": "success",
-        }
+        rows_updated = update_recent_orders(snaptrade, client, account_id)
+        return {"status": "success", "data": {"rows_updated": rows_updated}}
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
@@ -106,7 +108,7 @@ def handler(event, context):
     try:
         logger.info(json.dumps(event))
         action = event.get("action")
-        data = event.get("data")
+        data = event.get("data", {})
 
         snaptrade = get_snaptrade_auth()
         client = get_turso_client()
@@ -123,7 +125,7 @@ def handler(event, context):
                 )
             elif action == "update_orders_by_account":
                 res = click_update_orders_by_account(
-                    snaptrade, client, account_id=data, seconds=30
+                    snaptrade, client, account_id=data.get("account_id"), seconds=30
                 )
             elif action == "get_all_account":
                 res = get_all_active_accounts(client)
@@ -150,4 +152,12 @@ def handler(event, context):
 
 
 if __name__ == "__main__":
-    handler({"action": "update_all_activities"}, None)
+    handler(
+        # {
+        #     "action": "update_orders_by_account",
+        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
+        # },
+        {"action": "update_all_activities"},
+        # {"action": "get_all_account"},
+        None,
+    )

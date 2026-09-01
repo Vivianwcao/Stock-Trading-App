@@ -55,7 +55,7 @@ def calculate_wait_time(
 
 
 # result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
-# result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)]).
+# result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)], ...).
 def to_dicts(result_set):
     """Converts a multi-row ResultSet into a list of dictionaries."""
     return [dict(zip(result_set.columns, row)) for row in result_set.rows]

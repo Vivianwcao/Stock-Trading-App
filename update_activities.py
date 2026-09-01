@@ -193,13 +193,16 @@ def update_activities(snaptrade, client, account_id, is_bulk=False):
         )
         for activity in activities_list
     ]
+    rows_updated = 0
     if statements:
-        client.batch(statements)
+        batch_results = client.batch(statements)
+        rows_updated = sum(r.rows_affected for r in batch_results)
 
     update_last_fetched(client, "activities", account_id)
     logger.info(
-        f"Successfully synced activities for account: {account_id} from {start_date}, and updated last_fetched successfully"
+        f"Successfully synced {rows_updated} activities for account: {account_id} from {start_date}, and updated last_fetched successfully"
     )
+    return rows_updated
 
 
 # update activities with recent orders (per WS account)
@@ -232,10 +235,12 @@ def update_recent_orders(snaptrade, client, account_id):
                 ),
             )
         )
-
+    rows_updated = 0
     if statements:
-        client.batch(statements)
+        batch_results = client.batch(statements)
+        rows_updated = sum(r.rows_affected for r in batch_results)
     update_last_fetched(client, "orders", account_id)
     logger.info(
-        f"Successfully synced orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
+        f"Successfully synced {rows_updated} orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
+    return rows_updated
