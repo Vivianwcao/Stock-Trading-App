@@ -1,3 +1,4 @@
+import libsql_client
 from datetime import datetime, timedelta, timezone
 import logging
 from retrieve_snaptrade_data import (
@@ -52,7 +53,8 @@ TRANSPORT_TYPES = (
 
 # one time
 def init_db(client):
-    client.executescript("""
+    tables = (
+        """
         create table if not exists accounts (
             id text primary key, --snaptrade account_id
             account_name text not null, --tfsa-absvdfh
@@ -64,6 +66,8 @@ def init_db(client):
             currency text default 'CAD',
             last_successful_sync text not null -- utc timestamp from api
         );
+        """,
+        """
         create table if not exists activities (
             id text primary key,
             account_id text not null,
@@ -83,21 +87,24 @@ def init_db(client):
                 references accounts(id),
             unique (trade_date, account_id, symbol, type, price, units)
         );
+        """,
+        """
         create table if not exists last_fetched (
             api_source text not null,
             account_id text not null,
             fetched_at text not null
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
-            primary key(api_source, account_id)
-        );
-    """)
+            primary key(api_source, account_id)""",
+    )
+    for statement in tables:
+        client.execute(statement)
 
 
 def update_accounts(snaptrade, client):
     accounts_list = get_accounts(snaptrade)
     statements = [
-        client.Statement(
+        libsql_client.Statement(
             """
             insert into accounts (
             id, account_name, account_type, status, balance, 
@@ -122,8 +129,10 @@ def update_accounts(snaptrade, client):
         for account in accounts_list
     ]
     # Executes all statements as a single HTTP batch transaction
-    client.batch(statements)
-    logger.info("Updated accounts table successfully via HTTP batch.")
+
+    if statements:
+        client.batch(statements)
+        logger.info("Updated accounts table successfully via HTTP batch.")
 
 
 def update_last_fetched(client, api_source: str, account_id: str):
@@ -166,12 +175,12 @@ def update_activities(snaptrade, client, account_id, is_bulk=False):
     )
 
     statements = [
-        client.Statement(
+        libsql_client.Statement(
             insert_activities_query,
             (
                 activity["id"],
                 account_id,
-                activity.get("symbol", {}).get("symbol"),
+                (activity.get("symbol") or {}).get("symbol"),
                 activity["type"],
                 activity["price"],
                 activity["units"],
@@ -184,9 +193,10 @@ def update_activities(snaptrade, client, account_id, is_bulk=False):
         )
         for activity in activities_list
     ]
-    client.batch(statements)
-    update_last_fetched(client, "activities", account_id)
+    if statements:
+        client.batch(statements)
 
+    update_last_fetched(client, "activities", account_id)
     logger.info(
         f"Successfully synced activities for account: {account_id} from {start_date}, and updated last_fetched successfully"
     )
@@ -200,34 +210,31 @@ def update_recent_orders(snaptrade, client, account_id):
 
     orders_list = get_orders_last_24hrs(snaptrade, account_id)
 
-    all_records = []
+    statements = []
     for order in orders_list:
         price = float(order["execution_price"])
         qty = float(order["filled_quantity"])
-        all_records.append(
-            (
-                order["brokerage_order_id"],
-                account_id,
-                order["universal_symbol"]["symbol"],
-                order["action"],
-                price,
-                qty,
-                price * qty,
-                0,
-                order["universal_symbol"]["currency"]["code"],
-                order["time_executed"],
-                "api_orders",
+        statements.append(
+            libsql_client.Statement(
+                insert_activities_query,
+                (
+                    order["brokerage_order_id"],
+                    account_id,
+                    order["universal_symbol"]["symbol"],
+                    order["action"],
+                    price,
+                    qty,
+                    price * qty,
+                    0,
+                    order["universal_symbol"]["currency"]["code"],
+                    order["time_executed"],
+                    "api_orders",
+                ),
             )
         )
 
-    statements = [
-        client.Statement(
-            insert_activities_query,
-            record,
-        )
-        for record in all_records
-    ]
-    client.batch(statements)
+    if statements:
+        client.batch(statements)
     update_last_fetched(client, "orders", account_id)
     logger.info(
         f"Successfully synced orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"

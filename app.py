@@ -31,17 +31,32 @@ HEADERS = {
 }
 
 
+def get_turso_client():
+    return libsql_client.create_client_sync(
+        url=os.environ["TURSO_DATABASE_URL"],
+        auth_token=os.environ["TURSO_AUTH_TOKEN"],
+    )
+
+
+def get_all_active_accounts(client):
+    res = client.execute("""
+            select *
+            from accounts
+            where status='open'
+            and balance > 10
+        """)
+    return {"status": "success", "data": to_dicts(res)}
+
+
 def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
     hrs, mins, secs = calculate_wait_time(client, api_source="activities", hours=hours)
     if hrs == mins == secs == 0:
         # ready tp update:
         update_accounts(snaptrade, client)
 
-        accounts = get_all_active_accounts(client)
+        accounts = get_all_active_accounts(client).get("data")
         if not accounts:
-            return {
-                "status": "fail",
-            }
+            return {"status": "fail", "error": "No active accounts found"}
 
         account_ids = {account["id"]: {} for account in accounts}
         for account_id, info in account_ids.items():
@@ -63,9 +78,8 @@ def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
                 info["status"] = "fail"
                 info["error"] = f"{type(e).__name__}: {str(e)}"
 
-                continue
-
         return {"status": "success", "data": account_ids}
+
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
@@ -88,23 +102,6 @@ def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
     }
 
 
-def get_all_active_accounts(client):
-    res = client.execute("""
-            select id
-            from accounts
-            where status='open'
-            and balance > 10
-        """)
-    return to_dicts(res)
-
-
-def get_turso_client():
-    return libsql_client.create_client_sync(
-        url=os.environ["TURSO_DATABASE_URL"],  # e.g., "libsql://db-name.turso.io"
-        auth_token=os.environ["TURSO_AUTH_TOKEN"],
-    )
-
-
 def handler(event, context):
     try:
         logger.info(json.dumps(event))
@@ -122,7 +119,7 @@ def handler(event, context):
 
             if action == "update_all_activities":
                 res = click_update_all_activities(
-                    snaptrade, client, hours=4, is_bulk=True
+                    snaptrade, client, hours=4, is_bulk=False
                 )
             elif action == "update_orders_by_account":
                 res = click_update_orders_by_account(
