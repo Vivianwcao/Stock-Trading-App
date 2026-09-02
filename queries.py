@@ -1,12 +1,11 @@
-def update account_nickname(client, account_id: str, nickname: str | None):
-    clean_nickname = nickname.strip() or None if nickname else None
-    client.execute(
-        """
-        update accounts
-        set nickname = ?
-        where id = ?
-        """,
-        (clean_nickname, account_id)
-    )
-    logger.info("Updated nickname: %s for account: %s.", clean_nickname, account_id)
-    return clean_nickname
+from utils import to_dicts, to_dict
+
+
+def get_all_active_accounts(client):
+    res = client.execute("""
+            select *
+            from accounts
+            where status='open'
+            and balance > 10
+        """)
+    return to_dicts(res)
