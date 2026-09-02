@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime, timezone
 
@@ -66,4 +65,3 @@ def calculate_wait_time(
     mins = total_seconds % 3600 // 60
     secs = total_seconds % 3600 % 60
     return hrs, mins, secs
-

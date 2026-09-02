@@ -138,6 +138,20 @@ def update_accounts(snaptrade, client):
         logger.info("Updated accounts table successfully via HTTP batch.")
 
 
+def update_account_nickname(client, account_id: str, nickname: str | None):
+    clean_nickname = nickname.strip() or None if nickname else None
+    client.execute(
+        """
+        update accounts
+        set nickname = ?
+        where id = ?
+        """,
+        (clean_nickname, account_id),
+    )
+    logger.info("Updated nickname: %s for account: %s.", clean_nickname, account_id)
+    return clean_nickname
+
+
 def update_last_fetched(client, api_source: str, account_id: str):
     client.execute(
         """
