@@ -58,6 +58,7 @@ def init_db(client):
         create table if not exists accounts (
             id text primary key, --snaptrade account_id
             account_name text not null, --tfsa-absvdfh
+            nickname text, -- added custom/display nickname
             account_type text not null,
             status text,
             balance real,
@@ -107,11 +108,13 @@ def update_accounts(snaptrade, client):
         libsql_client.Statement(
             """
             insert into accounts (
-            id, account_name, account_type, status, balance, 
-            first_transaction_date, institution, currency, last_successful_sync)
+                id, account_name, account_type, status, balance, 
+                first_transaction_date, institution, currency, last_successful_sync
+            )
             values(?, ?, ?, ?, ?, ?, ?, ?, ?)
             on conflict(id) do update set
                 status = excluded.status,
+                balance = excluded.balance,
                 last_successful_sync = excluded.last_successful_sync;
             """,
             (

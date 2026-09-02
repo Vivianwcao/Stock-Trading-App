@@ -7,6 +7,20 @@ from datetime import datetime, timezone
 logger = logging.getLogger(__name__)
 
 
+# result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
+# result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)], ...).
+def to_dicts(result_set):
+    """Converts a multi-row ResultSet into a list of dictionaries."""
+    return [dict(zip(result_set.columns, row)) for row in result_set.rows]
+
+
+def to_dict(result_set):
+    """Converts a single-row ResultSet into a dictionary (or None)."""
+    if not result_set.rows:
+        return None
+    return dict(zip(result_set.columns, result_set.rows[0]))
+
+
 # The * means everything after it must be passed as named arguments
 # only one of the three (hours, minutes, seconds) should be passed
 def calculate_wait_time(
@@ -53,16 +67,3 @@ def calculate_wait_time(
     secs = total_seconds % 3600 % 60
     return hrs, mins, secs
 
-
-# result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
-# result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)], ...).
-def to_dicts(result_set):
-    """Converts a multi-row ResultSet into a list of dictionaries."""
-    return [dict(zip(result_set.columns, row)) for row in result_set.rows]
-
-
-def to_dict(result_set):
-    """Converts a single-row ResultSet into a dictionary (or None)."""
-    if not result_set.rows:
-        return None
-    return dict(zip(result_set.columns, result_set.rows[0]))
