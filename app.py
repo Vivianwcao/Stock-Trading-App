@@ -10,6 +10,7 @@ from update_activities import (
     update_recent_orders,
 )
 from utils import calculate_wait_time, to_dicts, to_dict
+from queries import update_account_nickname
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -103,6 +104,20 @@ def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
     }
 
+# Route handler function
+def click_update_nickname(client, account_id: str, nickname: str | None):
+    try:
+        updated_name = update_account_nickname(client, account_id, nickname)
+        return {
+            "status": "success",
+            "data": {"account_id": account_id, "nickname": updated_name}
+        }
+    except Exception as e:
+        logger.exception(f"Failed to update nickname for account {account_id}")
+        return {
+            "status": "fail",
+            "error": f"{type(e).__name__}: {str(e)}"
+        }
 
 def handler(event, context):
     try:
