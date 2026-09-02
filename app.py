@@ -100,7 +100,14 @@ if __name__ == "__main__":
         #     "action": "update_orders_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        {"action": "update_all_activities"},
+        # {"action": "update_all_activities"},
         # {"action": "get_all_account"},
+        {
+            "action": "update_nickname",
+            "data": {
+                "account_id": "12740fda-39c7-4199-b569-c3f8ac982a6c",
+                "nickname": "退休账户",
+            },
+        },
         None,
     )
