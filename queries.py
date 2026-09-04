@@ -57,8 +57,6 @@ def get_trading_activities_single_account(
         SELECT
             *,
             count(*) filter(where 
-            (pre_type is null and pre_rolling_units is null) 
-                or 
             (pre_type = 'SELL' and type = 'BUY' and pre_rolling_units<=0)) 
             over (partition by symbol order by trade_date) reset
         FROM with_pres
