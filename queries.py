@@ -71,9 +71,9 @@ def get_trading_activities_single_account(
         SELECT
             *,
             sum(units) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date) bought_units,
-            round(sum(amount) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date), 2) bought_balance,
-            round(sum(amount) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date)
-            /sum(units) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date), 3) avg_bought_price,
+            sum(amount) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date) bought_balance,
+            sum(amount) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date)
+            /sum(units) filter(where type = 'BUY') over(partition by symbol, reset order by trade_date) avg_bought_price,
             sum(amount) filter(where type = 'DIVIDEND') over(partition by symbol, reset, sell_reset order by trade_date) divident_balance
         FROM sell_grouped
         )
@@ -88,9 +88,9 @@ def get_trading_activities_single_account(
         reset,
         sell_reset,
         rolling_units,
-        avg_bought_price,
+        round(avg_bought_price, 3) avg_bought_price,
         divident_balance,
-        case when type = 'SELL' then round((price + avg_bought_price)/-avg_bought_price, 4) end 盈亏率 
+        case when type = 'SELL' then round((amount + coalesce(divident_balance, 0) - avg_bought_price*units)/(avg_bought_price*units), 4) end 增长率
         FROM partitioned;
         """,
         (),
