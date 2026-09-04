@@ -105,8 +105,8 @@ if __name__ == "__main__":
         {
             "action": "update_nickname",
             "data": {
-                "account_id": "12740fda-39c7-4199-b569-c3f8ac982a6c",
-                "nickname": "退休账户",
+                "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
+                "nickname": "微微首次购房",
             },
         },
         None,
