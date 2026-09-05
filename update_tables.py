@@ -51,57 +51,6 @@ TRANSPORT_TYPES = (
 )
 
 
-# one time
-def init_db(client):
-    tables = (
-        """
-        create table if not exists accounts (
-            id text primary key, --snaptrade account_id
-            account_name text not null, --tfsa-absvdfh
-            nickname text, -- added custom/display nickname
-            account_type text not null,
-            status text,
-            balance real,
-            first_transaction_date text,
-            institution text,
-            currency text default 'CAD',
-            last_successful_sync text not null -- utc timestamp from api
-        );
-        """,
-        """
-        create table if not exists activities (
-            id text primary key,
-            account_id text not null,
-            symbol text,
-            type text not null,
-            price real,
-            units real,
-            amount real,
-            fee real,
-            currency text,
-            trade_date text not null,
-            source text not null,
-            updated_at text not null
-                default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-
-            foreign key (account_id)
-                references accounts(id),
-            unique (trade_date, account_id, symbol, type, price, units)
-        );
-        """,
-        """
-        create table if not exists last_fetched (
-            api_source text not null,
-            account_id text not null,
-            fetched_at text not null
-                default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-
-            primary key(api_source, account_id)""",
-    )
-    for statement in tables:
-        client.execute(statement)
-
-
 def update_accounts(snaptrade, client):
     accounts_list = get_accounts(snaptrade)
     statements = [

@@ -1,9 +1,8 @@
 import json
 import logging
 
-from queries import get_all_active_accounts
+from queries import init_db, get_all_active_accounts
 from update_tables import (
-    init_db,
     update_account_nickname,
     update_accounts,
     update_activities,
