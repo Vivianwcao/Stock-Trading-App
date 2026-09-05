@@ -67,7 +67,7 @@ sell_all_grouped AS (
             symbol
             ORDER BY
                 trade_date
-        ) cycle
+        ) cycles
     FROM
         with_pres
 ),
@@ -80,10 +80,10 @@ sell_grouped AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle
+            cycles
             ORDER BY
                 trade_date
-        ) sell_cycle
+        ) sell_cycles
     FROM
         sell_all_grouped
 ),
@@ -96,7 +96,7 @@ partitioned AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle
+            cycles
             ORDER BY
                 trade_date
         ) bought_units,
@@ -106,7 +106,7 @@ partitioned AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle
+            cycles
             ORDER BY
                 trade_date
         ) bought_balance,
@@ -116,7 +116,7 @@ partitioned AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle
+            cycles
             ORDER BY
                 trade_date
         ) / sum(units) filter(
@@ -125,7 +125,7 @@ partitioned AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle
+            cycles
             ORDER BY
                 trade_date
         ) avg_bought_price,
@@ -135,8 +135,8 @@ partitioned AS (
         ) over(
             PARTITION by account_id,
             symbol,
-            cycle,
-            sell_cycle
+            cycles,
+            sell_cycles
             ORDER BY
                 trade_date
         ) dividend_balance
@@ -151,8 +151,8 @@ SELECT
     price,
     units,
     amount,
-    cycle,
-    sell_cycle,
+    cycles,
+    sell_cycles,
     rolling_units,
     round(avg_bought_price, 4) avg_bought_price,
     dividend_balance,

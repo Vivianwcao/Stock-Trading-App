@@ -100,23 +100,23 @@ def init_db(client):
             *,
             count(*) filter(where 
             (pre_trade_type = 'SELL' and type = 'BUY' and pre_rolling_units<=0)) 
-            over (partition by account_id, symbol order by trade_date) cycle
+            over (partition by account_id, symbol order by trade_date) cycles
         FROM with_pres
         ),
         sell_grouped as (
         select
             *,
-            count(*) filter(where pre_type='SELL') over(partition by account_id, symbol, cycle order by trade_date) sell_cycle
+            count(*) filter(where pre_type='SELL') over(partition by account_id, symbol, cycles order by trade_date) sell_cycles
         from sell_all_grouped
         ),
         partitioned as (
         SELECT
             *,
-            sum(units) filter(where type = 'BUY') over(partition by account_id, symbol, cycle order by trade_date) bought_units,
-            sum(amount) filter(where type = 'BUY') over(partition by account_id, symbol, cycle order by trade_date) bought_balance,
-            sum(amount) filter(where type = 'BUY') over(partition by account_id, symbol, cycle order by trade_date)
-            /sum(units) filter(where type = 'BUY') over(partition by account_id, symbol, cycle order by trade_date) avg_bought_price,
-            sum(amount) filter(where type = 'DIVIDEND') over(partition by account_id, symbol, cycle, sell_cycle order by trade_date) dividend_balance
+            sum(units) filter(where type = 'BUY') over(partition by account_id, symbol, cycles order by trade_date) bought_units,
+            sum(amount) filter(where type = 'BUY') over(partition by account_id, symbol, cycles order by trade_date) bought_balance,
+            sum(amount) filter(where type = 'BUY') over(partition by account_id, symbol, cycles order by trade_date)
+            /sum(units) filter(where type = 'BUY') over(partition by account_id, symbol, cycles order by trade_date) avg_bought_price,
+            sum(amount) filter(where type = 'DIVIDEND') over(partition by account_id, symbol, cycles, sell_cycles order by trade_date) dividend_balance
         FROM sell_grouped
         )
         SELECT
@@ -127,8 +127,8 @@ def init_db(client):
         price,
         units,
         amount,
-        cycle,
-        sell_cycle,
+        cycles,
+        sell_cycles,
         rolling_units,
         round(avg_bought_price, 4) avg_bought_price,
         dividend_balance,
