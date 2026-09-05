@@ -43,7 +43,17 @@ with_pres AS (
                 trade_date DESC
             LIMIT
                 1
-        ) pre_trade_type, lag(rolling_units) over(
+        ) pre_trade_type, 
+        -- substr(
+        --     max(CASE WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type END) 
+        --         OVER (PARTITION BY account_id, symbol ORDER BY trade_date ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
+        --     instr(
+        --         max(CASE WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type END) 
+        --             OVER (PARTITION BY account_id, symbol ORDER BY trade_date ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
+        --         '#'
+        --     ) + 1
+        -- ) AS pre_trade_type,
+        lag(rolling_units) over(
             PARTITION by account_id,
             symbol
             ORDER BY
