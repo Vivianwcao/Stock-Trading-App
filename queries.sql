@@ -28,8 +28,8 @@ with_pres AS (
             ORDER BY
                 trade_date
         ) AS pre_type,
-        
-        -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO
+
+        -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
         -- (
         --     SELECT
         --         TYPE
@@ -47,6 +47,7 @@ with_pres AS (
         -- ) pre_trade_type, 
 
         -- Replaces correlated CTE subquery with a window function
+        -- Trick for Turso
         substr(
             max(
                 CASE

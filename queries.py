@@ -91,24 +91,25 @@ def init_db(client):
                     ORDER BY
                         trade_date
                 ) AS pre_type,
-                
-                -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO
-                -- (
-                --     SELECT
-                --         TYPE
-                --     FROM
-                --         cleaned
-                --     WHERE
-                --         account_id = c.account_id
-                --         AND symbol = c.symbol
-                --         AND trade_date < c.trade_date
-                --         AND TYPE <> 'DIVIDEND'
-                --     ORDER BY
-                --         trade_date DESC
-                --     LIMIT
-                --         1
-                -- ) pre_trade_type, 
-                
+
+                /* NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
+                (
+                    SELECT
+                        TYPE
+                    FROM
+                        cleaned
+                    WHERE
+                        account_id = c.account_id
+                        AND symbol = c.symbol
+                        AND trade_date < c.trade_date
+                        AND TYPE <> 'DIVIDEND'
+                    ORDER BY
+                        trade_date DESC
+                    LIMIT
+                        1
+                ) pre_trade_type, 
+                */
+
                 -- Replaces correlated CTE subquery with a window function
                 substr(
                     max(
