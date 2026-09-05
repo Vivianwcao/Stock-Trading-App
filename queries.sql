@@ -28,7 +28,7 @@ with_pres AS (
             ORDER BY
                 trade_date
         ) AS pre_type,
-
+        
         -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
         -- (
         --     SELECT
@@ -83,7 +83,7 @@ with_pres AS (
         ) AS pre_rolling_units
     FROM
         cleaned
-    ),
+),
 sell_all_grouped AS (
     SELECT
         *,
@@ -97,7 +97,7 @@ sell_all_grouped AS (
             symbol
             ORDER BY
                 trade_date
-        ) AS cycles
+        ) AS reset_cycle -- Renamed from RESET
     FROM
         with_pres
 ),
@@ -110,10 +110,10 @@ sell_grouped AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            cycles
+            reset_cycle
             ORDER BY
                 trade_date
-        ) AS sell_cycles
+        ) AS sell_reset
     FROM
         sell_all_grouped
 ),
@@ -126,7 +126,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            cycles
+            reset_cycle
             ORDER BY
                 trade_date
         ) AS bought_units,
@@ -136,7 +136,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            cycles
+            reset_cycle
             ORDER BY
                 trade_date
         ) AS bought_balance,
@@ -146,7 +146,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            cycles
+            reset_cycle
             ORDER BY
                 trade_date
         ) / nullif(
@@ -156,7 +156,7 @@ partitioned AS (
             ) OVER (
                 PARTITION BY account_id,
                 symbol,
-                cycles
+                reset_cycle
                 ORDER BY
                     trade_date
             ),
@@ -168,8 +168,8 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            cycles,
-            sell_cycles
+            reset_cycle,
+            sell_reset
             ORDER BY
                 trade_date
         ) AS dividend_balance
@@ -184,9 +184,9 @@ SELECT
     price,
     units,
     amount,
-    cycles,
-    sell_cycles,
     rolling_units,
+    reset_cycle,
+    sell_reset,
     round(avg_bought_price, 4) AS avg_bought_price,
     dividend_balance,
     CASE
@@ -205,3 +205,5 @@ SELECT
     END AS realized_profit
 FROM
     partitioned;
+
+

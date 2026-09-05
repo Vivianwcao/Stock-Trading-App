@@ -91,26 +91,26 @@ def init_db(client):
                     ORDER BY
                         trade_date
                 ) AS pre_type,
-
-                /* NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
-                (
-                    SELECT
-                        TYPE
-                    FROM
-                        cleaned
-                    WHERE
-                        account_id = c.account_id
-                        AND symbol = c.symbol
-                        AND trade_date < c.trade_date
-                        AND TYPE <> 'DIVIDEND'
-                    ORDER BY
-                        trade_date DESC
-                    LIMIT
-                        1
-                ) pre_trade_type, 
-                */
+                
+                -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
+                -- (
+                --     SELECT
+                --         TYPE
+                --     FROM
+                --         cleaned
+                --     WHERE
+                --         account_id = c.account_id
+                --         AND symbol = c.symbol
+                --         AND trade_date < c.trade_date
+                --         AND TYPE <> 'DIVIDEND'
+                --     ORDER BY
+                --         trade_date DESC
+                --     LIMIT
+                --         1
+                -- ) pre_trade_type, 
 
                 -- Replaces correlated CTE subquery with a window function
+                -- Trick for Turso
                 substr(
                     max(
                         CASE
@@ -146,7 +146,7 @@ def init_db(client):
                 ) AS pre_rolling_units
             FROM
                 cleaned
-            ),
+        ),
         sell_all_grouped AS (
             SELECT
                 *,
@@ -160,7 +160,7 @@ def init_db(client):
                     symbol
                     ORDER BY
                         trade_date
-                ) AS cycles
+                ) AS reset_cycle -- Renamed from RESET
             FROM
                 with_pres
         ),
@@ -173,10 +173,10 @@ def init_db(client):
                 ) OVER (
                     PARTITION BY account_id,
                     symbol,
-                    cycles
+                    reset_cycle
                     ORDER BY
                         trade_date
-                ) AS sell_cycles
+                ) AS sell_reset
             FROM
                 sell_all_grouped
         ),
@@ -189,7 +189,7 @@ def init_db(client):
                 ) OVER (
                     PARTITION BY account_id,
                     symbol,
-                    cycles
+                    reset_cycle
                     ORDER BY
                         trade_date
                 ) AS bought_units,
@@ -199,7 +199,7 @@ def init_db(client):
                 ) OVER (
                     PARTITION BY account_id,
                     symbol,
-                    cycles
+                    reset_cycle
                     ORDER BY
                         trade_date
                 ) AS bought_balance,
@@ -209,7 +209,7 @@ def init_db(client):
                 ) OVER (
                     PARTITION BY account_id,
                     symbol,
-                    cycles
+                    reset_cycle
                     ORDER BY
                         trade_date
                 ) / nullif(
@@ -219,7 +219,7 @@ def init_db(client):
                     ) OVER (
                         PARTITION BY account_id,
                         symbol,
-                        cycles
+                        reset_cycle
                         ORDER BY
                             trade_date
                     ),
@@ -231,8 +231,8 @@ def init_db(client):
                 ) OVER (
                     PARTITION BY account_id,
                     symbol,
-                    cycles,
-                    sell_cycles
+                    reset_cycle,
+                    sell_reset
                     ORDER BY
                         trade_date
                 ) AS dividend_balance
@@ -247,9 +247,9 @@ def init_db(client):
             price,
             units,
             amount,
-            cycles,
-            sell_cycles,
             rolling_units,
+            reset_cycle,
+            sell_reset,
             round(avg_bought_price, 4) AS avg_bought_price,
             dividend_balance,
             CASE
