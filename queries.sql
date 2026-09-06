@@ -46,8 +46,8 @@ with_pres AS (
         --         1
         -- ) pre_trade_type, 
 
-        -- Replaces correlated CTE subquery with a window function
-        -- Trick for Turso
+        /* Replaces correlated CTE subquery with a window function */
+        /* Trick for Turso */
         substr(
             max(
                 CASE
@@ -84,7 +84,7 @@ with_pres AS (
     FROM
         cleaned
 ),
-sell_all_grouped AS (
+grouped AS (
     SELECT
         *,
         count(*) FILTER (
@@ -97,25 +97,18 @@ sell_all_grouped AS (
             symbol
             ORDER BY
                 trade_date
-        ) AS reset_cycle -- Renamed from RESET
-    FROM
-        with_pres
-),
-sell_grouped AS (
-    SELECT
-        *,
+        ) AS cycles,
         count(*) FILTER (
             WHERE
                 pre_type = 'SELL'
         ) OVER (
             PARTITION BY account_id,
-            symbol,
-            reset_cycle
+            symbol
             ORDER BY
                 trade_date
-        ) AS sell_reset
+        ) AS sell_cycles
     FROM
-        sell_all_grouped
+        with_pres
 ),
 partitioned AS (
     SELECT
@@ -126,7 +119,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            reset_cycle
+            cycles
             ORDER BY
                 trade_date
         ) AS bought_units,
@@ -136,7 +129,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            reset_cycle
+            cycles
             ORDER BY
                 trade_date
         ) AS bought_balance,
@@ -146,7 +139,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            reset_cycle
+            cycles
             ORDER BY
                 trade_date
         ) / nullif(
@@ -156,7 +149,7 @@ partitioned AS (
             ) OVER (
                 PARTITION BY account_id,
                 symbol,
-                reset_cycle
+                cycles
                 ORDER BY
                     trade_date
             ),
@@ -168,13 +161,12 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            reset_cycle,
-            sell_reset
+            sell_cycles
             ORDER BY
                 trade_date
         ) AS dividend_balance
     FROM
-        sell_grouped
+        grouped
 )
 SELECT
     account_id,
@@ -185,10 +177,10 @@ SELECT
     units,
     amount,
     rolling_units,
-    reset_cycle,
-    sell_reset,
+    cycles,
+    sell_cycles,
     round(avg_bought_price, 4) AS avg_bought_price,
-    dividend_balance,
+    round(dividend_balance, 4) AS dividend_balance,
     CASE
         WHEN TYPE = 'SELL' THEN round(
             (
@@ -205,5 +197,3 @@ SELECT
     END AS realized_profit
 FROM
     partitioned;
-
-
