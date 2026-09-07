@@ -25,7 +25,7 @@ HEADERS = {
 
 # ── Action Controllers ───────────────────────────────────────────────────────
 def handle_update_all_activities(snaptrade, client, data):
-    return click_update_all_activities(snaptrade, client, hours=4, is_bulk=True)
+    return click_update_all_activities(snaptrade, client, hours=4, is_bulk=False)
 
 
 def handle_update_orders(snaptrade, client, data):
