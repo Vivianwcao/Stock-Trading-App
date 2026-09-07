@@ -68,7 +68,9 @@ def init_db(client):
         WITH
         cleaned AS (
             SELECT
+            wealth_simple_account_id,
             account_id,
+            nickname,
             trade_date,
             symbol,
             type,
@@ -76,17 +78,20 @@ def init_db(client):
             units,
             amount,
             sum(units) OVER (
-                PARTITION BY account_id, symbol
+                PARTITION BY nickname, symbol
                 ORDER BY trade_date
             ) AS rolling_units
-            FROM activities
-            WHERE type IN ('BUY', 'SELL', 'DIVIDEND')
+            from accounts acc
+            join activities act
+            on acc.id = act.account_id
+            WHERE status = 'open'
+            and type IN ('BUY', 'SELL', 'DIVIDEND')
         ),
         with_pres AS (
             SELECT
             *,
             lag(type) OVER (
-                PARTITION BY account_id, symbol
+                PARTITION BY nickname, symbol
                 ORDER BY trade_date
             ) AS pre_type,
             
@@ -97,7 +102,7 @@ def init_db(client):
                     WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
                 END
                 ) OVER (
-                PARTITION BY account_id, symbol
+                PARTITION BY nickname, symbol
                 ORDER BY trade_date 
                 ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
                 ),
@@ -107,7 +112,7 @@ def init_db(client):
                     WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
                     END
                 ) OVER (
-                    PARTITION BY account_id, symbol
+                    PARTITION BY nickname, symbol
                     ORDER BY trade_date 
                     ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
                 ),
@@ -116,7 +121,7 @@ def init_db(client):
             ) AS pre_trade_type,
             
             lag(rolling_units) OVER (
-                PARTITION BY account_id, symbol
+                PARTITION BY nickname, symbol
                 ORDER BY trade_date
             ) AS pre_rolling_units
             FROM cleaned
@@ -130,7 +135,7 @@ def init_db(client):
                 AND type = 'BUY'
                 AND pre_rolling_units <= 0
             ) OVER (
-                PARTITION BY account_id, symbol
+                PARTITION BY nickname, symbol
                 ORDER BY trade_date
             ) AS cycles
             FROM with_pres  -- FIXED: Added missing source table
@@ -141,27 +146,27 @@ def init_db(client):
             sum(units) FILTER (
                 WHERE type = 'BUY'
             ) OVER (
-                PARTITION BY account_id, symbol, cycles
+                PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
             ) AS bought_units,
             
             sum(amount) FILTER (
                 WHERE type = 'BUY'
             ) OVER (
-                PARTITION BY account_id, symbol, cycles
+                PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
             ) AS bought_balance,
             
             sum(amount) FILTER (
                 WHERE type = 'BUY'
             ) OVER (
-                PARTITION BY account_id, symbol, cycles
+                PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
             ) / nullif(
                 sum(units) FILTER (
                 WHERE type = 'BUY'
                 ) OVER (
-                PARTITION BY account_id, symbol, cycles
+                PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
                 ),
                 0
@@ -170,13 +175,15 @@ def init_db(client):
             sum(amount) FILTER (
                 WHERE type = 'DIVIDEND'
             ) OVER (
-                PARTITION BY account_id, symbol, cycles
+                PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
             ) AS dividend_balance
             FROM grouped
         )
         SELECT
+        wealth_simple_account_id,
         account_id,
+        nickname,
         trade_date,
         symbol,
         type,
