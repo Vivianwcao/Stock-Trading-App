@@ -150,7 +150,7 @@ def update_activities(snaptrade, client, account_id, is_bulk=False):
             (
                 activity["id"],
                 account_id,
-                (activity.get("symbol") or {}).get("symbol"),
+                (activity.get("symbol") or {}).get("raw_symbol"),
                 activity["type"],
                 activity["price"],
                 activity["units"],
@@ -193,7 +193,7 @@ def update_recent_orders(snaptrade, client, account_id):
                 (
                     order["brokerage_order_id"],
                     account_id,
-                    order["universal_symbol"]["symbol"],
+                    order["universal_symbol"]["raw_symbol"],
                     order["action"],
                     price,
                     qty,
