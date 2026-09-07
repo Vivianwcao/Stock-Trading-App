@@ -64,97 +64,9 @@ def init_db(client):
     client.execute(
         """
         CREATE VIEW IF NOT EXISTS transactions AS
-        WITH cleaned AS (
+        WITH
+        cleaned AS (
             SELECT
-                account_id,
-                trade_date,
-                symbol,
-                type,
-                price,
-                units,
-                amount,
-                sum(units) OVER (
-                    PARTITION BY account_id, symbol
-                    ORDER BY trade_date
-                ) AS rolling_units
-            FROM activities
-            WHERE type IN ('BUY', 'SELL', 'DIVIDEND')
-        ),
-        with_pres AS (
-            SELECT
-                *,
-                lag(type) OVER (
-                    PARTITION BY account_id, symbol
-                    ORDER BY trade_date
-                ) AS pre_type,
-                
-                /* Replaces correlated CTE subquery with a window function */
-                substr(
-                    max(CASE WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type END) 
-                        OVER (PARTITION BY account_id, symbol ORDER BY trade_date ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
-                    instr(
-                        max(CASE WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type END) 
-                            OVER (PARTITION BY account_id, symbol ORDER BY trade_date ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
-                        '#'
-                    ) + 1
-                ) AS pre_trade_type,
-
-                lag(rolling_units) OVER (
-                    PARTITION BY account_id, symbol
-                    ORDER BY trade_date
-                ) AS pre_rolling_units
-            FROM cleaned
-        ),
-        grouped AS (
-            SELECT
-                *,
-                count(*) FILTER (
-                    WHERE pre_trade_type = 'SELL'
-                    AND type = 'BUY'
-                    AND pre_rolling_units <= 0
-                ) OVER (
-                    PARTITION BY account_id, symbol
-                    ORDER BY trade_date
-                ) AS cycles,
-        
-                count(*) FILTER (
-                    WHERE pre_type = 'SELL'
-                ) OVER (
-                    PARTITION BY account_id, symbol
-                    ORDER BY trade_date
-                ) AS sell_cycles
-            FROM with_pres
-        ),
-        partitioned AS (
-            SELECT
-                *,
-                sum(units) FILTER (WHERE type = 'BUY') OVER (
-                    PARTITION BY account_id, symbol, cycles
-                    ORDER BY trade_date
-                ) AS bought_units,
-                
-                sum(amount) FILTER (WHERE type = 'BUY') OVER (
-                    PARTITION BY account_id, symbol, cycles
-                    ORDER BY trade_date
-                ) AS bought_balance,
-                
-                sum(amount) FILTER (WHERE type = 'BUY') OVER (
-                    PARTITION BY account_id, symbol, cycles
-                    ORDER BY trade_date
-                ) / nullif(
-                    sum(units) FILTER (WHERE type = 'BUY') OVER (
-                        PARTITION BY account_id, symbol, cycles
-                        ORDER BY trade_date
-                    ), 0
-                ) AS avg_bought_price,
-                
-                sum(amount) FILTER (WHERE type = 'DIVIDEND') OVER (
-                    PARTITION BY account_id, symbol, sell_cycles
-                    ORDER BY trade_date
-                ) AS dividend_balance
-            FROM grouped
-        )
-        SELECT
             account_id,
             trade_date,
             symbol,
@@ -162,24 +74,127 @@ def init_db(client):
             price,
             units,
             amount,
-            rolling_units,
-            cycles,
-            sell_cycles,
-            round(avg_bought_price, 4) AS avg_bought_price,
-            round(dividend_balance, 4) AS dividend_balance,
-            CASE
-                WHEN type = 'SELL' THEN round(
-                    (amount + coalesce(dividend_balance, 0) - avg_bought_price * units) * 100 
-                    / nullif(avg_bought_price * units, 0), 
-                    2
-                )
-            END AS return_percentage,
-            CASE
-                WHEN type = 'SELL' THEN round(
-                    amount + coalesce(dividend_balance, 0) - avg_bought_price * units, 
-                    2
-                )
-            END AS realized_profit
+            sum(units) OVER (
+                PARTITION BY account_id, symbol
+                ORDER BY trade_date
+            ) AS rolling_units
+            FROM activities
+            WHERE type IN ('BUY', 'SELL', 'DIVIDEND')
+        ),
+        with_pres AS (
+            SELECT
+            *,
+            lag(type) OVER (
+                PARTITION BY account_id, symbol
+                ORDER BY trade_date
+            ) AS pre_type,
+            
+            /* Replaces correlated CTE subquery with a window function */
+            substr(
+                max(
+                CASE
+                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                END
+                ) OVER (
+                PARTITION BY account_id, symbol
+                ORDER BY trade_date 
+                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ),
+                instr(
+                max(
+                    CASE
+                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                    END
+                ) OVER (
+                    PARTITION BY account_id, symbol
+                    ORDER BY trade_date 
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ),
+                '#'
+                ) + 1
+            ) AS pre_trade_type,
+            
+            lag(rolling_units) OVER (
+                PARTITION BY account_id, symbol
+                ORDER BY trade_date
+            ) AS pre_rolling_units
+            FROM cleaned
+        ),
+        grouped AS (
+            SELECT
+            *,
+            count(*) FILTER (
+                WHERE
+                pre_trade_type = 'SELL'
+                AND type = 'BUY'
+                AND pre_rolling_units <= 0
+            ) OVER (
+                PARTITION BY account_id, symbol
+                ORDER BY trade_date
+            ) AS cycles
+            FROM with_pres  -- FIXED: Added missing source table
+        ),
+        partitioned AS (
+            SELECT
+            *,
+            sum(units) FILTER (
+                WHERE type = 'BUY'
+            ) OVER (
+                PARTITION BY account_id, symbol, cycles
+                ORDER BY trade_date
+            ) AS bought_units,
+            
+            sum(amount) FILTER (
+                WHERE type = 'BUY'
+            ) OVER (
+                PARTITION BY account_id, symbol, cycles
+                ORDER BY trade_date
+            ) AS bought_balance,
+            
+            sum(amount) FILTER (
+                WHERE type = 'BUY'
+            ) OVER (
+                PARTITION BY account_id, symbol, cycles
+                ORDER BY trade_date
+            ) / nullif(
+                sum(units) FILTER (
+                WHERE type = 'BUY'
+                ) OVER (
+                PARTITION BY account_id, symbol, cycles
+                ORDER BY trade_date
+                ),
+                0
+            ) AS avg_bought_price,
+            
+            sum(amount) FILTER (
+                WHERE type = 'DIVIDEND'
+            ) OVER (
+                PARTITION BY account_id, symbol, cycles
+                ORDER BY trade_date
+            ) AS dividend_balance
+            FROM grouped
+        )
+        SELECT
+        account_id,
+        trade_date,
+        symbol,
+        type,
+        price,
+        units,
+        amount,
+        rolling_units,
+        cycles,
+        round(avg_bought_price, 4) AS avg_bought_price,
+        round(dividend_balance, 4) AS dividend_balance,
+        CASE
+            WHEN type = 'SELL' THEN round(
+            (amount - avg_bought_price * units) * 100 / nullif(avg_bought_price * units, 0),
+            2
+            )
+        END AS return_percentage,
+        CASE
+            WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
+        END AS realized_profit
         FROM partitioned;
         """,
         (),
