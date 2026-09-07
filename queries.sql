@@ -1,4 +1,5 @@
 CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, trade_date);
+
 CREATE VIEW IF NOT EXISTS transactions AS WITH cleaned AS (
     SELECT
         account_id,
@@ -28,26 +29,7 @@ with_pres AS (
             ORDER BY
                 trade_date
         ) AS pre_type,
-        
-        -- NEED TO REMOVE THIS CTE TO CREATE A VIEW IN TURSO, LIBSQL DOES NOT SUPPORT SUBQUERY IN VIEWS
-        -- (
-        --     SELECT
-        --         TYPE
-        --     FROM
-        --         cleaned
-        --     WHERE
-        --         account_id = c.account_id
-        --         AND symbol = c.symbol
-        --         AND trade_date < c.trade_date
-        --         AND TYPE <> 'DIVIDEND'
-        --     ORDER BY
-        --         trade_date DESC
-        --     LIMIT
-        --         1
-        -- ) pre_trade_type, 
-
         /* Replaces correlated CTE subquery with a window function */
-        /* Trick for Turso */
         substr(
             max(
                 CASE
@@ -97,18 +79,9 @@ grouped AS (
             symbol
             ORDER BY
                 trade_date
-        ) AS cycles,
-        count(*) FILTER (
-            WHERE
-                pre_type = 'SELL'
-        ) OVER (
-            PARTITION BY account_id,
-            symbol
-            ORDER BY
-                trade_date
-        ) AS sell_cycles
+        ) AS cycles
     FROM
-        with_pres
+        with_pres -- FIXED: Added missing source table
 ),
 partitioned AS (
     SELECT
@@ -161,7 +134,7 @@ partitioned AS (
         ) OVER (
             PARTITION BY account_id,
             symbol,
-            sell_cycles
+            cycles
             ORDER BY
                 trade_date
         ) AS dividend_balance
@@ -178,22 +151,16 @@ SELECT
     amount,
     rolling_units,
     cycles,
-    sell_cycles,
     round(avg_bought_price, 4) AS avg_bought_price,
     round(dividend_balance, 4) AS dividend_balance,
     CASE
         WHEN TYPE = 'SELL' THEN round(
-            (
-                amount + coalesce(dividend_balance, 0) - avg_bought_price * units
-            ) * 100 / nullif(avg_bought_price * units, 0),
+            (amount - avg_bought_price * units) * 100 / nullif(avg_bought_price * units, 0),
             2
         )
     END AS return_percentage,
     CASE
-        WHEN TYPE = 'SELL' THEN round(
-            amount + coalesce(dividend_balance, 0) - avg_bought_price * units,
-            2
-        )
+        WHEN TYPE = 'SELL' THEN round(amount - avg_bought_price * units, 2)
     END AS realized_profit
 FROM
     partitioned;
