@@ -2,7 +2,9 @@ CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, tr
 
 CREATE VIEW IF NOT EXISTS transactions AS WITH cleaned AS (
     SELECT
+        wealth_simple_account_id,
         account_id,
+        nickname,
         trade_date,
         symbol,
         TYPE,
@@ -10,21 +12,23 @@ CREATE VIEW IF NOT EXISTS transactions AS WITH cleaned AS (
         units,
         amount,
         sum(units) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol
             ORDER BY
                 trade_date
         ) AS rolling_units
     FROM
-        activities
+        accounts acc
+        JOIN activities act ON acc.id = act.account_id
     WHERE
-        TYPE IN ('BUY', 'SELL', 'DIVIDEND')
+        STATUS = 'open'
+        AND TYPE IN ('BUY', 'SELL', 'DIVIDEND')
 ),
 with_pres AS (
     SELECT
         *,
         lag(TYPE) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol
             ORDER BY
                 trade_date
@@ -36,7 +40,7 @@ with_pres AS (
                     WHEN TYPE <> 'DIVIDEND' THEN trade_date || '#' || TYPE
                 END
             ) OVER (
-                PARTITION BY account_id,
+                PARTITION BY nickname,
                 symbol
                 ORDER BY
                     trade_date ROWS BETWEEN UNBOUNDED PRECEDING
@@ -48,7 +52,7 @@ with_pres AS (
                         WHEN TYPE <> 'DIVIDEND' THEN trade_date || '#' || TYPE
                     END
                 ) OVER (
-                    PARTITION BY account_id,
+                    PARTITION BY nickname,
                     symbol
                     ORDER BY
                         trade_date ROWS BETWEEN UNBOUNDED PRECEDING
@@ -58,7 +62,7 @@ with_pres AS (
             ) + 1
         ) AS pre_trade_type,
         lag(rolling_units) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol
             ORDER BY
                 trade_date
@@ -75,7 +79,7 @@ grouped AS (
                 AND TYPE = 'BUY'
                 AND pre_rolling_units <= 0
         ) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol
             ORDER BY
                 trade_date
@@ -90,7 +94,7 @@ partitioned AS (
             WHERE
                 TYPE = 'BUY'
         ) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol,
             cycles
             ORDER BY
@@ -100,7 +104,7 @@ partitioned AS (
             WHERE
                 TYPE = 'BUY'
         ) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol,
             cycles
             ORDER BY
@@ -110,7 +114,7 @@ partitioned AS (
             WHERE
                 TYPE = 'BUY'
         ) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol,
             cycles
             ORDER BY
@@ -120,7 +124,7 @@ partitioned AS (
                 WHERE
                     TYPE = 'BUY'
             ) OVER (
-                PARTITION BY account_id,
+                PARTITION BY nickname,
                 symbol,
                 cycles
                 ORDER BY
@@ -132,7 +136,7 @@ partitioned AS (
             WHERE
                 TYPE = 'DIVIDEND'
         ) OVER (
-            PARTITION BY account_id,
+            PARTITION BY nickname,
             symbol,
             cycles
             ORDER BY
@@ -142,7 +146,9 @@ partitioned AS (
         grouped
 )
 SELECT
+    wealth_simple_account_id,
     account_id,
+    nickname,
     trade_date,
     symbol,
     TYPE,
