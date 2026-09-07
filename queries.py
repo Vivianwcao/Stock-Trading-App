@@ -8,6 +8,7 @@ def init_db(client):
         """
         create table if not exists accounts (
             id text primary key, --snaptrade account_id
+            wealth_simple_account_id text, --wealth simple account_id
             account_name text not null, --tfsa-absvdfh
             nickname text, -- added custom/display nickname
             account_type text not null,
