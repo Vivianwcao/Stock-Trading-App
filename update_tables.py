@@ -15,10 +15,13 @@ logger = logging.getLogger(__name__)
 
 # date helpers
 def to_api_date(timestamp: str) -> str:
+    if not timestamp:
+        return None
     return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date().isoformat()
 
 
 def x_days_ago(x):
+    """Returns a date string in YYYY-MM-DD format."""
     return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
@@ -115,20 +118,21 @@ def update_last_fetched(client, api_source: str, account_id: str):
 
 # get activities by account
 def update_activities(snaptrade, client, account_id, is_bulk=False):
-    start_date = None
+    latest_transaction_date = None
 
-    # find the latest transaction_date obtained from API
-    res = client.execute(
-        """
-        select 
-            max(trade_date) latest_date
-        from activities
-        where account_id = ?
-    """,
-        (account_id,),
-    )
-    row = to_dict(res)
-    latest_transaction_date = row["latest_date"] if row else None
+    if not is_bulk:
+        # find the latest transaction_date obtained from API
+        res = client.execute(
+            """
+            select 
+                max(trade_date) latest_date
+            from activities
+            where account_id = ?
+        """,
+            (account_id,),
+        )
+        row = to_dict(res)
+        latest_transaction_date = row["latest_date"] if row else None
 
     start_date = (
         None

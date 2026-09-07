@@ -25,7 +25,7 @@ HEADERS = {
 
 # ── Action Controllers ───────────────────────────────────────────────────────
 def handle_update_all_activities(snaptrade, client, data):
-    return click_update_all_activities(snaptrade, client, hours=4, is_bulk=False)
+    return click_update_all_activities(snaptrade, client, hours=4, is_bulk=True)
 
 
 def handle_update_orders(snaptrade, client, data):
@@ -100,14 +100,14 @@ if __name__ == "__main__":
         #     "action": "update_orders_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        # {"action": "update_all_activities"},
+        {"action": "update_all_activities"},
         # {"action": "get_all_account"},
-        {
-            "action": "update_nickname",
-            "data": {
-                "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
-                "nickname": "微微首次购房",
-            },
-        },
+        # {
+        #     "action": "update_nickname",
+        #     "data": {
+        #         "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
+        #         "nickname": "微微首次购房",
+        #     },
+        # },
         None,
     )

@@ -191,6 +191,6 @@ def get_all_active_accounts(client):
             select *
             from accounts
             where status='open'
-            # and balance > 10
+            and balance > 10
         """)
     return to_dicts(res)
