@@ -77,8 +77,9 @@ def batch_import_csv(turso_client, conn, batch_size=250):
     for i in range(0, len(res), batch_size):
         chunk = statements[i : i + batch_size]
         batch_results = turso_client.batch(chunk)
-        rows_updated += sum(r.rows_affected for r in batch_results)
-        print(f"Batch: {i}: Successfully synced {rows_updated} activities.")
+        rs_updated = sum(r.rows_affected for r in batch_results)
+        rows_updated += rs_updated
+        print(f"Batch: {i}: Successfully synced {rs_updated} activities.")
 
     print(f"Successfully synced {rows_updated} activities in total.")
 
