@@ -1,5 +1,3 @@
-import os
-import libsql_client
 from snaptrade import get_snaptrade_auth
 import logging
 import json
@@ -9,6 +7,7 @@ from handlers import (
     click_update_nickname,
 )
 from queries import get_all_active_accounts
+from utils import get_turso_client
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -41,13 +40,6 @@ def handle_get_accounts(snaptrade, client, data):
 
 def handle_update_nickname(snaptrade, client, data):
     return click_update_nickname(client, data.get("account_id"), data.get("nickname"))
-
-
-def get_turso_client():
-    return libsql_client.create_client_sync(
-        url=os.environ["TURSO_DATABASE_URL"],
-        auth_token=os.environ["TURSO_AUTH_TOKEN"],
-    )
 
 
 # ── Action Registry ──────────────────────────────────────────────────────────

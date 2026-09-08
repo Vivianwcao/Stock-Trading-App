@@ -1,5 +1,10 @@
+import os
 import logging
 from datetime import datetime, timezone
+from dotenv import load_dotenv
+import libsql_client
+
+load_dotenv()
 
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -65,3 +70,10 @@ def calculate_wait_time(
     mins = total_seconds % 3600 // 60
     secs = total_seconds % 3600 % 60
     return hrs, mins, secs
+
+
+def get_turso_client():
+    return libsql_client.create_client_sync(
+        url=os.environ["TURSO_DATABASE_URL"],
+        auth_token=os.environ["TURSO_AUTH_TOKEN"],
+    )
