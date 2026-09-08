@@ -1,5 +1,5 @@
 import libsql_client
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 import logging
 from retrieve_snaptrade_data import (
     get_accounts,
@@ -7,7 +7,7 @@ from retrieve_snaptrade_data import (
     get_orders_last_24hrs,
     get_account_positions,
 )
-from utils import to_dicts, to_dict
+from utils import to_dicts, to_dict, x_days_ago
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -18,11 +18,6 @@ def to_api_date(timestamp: str) -> str:
     if not timestamp:
         return None
     return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date().isoformat()
-
-
-def x_days_ago(x):
-    """Returns a date string in YYYY-MM-DD format."""
-    return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
 insert_activities_query = """
