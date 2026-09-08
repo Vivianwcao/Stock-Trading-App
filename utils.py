@@ -1,6 +1,6 @@
 import os
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 import libsql_client
 
@@ -23,6 +23,11 @@ def to_dict(result_set):
     if not result_set.rows:
         return None
     return dict(zip(result_set.columns, result_set.rows[0]))
+
+
+def x_days_ago(x):
+    """Returns a date string in YYYY-MM-DD format."""
+    return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
 # The * means everything after it must be passed as named arguments
