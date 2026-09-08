@@ -85,7 +85,8 @@ def init_db(client):
             join activities act
             on acc.id = act.account_id
             WHERE status = 'open'
-            and type IN ('BUY', 'SELL', 'DIVIDEND')
+            and nickname is not null
+            -- and type IN ('BUY', 'SELL', 'DIVIDEND')
         ),
         with_pres AS (
             SELECT
