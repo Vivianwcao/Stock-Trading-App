@@ -21,6 +21,7 @@ import_csv_query = """
             uuid()::varchar,
             c.account_id,
             case 
+                when starts_with(symbol, 'QQU') then 'HQU'
                 when ends_with(symbol, '.TO') 
                 then left(symbol, length(symbol) - 3)
                 else symbol
