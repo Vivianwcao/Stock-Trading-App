@@ -52,7 +52,7 @@ import_csv_query = """
         from read_csv_auto('activities.csv', header=True) csv
         join cutoffs c
             on csv.account_id = c.wealth_simple_account_id
-        where activity_type like '%CorporateAction%'
+        where trade_date < cutoff
     """
 
 
