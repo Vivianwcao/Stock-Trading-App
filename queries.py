@@ -37,8 +37,7 @@ def init_db(client):
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
             foreign key (account_id)
-                references accounts(id),
-            unique (trade_date, account_id, symbol, type, price, units)
+                references accounts(id)
         );
         """,
         """
@@ -50,10 +49,16 @@ def init_db(client):
 
             primary key(api_source, account_id)""",
     )
-    # for statement in tables:
-    #     client.execute(statement)
+    for statement in tables:
+        client.execute(statement)
 
     # 2. Performance Index
+    client.execute("""
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_api_dedup 
+        ON activities (trade_date, account_id, symbol, type, price, units)
+        WHERE source <> 'wealth_simple_csv';
+    """)
+
     client.execute("""
         create index if not exists idx_transactions
         on activities(account_id, symbol, trade_date);
