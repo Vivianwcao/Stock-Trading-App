@@ -25,11 +25,18 @@ import_csv_query = """
                 then left(symbol, length(symbol) - 3)
                 else symbol
             end,
-            activity_sub_type,
-            unit_price::double,
-            quantity::double,
-            net_cash_amount::double,
-            commission::double,
+            case 
+                when activity_type = 'Trade' then activity_sub_type
+                else upper(activity_type)
+            end,
+            coalesce(unit_price, 0)::double,
+            case
+                when activity_type = 'Trade' then quantity
+                when activity_type like '%CorporateAction%' then quantity
+                else 0
+            end::double,
+            coalesce(net_cash_amount, 0)::double,
+            coalesce(commission, 0)::double,
             currency,
             strftime(
                 timezone(
@@ -45,7 +52,7 @@ import_csv_query = """
         from read_csv_auto('activities.csv', header=True) csv
         join cutoffs c
             on csv.account_id = c.wealth_simple_account_id
-        where trade_date < cutoff
+        where activity_type like '%CorporateAction%'
     """
 
 
