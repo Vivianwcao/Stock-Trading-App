@@ -184,7 +184,8 @@ def init_db(client):
             ) OVER (
                 PARTITION BY nickname, symbol, cycles
                 ORDER BY trade_date
-            ) AS dividend_balance
+            ) AS dividend_balance,
+            sum(amount) filter(where type in ('BUY', 'SELL')) over(partition by nickname, symbol, cycles order by trade_date) trading_balance
             FROM grouped
         )
         SELECT
@@ -198,6 +199,7 @@ def init_db(client):
         units,
         amount,
         rolling_units,
+        round(trading_balance, 4) trading_balance,
         cycles,
         round(avg_bought_price, 4) AS avg_bought_price,
         round(dividend_balance, 4) AS dividend_balance,
