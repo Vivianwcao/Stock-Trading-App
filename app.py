@@ -6,7 +6,7 @@ from handlers import (
     click_update_orders_by_account,
     click_update_nickname,
 )
-from queries import get_all_active_accounts
+from queries import get_all_active_accounts, get_all_active_transactions
 from utils import get_turso_client
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -42,12 +42,18 @@ def handle_update_nickname(snaptrade, client, data):
     return click_update_nickname(client, data.get("account_id"), data.get("nickname"))
 
 
+def handle_get_transactions(snaptrade, client, data):
+    transactions = get_all_active_transactions(client, data)
+    return {"status": "success", "data": transactions}
+
+
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
     "update_all_activities": handle_update_all_activities,
     "update_orders_by_account": handle_update_orders,
-    "get_all_account": handle_get_accounts,
     "update_nickname": handle_update_nickname,
+    "get_all_account": handle_get_accounts,
+    "get_transactions": handle_get_transactions,
 }
 
 

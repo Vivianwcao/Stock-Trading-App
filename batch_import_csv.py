@@ -16,6 +16,7 @@ get_cutoff_dates_query = """
         group by wealth_simple_account_id
     """
 
+# Wealth simple csv uses QQU, where SnapTrade API uses HQU
 import_csv_query = """
         select
             uuid()::varchar,
@@ -57,6 +58,35 @@ import_csv_query = """
     """
 
 
+# there could be exact identical rows in the csv. we need to keep them all
+def check_csv_identical_rows(conn):
+    return conn.sql("""
+        select  
+            effective_date, 
+            effective_time, 
+            account_id, 
+            activity_type, 
+            activity_sub_type,
+            symbol,
+            quantity,
+            unit_price,
+            net_cash_amount,
+            count(*) cnt
+        from read_csv_auto('activities.csv', header=True)
+        group by 
+            effective_date, 
+            effective_time, 
+            account_id, 
+            activity_type, 
+            activity_sub_type,
+            symbol,
+            quantity,
+            unit_price,
+            net_cash_amount
+            having count(*)>1
+    """)
+
+
 # **only batch import csv after activities is filled with API data
 def batch_import_csv(turso_client, conn, batch_size=250):
     # 1. Fetch cutoffs from Turso
@@ -96,7 +126,9 @@ if __name__ == "__main__":
     conn = duckdb.connect()
     client = get_turso_client()
 
-    batch_import_csv(client, conn)
+    check_csv_identical_rows(conn).show()
+
+    # batch_import_csv(client, conn)
 
     conn.close()
     client.close()

@@ -1,5 +1,7 @@
+import libsql_client
 from utils import to_dicts, to_dict
 from update_tables import TRANSPORT_TYPES
+from datetime import datetime, timedelta, timezone
 
 
 # one time
@@ -65,7 +67,6 @@ def init_db(client):
         """)
 
     # 3. View Creation
-    # Only buy and sell transactions, no divident, tax, interests or transfer
     client.execute("DROP VIEW IF EXISTS transactions;")
     client.execute(
         """
@@ -144,7 +145,7 @@ def init_db(client):
                 PARTITION BY nickname, symbol
                 ORDER BY trade_date
             ) AS cycles
-            FROM with_pres  -- FIXED: Added missing source table
+            FROM with_pres
         ),
         partitioned AS (
             SELECT
@@ -217,9 +218,45 @@ def init_db(client):
 
 def get_all_active_accounts(client):
     res = client.execute("""
-            select *
+        select *
+        from accounts
+        where status='open'
+        and balance > 10
+    """)
+    return to_dicts(res)
+
+
+def get_all_active_transactions(client, data):
+    # a list or tuple
+    nicknames = data.get("nicknames")
+    start_date = data.get("start_date") or "2018-01-01"
+    # use tomorrow's date if no end_date provided
+    end_date = data.get("end_date") or (
+        datetime.now(timezone.utc) + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+
+    if not nicknames:
+        result = client.execute("""
+            select 
+                nickname
             from accounts
-            where status='open'
+            where nickname is not null
+            and status='open'
             and balance > 10
         """)
-    return to_dicts(res)
+        nicknames = [r[0] for r in result.rows]
+
+    placeholder = ",".join(["?" for _ in nicknames])
+
+    result = client.execute(
+        f"""
+            select
+                *
+            from transactions
+            where nickname in ({placeholder})
+            and trade_date > ?
+            and trade_date < ?
+        """,
+        (nicknames, start_date, end_date),
+    )
+    return to_dicts(result)
