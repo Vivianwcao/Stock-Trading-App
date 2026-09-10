@@ -257,6 +257,6 @@ def get_all_active_transactions(client, data):
             and trade_date > ?
             and trade_date < ?
         """,
-        (nicknames, start_date, end_date),
+        (*nicknames, start_date, end_date),
     )
     return to_dicts(result)
