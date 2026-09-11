@@ -1,13 +1,12 @@
-import libsql_client
-from utils import to_dicts, to_dict
 from update_tables import TRANSPORT_TYPES
 from datetime import datetime, timedelta, timezone
 
 
 # one time
-def init_db(client):
-    tables = (
-        """
+def init_db(conn):
+    cursor = conn.cursor()
+
+    script = """
         create table if not exists accounts (
             id text primary key, --snaptrade account_id
             wealth_simple_account_id text, --wealth simple account_id
@@ -21,8 +20,7 @@ def init_db(client):
             currency text default 'CAD',
             last_successful_sync text not null -- utc timestamp from api
         );
-        """,
-        """
+        
         create table if not exists activities (
             id text primary key,
             account_id text not null,
@@ -41,35 +39,31 @@ def init_db(client):
             foreign key (account_id)
                 references accounts(id)
         );
-        """,
-        """
+
         create table if not exists last_fetched (
             api_source text not null,
             account_id text not null,
             fetched_at text not null
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
-            primary key(api_source, account_id)""",
-    )
-    for statement in tables:
-        client.execute(statement)
+            primary key(api_source, account_id
+        );
 
-    # 2. Performance Index
-    client.execute("""
         CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_api_dedup 
-        ON activities (trade_date, account_id, symbol, type, price, units)
-        WHERE source <> 'wealth_simple_csv';
-    """)
+                ON activities (trade_date, account_id, symbol, type, price, units)
+                WHERE source <> 'wealth_simple_csv';
 
-    client.execute("""
         create index if not exists idx_transactions
-        on activities(account_id, symbol, trade_date);
-        """)
+        on activities(account_id, symbol, trade_date);            
+    """
 
-    # 3. View Creation
-    client.execute("DROP VIEW IF EXISTS transactions;")
-    client.execute(
+    cursor.executescript(script)
+
+    # 2. View Creation
+    cursor.executescript(
         """
+        DROP VIEW IF EXISTS transactions;
+
         CREATE VIEW IF NOT EXISTS transactions AS
         WITH
         cleaned AS (
@@ -86,7 +80,11 @@ def init_db(client):
             sum(units) OVER (
                 PARTITION BY nickname, symbol
                 ORDER BY trade_date
-            ) AS rolling_units
+            ) AS rolling_units,
+            sum(amount) OVER (
+                PARTITION BY nickname
+                ORDER BY trade_date
+            ) AS account_balance
             from accounts acc
             join activities act
             on acc.id = act.account_id
@@ -211,24 +209,25 @@ def init_db(client):
         END AS return_percentage,
         CASE
             WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
-        END AS realized_profit
+        END AS realized_profit,
+        round(account_balance, 4) account_balance
         FROM partitioned;
-        """,
-        (),
+        """
     )
 
 
-def get_all_active_accounts(client):
-    res = client.execute("""
+def get_all_active_accounts(conn):
+    cursor = conn.cursor()
+    rows = cursor.execute("""
         select *
         from accounts
         where status='open'
         and balance > 10
-    """)
-    return to_dicts(res)
+    """).fetchall()
+    return rows
 
 
-def get_all_active_transactions(client, data):
+def get_all_active_transactions(conn, data):
     # a list or tuple
     nicknames = data.get("nicknames")
     start_date = data.get("start_date") or "2018-01-01"
@@ -237,20 +236,22 @@ def get_all_active_transactions(client, data):
         datetime.now(timezone.utc) + timedelta(days=1)
     ).strftime("%Y-%m-%d")
 
+    cursor = conn.cursor()
+
     if not nicknames:
-        result = client.execute("""
+        names = cursor.execute("""
             select 
                 nickname
             from accounts
             where nickname is not null
             and status='open'
             and balance > 10
-        """)
-        nicknames = [r[0] for r in result.rows]
+        """).fetchall()
+        nicknames = [r[0] for r in names]
 
     placeholder = ",".join(["?" for _ in nicknames])
 
-    result = client.execute(
+    rows = cursor.execute(
         f"""
             select
                 *
@@ -260,5 +261,5 @@ def get_all_active_transactions(client, data):
             and trade_date < ?
         """,
         (*nicknames, start_date, end_date),
-    )
-    return to_dicts(result)
+    ).fetchall()
+    return rows
