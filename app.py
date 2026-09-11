@@ -7,7 +7,7 @@ from handlers import (
     click_update_nickname,
 )
 from queries import get_all_active_accounts, get_all_active_transactions
-from utils import get_turso_client
+import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -23,27 +23,27 @@ HEADERS = {
 
 
 # ── Action Controllers ───────────────────────────────────────────────────────
-def handle_update_all_activities(snaptrade, client, data):
-    return click_update_all_activities(snaptrade, client, hours=4, is_bulk=False)
+def handle_update_all_activities(snaptrade, conn, data):
+    return click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False)
 
 
-def handle_update_orders(snaptrade, client, data):
+def handle_update_orders(snaptrade, conn, data):
     return click_update_orders_by_account(
-        snaptrade, client, data.get("account_id"), seconds=30
+        snaptrade, conn, data.get("account_id"), seconds=30
     )
 
 
-def handle_get_accounts(snaptrade, client, data):
-    accounts = get_all_active_accounts(client)
+def handle_get_accounts(snaptrade, conn, data):
+    accounts = get_all_active_accounts(conn)
     return {"status": "success", "data": accounts}
 
 
-def handle_update_nickname(snaptrade, client, data):
-    return click_update_nickname(client, data.get("account_id"), data.get("nickname"))
+def handle_update_nickname(snaptrade, conn, data):
+    return click_update_nickname(conn, data.get("account_id"), data.get("nickname"))
 
 
-def handle_get_transactions(snaptrade, client, data):
-    transactions = get_all_active_transactions(client, data)
+def handle_get_transactions(snaptrade, conn, data):
+    transactions = get_all_active_transactions(conn, data)
     return {"status": "success", "data": transactions}
 
 
@@ -72,14 +72,17 @@ def app_handler(event, context):
             }
 
         snaptrade = get_snaptrade_auth()
-        client = get_turso_client()
+        # Connect to local database file (creates stocks.db automatically)
+        conn = sqlite3.connect("stocks.db")
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
 
         try:
-            res = controller(snaptrade, client, data)
+            res = controller(snaptrade, conn, data)
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
 
         finally:
-            client.close()
+            conn.close()
 
     except Exception as e:
         logger.exception("Request failed.")

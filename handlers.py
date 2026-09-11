@@ -23,20 +23,21 @@ logging.basicConfig(level=logging.INFO)  # required for local
 # }
 
 
-def create_tables(client):
-    client.executescript(
-        "drop table activities; drop table accounts; drop table last_fetched;"
+def create_tables(conn):
+    cursor = conn.cursor()
+    cursor.executescript(
+        "drop table if exists activities; drop table if exists accounts; drop table if exists last_fetched;"
     )
-    init_db(client)  # run once
+    init_db(cursor)  # run once
 
 
-def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
-    hrs, mins, secs = calculate_wait_time(client, api_source="activities", hours=hours)
+def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
+    hrs, mins, secs = calculate_wait_time(conn, api_source="activities", hours=hours)
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_accounts(snaptrade, client)
+        update_accounts(snaptrade, conn)
 
-        accounts = get_all_active_accounts(client)
+        accounts = get_all_active_accounts(conn)
         if not accounts:
             return {"status": "fail", "error": "No active accounts found"}
 
@@ -44,13 +45,13 @@ def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
         for account_id, info in account_ids.items():
             try:
                 hrs, mins, secs = calculate_wait_time(
-                    client, api_source="activities", account_id=account_id, hours=hours
+                    conn, api_source="activities", account_id=account_id, hours=hours
                 )
                 if hrs == mins == secs == 0:
                     # ready tp update:
 
                     rows_updated = update_activities(
-                        snaptrade, client, account_id, is_bulk
+                        snaptrade, conn, account_id, is_bulk
                     )
                     info["status"] = "success"
                     info["data"] = {"rows_updated": rows_updated}
@@ -72,13 +73,13 @@ def click_update_all_activities(snaptrade, client, hours=4, is_bulk=False):
     }
 
 
-def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
+def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
     hrs, mins, secs = calculate_wait_time(
-        client, api_source="orders", account_id=account_id, seconds=seconds
+        conn, api_source="orders", account_id=account_id, seconds=seconds
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        rows_updated = update_recent_orders(snaptrade, client, account_id)
+        rows_updated = update_recent_orders(snaptrade, conn, account_id)
         return {"status": "success", "data": {"rows_updated": rows_updated}}
     return {
         "status": "cooldown",
@@ -86,9 +87,9 @@ def click_update_orders_by_account(snaptrade, client, account_id, seconds=30):
     }
 
 
-def click_update_nickname(client, account_id: str, nickname: str | None):
+def click_update_nickname(conn, account_id: str, nickname: str | None):
     try:
-        updated_name = update_account_nickname(client, account_id, nickname)
+        updated_name = update_account_nickname(conn, account_id, nickname)
         return {
             "status": "success",
             "data": {"account_id": account_id, "nickname": updated_name},

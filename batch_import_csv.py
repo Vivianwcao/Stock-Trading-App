@@ -1,5 +1,4 @@
-from utils import get_turso_client
-import libsql_client
+import sqlite3
 import duckdb
 from update_tables import insert_activities_query
 
@@ -17,50 +16,52 @@ get_cutoff_dates_query = """
     """
 
 # Wealth simple csv uses QQU, where SnapTrade API uses HQU
-import_csv_query = """
-        select
-            uuid()::varchar,
-            c.account_id,
-            case 
-                when starts_with(symbol, 'QQU') then 'HQU'
-                when ends_with(symbol, '.TO') 
-                then left(symbol, length(symbol) - 3)
-                else symbol
-            end,
-            case 
-                when activity_type = 'Trade' then activity_sub_type
-                else upper(activity_type)
-            end,
-            coalesce(unit_price, 0)::double,
-            case
-                when activity_type = 'Trade' then quantity
-                when activity_type like '%CorporateAction%' then quantity
-                else 0
-            end::double,
-            coalesce(net_cash_amount, 0)::double,
-            coalesce(commission, 0)::double,
-            currency,
-            strftime(
+import_csv_query_initial_batch = """
+    select
+        uuid()::varchar,
+        c.account_id,
+        case 
+            when starts_with(symbol, 'QQU') then 'HQU'
+            when ends_with(symbol, '.TO') 
+            then left(symbol, length(symbol) - 3)
+            else symbol
+        end,
+        case 
+            when activity_type = 'Trade' then activity_sub_type
+            else upper(activity_type)
+        end,
+        coalesce(unit_price, 0)::double,
+        case
+            when activity_type = 'Trade' then quantity
+            when activity_type = 'InternalSecurityTransfer' then quantity
+            when activity_type like '%CorporateAction%' then quantity
+            else 0
+        end::double,
+        coalesce(net_cash_amount, 0)::double,
+        coalesce(commission, 0)::double,
+        currency,
+        strftime(
+            timezone(
+                'UTC', 
                 timezone(
-                    'UTC', 
-                    timezone(
-                        'America/Vancouver', 
-                        (effective_date::varchar || ' ' || effective_time::varchar)::timestamp
-                    )
-                ),
-                '%Y-%m-%dT%H:%M:%S.%fZ'
-            ) trade_date,
-            'wealth_simple_csv'
-        from read_csv_auto('activities.csv', header=True) csv
-        join cutoffs c
-            on csv.account_id = c.wealth_simple_account_id
-        where trade_date < cutoff
-    """
+                    'America/Vancouver', 
+                    (effective_date::varchar || ' ' || effective_time::varchar)::timestamp
+                )
+            ),
+            '%Y-%m-%dT%H:%M:%S.%fZ'
+        ) trade_date,
+        'wealth_simple_csv'
+    from read_csv_auto('activities.csv', header=True) csv
+    join cutoffs c
+        on csv.account_id = c.wealth_simple_account_id
+"""
+
+import_csv_query = import_csv_query_initial_batch + " where trade_date < cutoff"
 
 
-# there could be exact identical rows in the csv. we need to keep them all
-def check_csv_identical_rows(conn):
-    return conn.sql("""
+# DuckDB check - there could be exact identical rows in the csv. we need to keep them all
+def check_csv_identical_rows(ddb_conn):
+    return ddb_conn.sql("""
         select  
             effective_date, 
             effective_time, 
@@ -87,14 +88,13 @@ def check_csv_identical_rows(conn):
     """)
 
 
-# **only batch import csv after activities is filled with API data
-def batch_import_csv(turso_client, conn, batch_size=250):
-    # 1. Fetch cutoffs from Turso
-    res = turso_client.execute(get_cutoff_dates_query)
-    cutoffs = res.rows
+def import_csv(sql_conn, ddb_conn, is_initial_batch=True):
 
-    # 2. Create temporary mapping table
-    conn.execute("""
+    cursor = sql_conn.cursor()
+    # 1. Fetch cutoffs from sql
+    cutoffs = cursor.execute(get_cutoff_dates_query).fetchall()
+    # 2. Create temporary mapping table in duckDB
+    ddb_conn.execute("""
         create temp table cutoffs (
             account_id varchar,
             wealth_simple_account_id varchar,
@@ -102,33 +102,29 @@ def batch_import_csv(turso_client, conn, batch_size=250):
         )
     """)
 
-    # 3. Insert Turso cutoffs into DuckDB
-    conn.executemany("insert into cutoffs values (?, ?, ?)", cutoffs)
+    # 3. Insert sql cutoffs into DuckDB
+    ddb_conn.executemany("insert into cutoffs values (?, ?, ?)", cutoffs)
 
-    # 4. Query CSV joined with Cutoffs
-    res = conn.execute(import_csv_query).fetchall()
+    if is_initial_batch:
+        # Query CSV joined with Cutoffs with no end dates
+        rows = ddb_conn.execute(import_csv_query_initial_batch).fetchall()
+    else:
+        # 4. Query CSV joined with Cutoffs
+        rows = ddb_conn.execute(import_csv_query).fetchall()
 
-    # Write into activities
-    statements = [libsql_client.Statement(insert_activities_query, row) for row in res]
-
-    rows_updated = 0
-    for i in range(0, len(res), batch_size):
-        chunk = statements[i : i + batch_size]
-        batch_results = turso_client.batch(chunk)
-        rs_updated = sum(r.rows_affected for r in batch_results)
-        rows_updated += rs_updated
-        print(f"Batch: {i}: Successfully synced {rs_updated} activities.")
-
-    print(f"Successfully synced {rows_updated} activities in total.")
+    cursor.executemany(insert_activities_query, rows)
+    print(f"Successfully synced {cursor.rowcount} activities in total.")
 
 
 if __name__ == "__main__":
-    conn = duckdb.connect()
-    client = get_turso_client()
+    ddb_conn = duckdb.connect()
+    sql_conn = sqlite3.connect("stocks.db")
+    sql_conn.row_factory = sqlite3.Row
+    sql_conn.execute("PRAGMA foreign_keys = ON")
 
-    check_csv_identical_rows(conn).show()
+    import_csv(sql_conn, ddb_conn, True)
 
-    # batch_import_csv(client, conn)
+    # check_csv_identical_rows(ddb_conn).show()
 
-    conn.close()
-    client.close()
+    ddb_conn.close()
+    sql_conn.close()

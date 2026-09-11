@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 # result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
 # result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)], ...).
 def to_dicts(result_set):
-    """Converts a multi-row ResultSet into a list of dictionaries."""
+    """Converts a libsql multi-row ResultSet into a list of dictionaries."""
     return [dict(zip(result_set.columns, row)) for row in result_set.rows]
 
 
 def to_dict(result_set):
-    """Converts a single-row ResultSet into a dictionary (or None)."""
+    """Converts a libsql single-row ResultSet into a dictionary (or None)."""
     if not result_set.rows:
         return None
     return dict(zip(result_set.columns, result_set.rows[0]))
@@ -33,11 +33,12 @@ def x_days_ago(x):
 # The * means everything after it must be passed as named arguments
 # only one of the three (hours, minutes, seconds) should be passed
 def calculate_wait_time(
-    client, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
+    conn, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
 ):
+    cursor = conn.cursor()
     if account_id is None:
         # activities, check all accounts
-        res = client.execute(
+        row = cursor.execute(
             """
             select
                 max(fetched_at) fetched_at
@@ -45,10 +46,10 @@ def calculate_wait_time(
             where api_source = ?
         """,
             (api_source,),
-        )
+        ).fetchone()
     else:
         # orders, check by account
-        res = client.execute(
+        row = cursor.execute(
             """
             select
                 fetched_at
@@ -57,8 +58,7 @@ def calculate_wait_time(
             and api_source = ?
         """,
             (account_id, api_source),
-        )
-    row = to_dict(res)
+        ).fetchone()
 
     # If never fetched before, no wait time is required
     if not row or not row["fetched_at"]:

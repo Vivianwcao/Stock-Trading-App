@@ -18,13 +18,16 @@ WITH
       sum(units) OVER (
         PARTITION BY nickname, symbol
         ORDER BY trade_date
-      ) AS rolling_units
+      ) AS rolling_units,
+      sum(amount) OVER (
+        PARTITION BY nickname
+        ORDER BY trade_date
+      ) AS account_balance
     from accounts acc
     join activities act
     on acc.id = act.account_id
     WHERE status = 'open'
       and nickname is not null
-    -- and type IN ('BUY', 'SELL', 'DIVIDEND')
   ),
   with_pres AS (
     SELECT
@@ -143,5 +146,6 @@ SELECT
   END AS return_percentage,
   CASE
     WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
-  END AS realized_profit
+  END AS realized_profit,
+  round(account_balance, 4) account_balance
 FROM partitioned;
