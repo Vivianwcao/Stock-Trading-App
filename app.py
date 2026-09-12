@@ -58,6 +58,11 @@ def handle_update_accounts(snaptrade, conn, data):
     return {"status": "success"}
 
 
+def handle_update_wealth_simple_account_id(snaptrade, conn, data):
+    update_wealth_simple_account_id(snaptrade, conn)
+    return {"status": "success"}
+
+
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
     "init_db": handle_init_db,
@@ -67,7 +72,7 @@ ACTION_REGISTRY = {
     "get_all_account": handle_get_accounts,
     "get_transactions": handle_get_transactions,
     "update_accounts": handle_update_accounts,
-    "update_wealth_simple_account_id": "handle_update_wealth_simple_account_id",
+    "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }
 
 
