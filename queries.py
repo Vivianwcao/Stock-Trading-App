@@ -46,7 +46,7 @@ def init_db(conn):
             fetched_at text not null
                 default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
 
-            primary key(api_source, account_id
+            primary key(api_source, account_id)
         );
 
         CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_api_dedup 
@@ -224,7 +224,7 @@ def get_all_active_accounts(conn):
         where status='open'
         and balance > 10
     """).fetchall()
-    return rows
+    return [dict(r) for r in rows]
 
 
 def get_all_active_transactions(conn, data):
@@ -262,4 +262,4 @@ def get_all_active_transactions(conn, data):
         """,
         (*nicknames, start_date, end_date),
     ).fetchall()
-    return rows
+    return [dict(r) for r in rows]
