@@ -83,14 +83,15 @@ def update_accounts(snaptrade, conn):
 
 def update_account_nickname(conn, account_id: str, nickname: str | None):
     clean_nickname = nickname.strip() or None if nickname else None
-    conn.execute(
-        """
-        update accounts
-        set nickname = ?
-        where id = ?
-        """,
-        (clean_nickname, account_id),
-    )
+    with conn:
+        conn.execute(
+            """
+            update accounts
+            set nickname = ?
+            where id = ?
+            """,
+            (clean_nickname, account_id),
+        )
     logger.info("Updated nickname: %s for account: %s.", clean_nickname, account_id)
     return clean_nickname
 
@@ -198,3 +199,34 @@ def update_recent_orders(snaptrade, conn, account_id):
         f"Successfully synced {row_count} orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
     return row_count
+
+
+def update_nickname(conn, account_id: str, nickname: str | None):
+    try:
+        updated_name = update_account_nickname(conn, account_id, nickname)
+        return {
+            "status": "success",
+            "data": {"account_id": account_id, "nickname": updated_name},
+        }
+    except Exception as e:
+        logger.exception(f"Failed to update nickname for account {account_id}")
+        return {"status": "fail", "error": f"{type(e).__name__}: {str(e)}"}
+
+
+def update_wealth_simple_account_id(conn, account_id: str, ws_account_id: str | None):
+    clean_ws_account_id = ws_account_id.strip() or None if ws_account_id else None
+    with conn:
+        conn.execute(
+            """
+            update accounts
+            set wealth_simple_account_id = ?
+            where id = ?
+            """,
+            (clean_ws_account_id, account_id),
+        )
+    logger.info(
+        "Updated wealth_simple_account_id: %s for account: %s.",
+        clean_ws_account_id,
+        account_id,
+    )
+    return clean_ws_account_id

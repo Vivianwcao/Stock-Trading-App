@@ -1,12 +1,13 @@
 from snaptrade import get_snaptrade_auth
 import logging
 import json
-from handlers import (
-    click_update_all_activities,
-    click_update_orders_by_account,
-    click_update_nickname,
+from handlers import click_update_all_activities, click_update_orders_by_account
+from update_tables import (
+    update_accounts,
+    update_nickname,
+    update_wealth_simple_account_id,
 )
-from queries import get_all_active_accounts, get_all_active_transactions
+from queries import create_tables, get_all_active_accounts, get_all_active_transactions
 import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -39,7 +40,7 @@ def handle_get_accounts(snaptrade, conn, data):
 
 
 def handle_update_nickname(snaptrade, conn, data):
-    return click_update_nickname(conn, data.get("account_id"), data.get("nickname"))
+    return update_nickname(conn, data.get("account_id"), data.get("nickname"))
 
 
 def handle_get_transactions(snaptrade, conn, data):
@@ -47,13 +48,26 @@ def handle_get_transactions(snaptrade, conn, data):
     return {"status": "success", "data": transactions}
 
 
+def handle_init_db(snaptrade, conn, data):
+    create_tables(conn)
+    return {"status": "success"}
+
+
+def handle_update_accounts(snaptrade, conn, data):
+    update_accounts(snaptrade, conn)
+    return {"status": "success"}
+
+
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
+    "init_db": handle_init_db,
     "update_all_activities": handle_update_all_activities,
     "update_orders_by_account": handle_update_orders,
     "update_nickname": handle_update_nickname,
     "get_all_account": handle_get_accounts,
     "get_transactions": handle_get_transactions,
+    "update_accounts": handle_update_accounts,
+    "update_wealth_simple_account_id": "handle_update_wealth_simple_account_id",
 }
 
 
@@ -79,8 +93,12 @@ def app_handler(event, context):
 
         try:
             res = controller(snaptrade, conn, data)
-            return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
+            # # Flushes all WAL data to stocks.db AND shrinks stocks.db-wal to 0 bytes
+            # conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
 
+            # Flushes WAL data safely without throwing errors if DBeaver is open
+            conn.execute("PRAGMA wal_checkpoint(PASSIVE);")
+            return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
         finally:
             conn.close()
 
@@ -97,18 +115,19 @@ def app_handler(event, context):
 
 if __name__ == "__main__":
     app_handler(
+        # {"action": "update_accounts"},
         # {
         #     "action": "update_orders_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        {"action": "update_all_activities"},
+        # {"action": "update_all_activities"},
         # {"action": "get_all_account"},
-        # {
-        #     "action": "update_nickname",
-        #     "data": {
-        #         "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
-        #         "nickname": "微微首次购房",
-        #     },
-        # },
+        {
+            "action": "update_nickname",
+            "data": {
+                "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
+                "nickname": "vivian_fhsa",
+            },
+        },
         None,
     )

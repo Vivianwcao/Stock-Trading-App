@@ -1,14 +1,12 @@
-import json
 import logging
 
-from queries import init_db, get_all_active_accounts
+from queries import get_all_active_accounts
 from update_tables import (
-    update_account_nickname,
     update_accounts,
     update_activities,
     update_recent_orders,
 )
-from utils import calculate_wait_time, to_dicts
+from utils import calculate_wait_time
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -21,14 +19,6 @@ logging.basicConfig(level=logging.INFO)  # required for local
 #   "data": { ... } | null,
 #   "error": "Error description string" | null
 # }
-
-
-def create_tables(conn):
-    cursor = conn.cursor()
-    cursor.executescript(
-        "drop table if exists activities; drop table if exists accounts; drop table if exists last_fetched;"
-    )
-    init_db(cursor)  # run once
 
 
 def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
@@ -85,15 +75,3 @@ def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
     }
-
-
-def click_update_nickname(conn, account_id: str, nickname: str | None):
-    try:
-        updated_name = update_account_nickname(conn, account_id, nickname)
-        return {
-            "status": "success",
-            "data": {"account_id": account_id, "nickname": updated_name},
-        }
-    except Exception as e:
-        logger.exception(f"Failed to update nickname for account {account_id}")
-        return {"status": "fail", "error": f"{type(e).__name__}: {str(e)}"}

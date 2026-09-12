@@ -5,6 +5,9 @@ from datetime import datetime, timedelta, timezone
 # one time
 def init_db(conn):
     cursor = conn.cursor()
+    # To have the fresh database instance automatically inherits WAL mode
+    cursor.execute("PRAGMA journal_mode = WAL;")
+    cursor.execute("PRAGMA foreign_keys = ON;")
 
     script = """
         create table if not exists accounts (
@@ -214,6 +217,14 @@ def init_db(conn):
         FROM partitioned;
         """
     )
+
+
+def create_tables(conn):
+    cursor = conn.cursor()
+    cursor.executescript(
+        "drop table if exists activities; drop table if exists accounts; drop table if exists last_fetched;"
+    )
+    init_db(conn)  # run once
 
 
 def get_all_active_accounts(conn):
