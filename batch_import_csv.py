@@ -90,9 +90,9 @@ def check_csv_identical_rows(ddb_conn):
 
 def import_csv(sql_conn, ddb_conn, is_initial_batch=True):
 
-    cursor = sql_conn.cursor()
     # 1. Fetch cutoffs from sql
-    cutoffs = cursor.execute(get_cutoff_dates_query).fetchall()
+    with sql_conn:
+        cutoffs = sql_conn.execute(get_cutoff_dates_query).fetchall()
     # 2. Create temporary mapping table in duckDB
     ddb_conn.execute("""
         create temp table cutoffs (
@@ -112,14 +112,14 @@ def import_csv(sql_conn, ddb_conn, is_initial_batch=True):
         # 4. Query CSV joined with Cutoffs
         rows = ddb_conn.execute(import_csv_query).fetchall()
 
-    cursor.executemany(insert_activities_query, rows)
-    print(f"Successfully synced {cursor.rowcount} activities in total.")
+    with sql_conn:
+        row_count = sql_conn.executemany(insert_activities_query, rows).rowcount
+    print(f"Successfully synced {row_count} activities in total.")
 
 
 if __name__ == "__main__":
     ddb_conn = duckdb.connect()
     sql_conn = sqlite3.connect("stocks.db")
-    sql_conn.row_factory = sqlite3.Row
     sql_conn.execute("PRAGMA foreign_keys = ON")
 
     import_csv(sql_conn, ddb_conn, True)
