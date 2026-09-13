@@ -81,21 +81,6 @@ def update_accounts(snaptrade, conn):
     logger.info("Updated accounts table successfully via HTTP batch.")
 
 
-def update_account_nickname(conn, account_id: str, nickname: str | None):
-    clean_nickname = nickname.strip() or None if nickname else None
-    with conn:
-        conn.execute(
-            """
-            update accounts
-            set nickname = ?
-            where id = ?
-            """,
-            (clean_nickname, account_id),
-        )
-    logger.info("Updated nickname: %s for account: %s.", clean_nickname, account_id)
-    return clean_nickname
-
-
 def update_last_fetched(conn, api_source: str, account_id: str):
     conn.execute(
         """
@@ -201,12 +186,21 @@ def update_recent_orders(snaptrade, conn, account_id):
     return row_count
 
 
-def update_nickname(conn, account_id: str, nickname: str | None):
+def update_account_nickname(conn, account_id: str, nickname: str | None):
     try:
-        updated_name = update_account_nickname(conn, account_id, nickname)
+        clean_nickname = nickname.strip() or None if nickname else None
+        with conn:
+            conn.execute(
+                """
+                update accounts
+                set nickname = ?
+                where id = ?
+                """,
+                (clean_nickname, account_id),
+            )
         return {
             "status": "success",
-            "data": {"account_id": account_id, "nickname": updated_name},
+            "data": {"account_id": account_id, "nickname": clean_nickname},
         }
     except Exception as e:
         logger.exception(f"Failed to update nickname for account {account_id}")

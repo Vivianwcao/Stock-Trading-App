@@ -4,7 +4,7 @@ import json
 from handlers import click_update_all_activities, click_update_orders_by_account
 from update_tables import (
     update_accounts,
-    update_nickname,
+    update_account_nickname,
     update_wealth_simple_account_id,
 )
 from queries import create_tables, get_all_active_accounts, get_all_active_transactions
@@ -39,8 +39,8 @@ def handle_get_accounts(snaptrade, conn, data):
     return {"status": "success", "data": accounts}
 
 
-def handle_update_nickname(snaptrade, conn, data):
-    return update_nickname(conn, data.get("account_id"), data.get("nickname"))
+def handle_update_account_nickname(snaptrade, conn, data):
+    return update_account_nickname(conn, data.get("account_id"), data.get("nickname"))
 
 
 def handle_get_transactions(snaptrade, conn, data):
@@ -59,7 +59,9 @@ def handle_update_accounts(snaptrade, conn, data):
 
 
 def handle_update_wealth_simple_account_id(snaptrade, conn, data):
-    update_wealth_simple_account_id(snaptrade, conn)
+    update_wealth_simple_account_id(
+        conn, data.get("account_id"), data.get("ws_account_id")
+    )
     return {"status": "success"}
 
 
@@ -68,7 +70,7 @@ ACTION_REGISTRY = {
     "init_db": handle_init_db,
     "update_all_activities": handle_update_all_activities,
     "update_orders_by_account": handle_update_orders,
-    "update_nickname": handle_update_nickname,
+    "update_nickname": handle_update_account_nickname,
     "get_all_account": handle_get_accounts,
     "get_transactions": handle_get_transactions,
     "update_accounts": handle_update_accounts,
@@ -128,7 +130,7 @@ if __name__ == "__main__":
         # {"action": "update_all_activities"},
         # {"action": "get_all_account"},
         {
-            "action": "update_nickname",
+            "action": "update_account_nickname",
             "data": {
                 "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
                 "nickname": "vivian_fhsa",
