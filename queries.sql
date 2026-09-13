@@ -150,8 +150,10 @@ SELECT
   round(account_balance, 4) account_balance
 FROM partitioned;
 
--- in terminal run sqlite3 stocks.db
--- after csv bulk import and the first activities update
+-- in terminal run sqlite3 stocks.db, .exit or .quit to exit sqlite mode in terminal
+-- Investigate after csv bulk import and the first activities update
+-- We need to keep the last row from api_activities because it has the accurate microseconds for later update
+-- non BUY/SELL activities from api can have ws rows comined 
 -- find all activities from api_activities
 select * 
 from activities
@@ -173,8 +175,25 @@ where date(trade_date) = (
 group by substr(trade_date, 1, 19)
 having c = 2
 order by trade_date desc;
-	
--- delete the dup rows from wealth_simple csv bulk import
+
+	-- find all latest rows from csv bulk
+select 
+	* 
+from (
+	SELECT 
+		act.*,
+		nickname,
+		row_number() over (partition by nickname, symbol order by trade_date desc) rn
+	from activities act
+	join accounts acc 
+	on act.account_id = acc.id
+	where source = 'wealth_simple_csv'
+	and symbol is not null
+) x
+where rn = 1
+order by trade_date desc;
+
+-- Delete the dup rows from wealth_simple csv bulk import
 with x as(
 	select
 		substr(trade_date, 1, 19) d,
