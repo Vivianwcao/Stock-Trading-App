@@ -1,3 +1,8 @@
+-- run:
+sqlite3 stocks.db "PRAGMA journal_mode = DELETE;"
+-- to inspect the active journal mode of your database
+sqlite3 stocks.db "PRAGMA journal_mode;"
+
 CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, trade_date);
 
 DROP VIEW IF EXISTS transactions;
@@ -18,11 +23,7 @@ WITH
       sum(units) OVER (
         PARTITION BY nickname, symbol
         ORDER BY trade_date
-      ) AS rolling_units,
-      sum(amount) OVER (
-        PARTITION BY nickname
-        ORDER BY trade_date
-      ) AS account_balance
+      ) AS rolling_units
     from accounts acc
     join activities act
     on acc.id = act.account_id
@@ -146,8 +147,7 @@ SELECT
   END AS return_percentage,
   CASE
     WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
-  END AS realized_profit,
-  round(account_balance, 4) account_balance
+  END AS realized_profit
 FROM partitioned;
 
 -- in terminal run sqlite3 stocks.db, .exit or .quit to exit sqlite mode in terminal

@@ -100,11 +100,8 @@ def app_handler(event, context):
             conn.row_factory = sqlite3.Row
 
             conn.execute("PRAGMA foreign_keys = ON")
-            # # Flushes all WAL data to stocks.db AND shrinks stocks.db-wal to 0 bytes
-            # conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
-
-            # Flushes WAL data safely without throwing errors if DBeaver is open
-            conn.execute("PRAGMA wal_checkpoint(PASSIVE);")
+            # writes commit straight to stocks.db, and temporary files are automatically deleted instantly
+            conn.execute("PRAGMA journal_mode = DELETE;")
 
             res = controller(snaptrade, conn, data)
 

@@ -2,7 +2,7 @@
 Minimal Flask wrapper for local testing.
 
 Install: pip install flask
-Run:     python local_server.py
+Run:     python3 local_server.py
 Listens: http://localhost:8000
 """
 
