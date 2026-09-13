@@ -95,16 +95,19 @@ def app_handler(event, context):
         snaptrade = get_snaptrade_auth()
         # Connect to local database file (creates stocks.db automatically)
         conn = sqlite3.connect("stocks.db")
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
 
         try:
-            res = controller(snaptrade, conn, data)
+            conn.row_factory = sqlite3.Row
+
+            conn.execute("PRAGMA foreign_keys = ON")
             # # Flushes all WAL data to stocks.db AND shrinks stocks.db-wal to 0 bytes
             # conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
 
             # Flushes WAL data safely without throwing errors if DBeaver is open
             conn.execute("PRAGMA wal_checkpoint(PASSIVE);")
+
+            res = controller(snaptrade, conn, data)
+
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
         finally:
             conn.close()
@@ -127,7 +130,7 @@ if __name__ == "__main__":
         #     "action": "update_orders_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        # {"action": "update_all_activities"},
+        {"action": "update_all_activities"},
         # {"action": "get_all_account"},
         # {
         #     "action": "update_account_nickname",
@@ -136,12 +139,12 @@ if __name__ == "__main__":
         #         "nickname": "vivian_fhsa",
         #     },
         # },
-        {
-            "action": "update_wealth_simple_account_id",
-            "data": {
-                "account_id": "8bbc2e4f-feef-457d-b9a7-476a28f9fbc8",
-                "ws_account_id": "HC05761K0CAD",
-            },
-        },
+        # {
+        #     "action": "update_wealth_simple_account_id",
+        #     "data": {
+        #         "account_id": "8bbc2e4f-feef-457d-b9a7-476a28f9fbc8",
+        #         "ws_account_id": "HC05761K0CAD",
+        #     },
+        # },
         None,
     )
