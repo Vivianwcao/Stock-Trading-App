@@ -5,8 +5,10 @@ from datetime import datetime, timedelta, timezone
 # one time
 def init_db(conn):
     cursor = conn.cursor()
-    # To have the fresh database instance automatically inherits WAL mode
-    cursor.execute("PRAGMA journal_mode = WAL;")
+    # To have the fresh database instance automatically inherits DELETE mode (safe for aws lambda)
+    # if didn't init DB with delete mode simply run
+    # sqlite3 stocks.db "PRAGMA journal_mode = DELETE;"
+    cursor.execute("PRAGMA journal_mode = DELETE;")
     cursor.execute("PRAGMA foreign_keys = ON;")
 
     script = """
@@ -83,11 +85,7 @@ def init_db(conn):
             sum(units) OVER (
                 PARTITION BY nickname, symbol
                 ORDER BY trade_date
-            ) AS rolling_units,
-            sum(amount) OVER (
-                PARTITION BY nickname
-                ORDER BY trade_date
-            ) AS account_balance
+            ) AS rolling_units
             from accounts acc
             join activities act
             on acc.id = act.account_id
@@ -212,8 +210,7 @@ def init_db(conn):
         END AS return_percentage,
         CASE
             WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
-        END AS realized_profit,
-        round(account_balance, 4) account_balance
+        END AS realized_profit
         FROM partitioned;
         """
     )
