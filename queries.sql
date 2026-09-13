@@ -149,3 +149,50 @@ SELECT
   END AS realized_profit,
   round(account_balance, 4) account_balance
 FROM partitioned;
+
+-- in terminal run sqlite3 stocks.db
+-- after csv bulk import and the first activities update
+-- find all activities from api_activities
+select * 
+from activities
+where source='api_activities'
+order by trade_date desc;
+
+-- find the ids of wealth simple csv dup rows
+select
+	substr(trade_date, 1, 19) d,
+	count(*) c,
+	min(trade_date) ws_trade_date,
+	min(id) filter (where source = 'wealth_simple_csv') ws_id
+from activities
+where date(trade_date) = (
+	select 
+		date(max(trade_date))
+	from activities
+)
+group by substr(trade_date, 1, 19)
+having c = 2
+order by trade_date desc;
+	
+-- delete the dup rows from wealth_simple csv bulk import
+with x as(
+	select
+		substr(trade_date, 1, 19) d,
+		count(*) c,
+		min(trade_date) ws_trade_date,
+		min(id) filter (where source = 'wealth_simple_csv') ws_id
+	from activities
+	where date(trade_date) = (
+		select 
+			date(max(trade_date))
+		from activities
+	)
+	group by substr(trade_date, 1, 19)
+	having c = 2
+)
+delete from activities
+where id in (
+	select ws_id
+	from x
+);
+	
