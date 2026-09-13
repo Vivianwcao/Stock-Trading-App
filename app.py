@@ -129,11 +129,18 @@ if __name__ == "__main__":
         # },
         # {"action": "update_all_activities"},
         # {"action": "get_all_account"},
+        # {
+        #     "action": "update_account_nickname",
+        #     "data": {
+        #         "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
+        #         "nickname": "vivian_fhsa",
+        #     },
+        # },
         {
-            "action": "update_account_nickname",
+            "action": "update_wealth_simple_account_id",
             "data": {
-                "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
-                "nickname": "vivian_fhsa",
+                "account_id": "8bbc2e4f-feef-457d-b9a7-476a28f9fbc8",
+                "ws_account_id": "HC05761K0CAD",
             },
         },
         None,
