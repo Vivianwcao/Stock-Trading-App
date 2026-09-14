@@ -1,13 +1,17 @@
 from snaptrade import get_snaptrade_auth
 import logging
 import json
-from handlers import click_update_all_activities, click_update_orders_by_account
+from handlers import (
+    click_update_all_activities,
+    click_update_orders_by_account,
+    get_transactions_and_balances,
+)
 from update_tables import (
     update_accounts,
     update_account_nickname,
     update_wealth_simple_account_id,
 )
-from queries import create_tables, get_all_active_accounts, get_all_active_transactions
+from queries import create_tables, get_all_active_accounts
 import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -44,8 +48,7 @@ def handle_update_account_nickname(snaptrade, conn, data):
 
 
 def handle_get_transactions(snaptrade, conn, data):
-    transactions = get_all_active_transactions(conn, data)
-    return {"status": "success", "data": transactions}
+    return get_transactions_and_balances(conn, data)
 
 
 def handle_init_db(snaptrade, conn, data):
@@ -71,10 +74,10 @@ ACTION_REGISTRY = {
     "update_all_activities": handle_update_all_activities,
     "update_orders_by_account": handle_update_orders,
     "update_nickname": handle_update_account_nickname,
-    "get_all_account": handle_get_accounts,
-    "get_transactions": handle_get_transactions,
     "update_accounts": handle_update_accounts,
     "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
+    "get_all_accounts": handle_get_accounts,
+    "get_transactions": handle_get_transactions,
 }
 
 
@@ -128,7 +131,7 @@ if __name__ == "__main__":
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
         {"action": "update_all_activities"},
-        # {"action": "get_all_account"},
+        # {"action": "get_all_accounts"},
         # {
         #     "action": "update_account_nickname",
         #     "data": {

@@ -38,7 +38,6 @@ WITH
         ORDER BY trade_date
       ) AS pre_type,
       
-      /* Replaces correlated CTE subquery with a window function */
       substr(
         max(
           CASE
@@ -215,3 +214,10 @@ where id in (
 	from x
 );
 	
+select
+  nickname,
+  sum(amount) balance
+from activities act
+join accounts acc 
+on act.account_id = acc.id
+group by nickname;
