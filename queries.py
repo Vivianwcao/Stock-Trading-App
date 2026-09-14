@@ -232,18 +232,17 @@ def get_all_active_accounts(conn):
 
 
 def get_nicknames_by_ids(conn, account_ids):
-    placeholder = ",".join("," for _ in account_ids)
-    rows = conn.execute(
+    placeholder = ",".join("?" for _ in account_ids)
+    nicknames = conn.execute(
         f"""
             select
-                account_id,
                 nickname
             from accounts
             where account_id in ({placeholder})
         """,
         (*account_ids,),
     ).fetchall()
-    return rows
+    return [n["nickname"] for n in nicknames]
 
 
 def get_all_nicknames(conn):
@@ -255,7 +254,7 @@ def get_all_nicknames(conn):
             and status='open'
             and balance > 10
         """).fetchall()
-    return nicknames
+    return [n["nickname"] for n in nicknames]
 
 
 def get_active_transactions(
@@ -290,4 +289,9 @@ def get_accounts_balance_by_nickname(conn, nicknames_placeholder, nicknames):
     """,
         (*nicknames,),
     ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_last_fetched(conn):
+    rows = conn.execute("select * from last_fetched").fetchall()
     return [dict(r) for r in rows]
