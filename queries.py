@@ -1,7 +1,3 @@
-from update_tables import TRANSPORT_TYPES
-from datetime import datetime, timedelta, timezone
-
-
 # one time
 def init_db(conn):
     cursor = conn.cursor()
@@ -235,19 +231,23 @@ def get_all_active_accounts(conn):
     return [dict(r) for r in rows]
 
 
-def get_all_active_transactions(conn, data):
-    # a list or tuple
-    nicknames = data.get("nicknames")
-    start_date = data.get("start_date") or "2018-01-01"
-    # use tomorrow's date if no end_date provided
-    end_date = data.get("end_date") or (
-        datetime.now(timezone.utc) + timedelta(days=1)
-    ).strftime("%Y-%m-%d")
+def get_nicknames_by_ids(conn, account_ids):
+    placeholder = ",".join("," for _ in account_ids)
+    rows = conn.execute(
+        f"""
+            select
+                account_id,
+                nickname
+            from accounts
+            where account_id in ({placeholder})
+        """,
+        (*account_ids,),
+    ).fetchall()
+    return rows
 
-    cursor = conn.cursor()
 
-    if not nicknames:
-        names = cursor.execute("""
+def get_all_nicknames(conn):
+    nicknames = conn.execute("""
             select 
                 nickname
             from accounts
@@ -255,19 +255,39 @@ def get_all_active_transactions(conn, data):
             and status='open'
             and balance > 10
         """).fetchall()
-        nicknames = [r[0] for r in names]
+    return nicknames
 
-    placeholder = ",".join(["?" for _ in nicknames])
 
-    rows = cursor.execute(
+def get_active_transactions(
+    conn, nicknames_placeholder, nicknames, start_date, end_date
+):
+
+    rows = conn.execute(
         f"""
             select
                 *
             from transactions
-            where nickname in ({placeholder})
+            where nickname in ({nicknames_placeholder})
             and trade_date > ?
             and trade_date < ?
         """,
         (*nicknames, start_date, end_date),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_accounts_balance_by_nickname(conn, nicknames_placeholder, nicknames):
+    rows = conn.execute(
+        f"""
+        select
+            nickname,
+            sum(amount) balance
+        from activities act
+        join accounts acc 
+        on act.account_id = acc.id
+        where nickname in ({nicknames_placeholder})
+        group by nickname;
+    """,
+        (*nicknames,),
     ).fetchall()
     return [dict(r) for r in rows]

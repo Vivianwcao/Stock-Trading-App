@@ -1,6 +1,15 @@
 import logging
 
-from queries import get_all_active_accounts
+from datetime import datetime, timedelta, timezone
+
+from queries import (
+    get_all_active_accounts,
+    get_all_nicknames,
+    get_active_transactions,
+    get_accounts_balance_by_nickname,
+    get_nicknames_by_ids,
+    get_last_fetched,
+)
 from update_tables import (
     update_accounts,
     update_activities,
@@ -74,4 +83,34 @@ def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
+    }
+
+
+def get_transactions_and_balances(conn, data):
+    # a list or tuple
+    account_ids = data.get("account_ids")
+
+    if not account_ids:
+        nicknames = get_all_nicknames(conn)
+    else:
+        nicknames = get_nicknames_by_ids(conn, account_ids)
+
+    nicknames_placeholder = ",".join("?" for _ in nicknames)
+
+    start_date = data.get("start_date") or "2018-01-01"
+    # use tomorrow's date if no end_date provided
+    end_date = data.get("end_date") or (
+        datetime.now(timezone.utc) + timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+
+    transactions = get_active_transactions(
+        conn, nicknames_placeholder, nicknames, start_date, end_date
+    )
+    balances = get_accounts_balance_by_nickname(conn, nicknames_placeholder, nicknames)
+    last_fetched_timestamps = get_last_fetched(conn)
+    return {
+        "status": "success",
+        "transactions": transactions,
+        "accounts_balance": balances,
+        "last_fetched": last_fetched_timestamps,
     }
