@@ -1,3 +1,5 @@
+from snaptrade_client.exceptions import ApiException
+
 from snaptrade import get_snaptrade_auth
 import logging
 import json
@@ -111,6 +113,17 @@ def app_handler(event, context):
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
         finally:
             conn.close()
+    except ApiException as e:
+        try:
+            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
+            detail = body.get("detail", str(e))
+        except Exception:
+            detail = str(e)
+        return {
+            "statusCode": 500,
+            "headers": HEADERS,
+            "body": json.dumps({"status": "fail", "error": detail}),
+        }
 
     except Exception as e:
         logger.exception("Request failed.")
