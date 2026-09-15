@@ -1,6 +1,6 @@
 # Stock Trading App
 
-> Serverless Python application on AWS Lambda backed by SQLite on AWS EFS, featuring SnapTrade API integration, custom position analytics, a virtual trade calculator, and a Netlify web interface.
+> A tailored trade-tracking application that ingests multi-account API data into a custom database engine to compute non-standard position metrics and simulate trade outcomes.
 
 ---
 
