@@ -156,18 +156,25 @@ def update_recent_orders(snaptrade, conn, account_id):
 
     records = []
     for order in orders_list:
+        type = order["action"]
         price = float(order["execution_price"])
         qty = float(order["filled_quantity"])
 
+        if type == "SELL":
+            qty *= -1
+        amount = price * qty
+
+        if type == "BUY":
+            amount *= -1
         records.append(
             (
                 order["brokerage_order_id"],
                 account_id,
                 order["universal_symbol"]["raw_symbol"],
-                order["action"],
+                type,
                 price,
                 qty,
-                price * qty,
+                amount,
                 0,
                 order["universal_symbol"]["currency"]["code"],
                 order["time_executed"],

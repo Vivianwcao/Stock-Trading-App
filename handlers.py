@@ -72,7 +72,7 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
     }
 
 
-def click_update_orders_by_account(snaptrade, conn, account_id, seconds=30):
+def click_update_orders_by_account(snaptrade, conn, account_id, seconds=60):
     hrs, mins, secs = calculate_wait_time(
         conn, api_source="orders", account_id=account_id, seconds=seconds
     )

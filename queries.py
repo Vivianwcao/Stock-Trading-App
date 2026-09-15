@@ -238,7 +238,7 @@ def get_nicknames_by_ids(conn, account_ids):
             select
                 nickname
             from accounts
-            where account_id in ({placeholder})
+            where id in ({placeholder})
         """,
         (*account_ids,),
     ).fetchall()
