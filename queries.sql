@@ -8,9 +8,10 @@ CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, tr
 DROP VIEW IF EXISTS transactions;
 
 CREATE VIEW IF NOT EXISTS transactions AS
-WITH
+WITH recursive
   cleaned AS (
     SELECT
+      act.id,
       wealth_simple_account_id,
       account_id,
       nickname,
@@ -23,7 +24,7 @@ WITH
       sum(units) OVER (
         PARTITION BY nickname, symbol
         ORDER BY trade_date
-      ) AS rolling_units
+      ) AS holdings_per_stock
     from accounts acc
     join activities act
     on acc.id = act.account_id
@@ -62,10 +63,10 @@ WITH
         ) + 1
       ) AS pre_trade_type,
       
-      lag(rolling_units) OVER (
+      lag(holdings_per_stock) OVER (
         PARTITION BY nickname, symbol
         ORDER BY trade_date
-      ) AS pre_rolling_units
+      ) AS pre_holdings_per_stock
     FROM cleaned
   ),
   grouped AS (
@@ -75,44 +76,22 @@ WITH
         WHERE
           pre_trade_type = 'SELL'
           AND type = 'BUY'
-          AND pre_rolling_units <= 0
+          AND pre_holdings_per_stock <= 0
       ) OVER (
         PARTITION BY nickname, symbol
         ORDER BY trade_date
       ) AS cycles
-    FROM with_pres  -- FIXED: Added missing source table
+    FROM with_pres 
   ),
   partitioned AS (
     SELECT
       *,
-      sum(units) FILTER (
-        WHERE type = 'BUY'
-      ) OVER (
+      -- ideally this should equal to holdings_per_stock as there shouldn't be negative holdings
+      -- For safety in case negative holdings due to missing data or calculating errors.
+      sum(units) OVER (
         PARTITION BY nickname, symbol, cycles
         ORDER BY trade_date
-      ) AS bought_units,
-      
-      sum(amount) FILTER (
-        WHERE type = 'BUY'
-      ) OVER (
-        PARTITION BY nickname, symbol, cycles
-        ORDER BY trade_date
-      ) AS bought_balance,
-      
-      sum(amount) FILTER (
-        WHERE type = 'BUY'
-      ) OVER (
-        PARTITION BY nickname, symbol, cycles
-        ORDER BY trade_date
-      ) / nullif(
-        sum(units) FILTER (
-          WHERE type = 'BUY'
-        ) OVER (
-          PARTITION BY nickname, symbol, cycles
-          ORDER BY trade_date
-        ),
-        0
-      ) AS avg_bought_price,
+      ) AS holdings_per_cycle,
       
       sum(amount) FILTER (
         WHERE type = 'DIVIDEND'
@@ -120,34 +99,90 @@ WITH
         PARTITION BY nickname, symbol, cycles
         ORDER BY trade_date
       ) AS dividend_balance,
-      sum(amount) filter(where type in ('BUY', 'SELL')) over(partition by nickname, symbol, cycles order by trade_date) trading_balance
+
+    row_number() over(
+      PARTITION BY nickname, symbol, cycles
+      ORDER BY trade_date, id) rn
+
     FROM grouped
+  ),
+  tree as (
+    select
+      id,
+      nickname,
+      symbol,
+      type,
+      price,
+      units,
+      amount,
+      cycles,
+      holdings_per_cycle,
+      rn,
+      case when type = 'BUY' then amount
+        else 0
+      end bought_balance,
+      case when type = 'BUY' then price
+        else 0
+      end avg_bought_price
+    from partitioned
+    -- seeds condition
+    where rn = 1
+
+    union all
+
+    select
+      p.id,
+      p.nickname,
+      p.symbol,
+      p.type,
+      p.price,
+      p.units,
+      p.amount,
+      p.cycles,
+      p.holdings_per_cycle,
+      p.rn,
+      case when p.type = 'BUY' then t.bought_balance + p.amount
+      when p.type = 'SELL' then t.bought_balance - t.avg_bought_price * p.units
+      else t.bought_balance
+      end as bought_balance,
+
+      case when p.type = 'BUY' then abs(coalesce((t.bought_balance + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
+      else t.avg_bought_price
+      end as avg_bought_price
+    from partitioned p
+    join tree t 
+    on p.nickname = t.nickname
+    and p.symbol = t.symbol
+    and p.cycles = t.cycles
+    and p.rn = t.rn + 1
   )
-SELECT
-  wealth_simple_account_id,
-  account_id,
-  nickname,
-  trade_date,
-  symbol,
-  type,
-  price,
-  units,
-  amount,
-  rolling_units,
-  round(trading_balance, 4) trading_balance,
-  cycles,
-  round(avg_bought_price, 4) AS avg_bought_price,
-  round(dividend_balance, 4) AS dividend_balance,
-  CASE
-    WHEN type = 'SELL' THEN round(
-      (amount - avg_bought_price * units) * 100 / nullif(avg_bought_price * units, 0),
-      2
-    )
-  END AS return_percentage,
-  CASE
-    WHEN type = 'SELL' THEN round(amount - avg_bought_price * units, 2)
-  END AS realized_profit
-FROM partitioned;
+  SELECT
+    p.wealth_simple_account_id,
+    p.account_id,
+    t.nickname,
+    p.trade_date,
+    t.symbol,
+    t.type,
+    t.price,
+    t.units,
+    t.amount,
+    t.cycles,
+    t.holdings_per_cycle,
+    round(p.dividend_balance, 4) AS dividend_balance,
+    round(bought_balance, 4) AS bought_balance,
+    round(avg_bought_price, 4) AS avg_bought_price,
+    CASE
+      WHEN t.type = 'SELL' THEN round(
+        (t.price - avg_bought_price) * 100 / nullif(avg_bought_price, 0),
+        2
+      )
+    END AS return_percentage,
+    CASE
+      WHEN t.type = 'SELL' THEN round((t.price - avg_bought_price) * abs(t.units), 2)
+    END AS realized_profit
+  FROM tree t
+  join partitioned p
+  using(id);
 
 -- in terminal run sqlite3 stocks.db, .exit or .quit to exit sqlite mode in terminal
 -- Investigate after csv bulk import and the first activities update
@@ -221,3 +256,4 @@ from activities act
 join accounts acc 
 on act.account_id = acc.id
 group by nickname;
+
