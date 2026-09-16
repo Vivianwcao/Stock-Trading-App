@@ -221,6 +221,7 @@ def update_positions_per_account(snaptrade, conn, account_id):
                 for position in positions
             ),
         )
+        update_last_fetched(conn, "positions", account_id)
 
 
 def update_account_nickname(conn, account_id: str, nickname: str | None):
