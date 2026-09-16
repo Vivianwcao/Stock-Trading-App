@@ -193,6 +193,36 @@ def update_recent_orders(snaptrade, conn, account_id):
     return row_count
 
 
+def update_positions_per_account(snaptrade, conn, account_id):
+    positions, sync_date = get_account_positions(snaptrade, account_id).values()
+    cursor = conn.cursor()
+    with conn:
+        cursor.executemany(
+            """
+            insert into positions (account_id, symbol, holdings, 
+            current_price, cost_basis, last_successful_sync
+            )
+            values(?, ?, ?, ?, ?, ?)
+            on conflict (account_id, symbol) do update set
+            holdings = excluded.holdings, 
+            current_price = excluded.current_price, 
+            cost_basis = excluded.cost_basis, 
+            last_successful_sync = excluded.last_successful_sync
+        """,
+            (
+                (
+                    account_id,
+                    position["instrument"]["raw_symbol"],
+                    float(position["units"]),
+                    float(position["price"]),
+                    float(position["cost_basis"]),
+                    sync_date["as_of"],
+                )
+                for position in positions
+            ),
+        )
+
+
 def update_account_nickname(conn, account_id: str, nickname: str | None):
     try:
         clean_nickname = nickname.strip() or None if nickname else None

@@ -3,6 +3,20 @@ sqlite3 stocks.db "PRAGMA journal_mode = DELETE;"
 -- to inspect the active journal mode of your database
 sqlite3 stocks.db "PRAGMA journal_mode;"
 
+create table if not exists positions(
+    account_id text,
+    symbol text,
+    holdings real not null,
+    current_price real not null,
+    cost_basis real not null,
+    last_successful_sync text,
+
+    primary key (account_id, symbol),
+
+    Foreign Key (account_id) 
+      REFERENCES accounts(id)
+  );
+
 CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, trade_date);
 
 DROP VIEW IF EXISTS transactions;

@@ -52,12 +52,11 @@ def calculate_wait_time(
         row = cursor.execute(
             """
             select
-                fetched_at
+                max(fetched_at) fetched_at
             from last_fetched
             where account_id = ?
-            and api_source = ?
         """,
-            (account_id, api_source),
+            (account_id,),
         ).fetchone()
 
     # If never fetched before, no wait time is required
