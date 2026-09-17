@@ -213,9 +213,9 @@ def update_positions_per_account(snaptrade, conn, account_id):
                 (
                     account_id,
                     position["instrument"]["raw_symbol"],
-                    float(position["units"]),
-                    float(position["price"]),
-                    float(position["cost_basis"]),
+                    round(float(position["units"]), 4),
+                    round(float(position["price"]), 4),
+                    round(float(position["cost_basis"]), 4),
                     sync_date["as_of"],
                 )
                 for position in positions

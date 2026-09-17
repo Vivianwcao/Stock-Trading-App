@@ -35,12 +35,10 @@ def get_orders_last_24hrs(snaptrade, account_id):
 
 def get_account_positions(snaptrade, account_id):
     # List all account positions
-    res3 = snaptrade.account_information.get_all_account_positions(
-        account_id=account_id
-    )
+    res = snaptrade.account_information.get_all_account_positions(account_id=account_id)
     # with open("./test/positions.json", "w", encoding="utf-8") as f:
     #     json.dump(res3.body, f, indent=2, default=str)
-    return res3.body["results"]
+    return res.body
 
 
 # # test get activities
