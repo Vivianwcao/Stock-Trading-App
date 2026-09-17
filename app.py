@@ -14,7 +14,7 @@ from update_tables import (
     update_account_nickname,
     update_wealth_simple_account_id,
 )
-from queries import create_tables, get_all_active_accounts
+from queries import create_tables, get_all_active_accounts, get_positions_analysis
 import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -58,6 +58,10 @@ def handle_get_transactions(snaptrade, conn, data):
     return get_transactions_and_balances(conn, data)
 
 
+def handle_get_positions_analysis(snaptrade, conn, data):
+    return get_positions_analysis(conn)
+
+
 def handle_init_db(snaptrade, conn, data):
     create_tables(conn)
     return {"status": "success"}
@@ -90,6 +94,7 @@ ACTION_REGISTRY = {
     "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
     "get_all_accounts": handle_get_accounts,
     "get_transactions": handle_get_transactions,
+    "get_positions_analysis": handle_get_positions_analysis,
 }
 
 

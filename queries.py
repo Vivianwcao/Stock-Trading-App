@@ -344,9 +344,37 @@ def get_last_fetched(conn):
     return [dict(r) for r in rows]
 
 
-def get_ratios_from_positions(conn):
+def get_positions_analysis(conn):
     rows = conn.execute("""
-        with totals as (
+        with latest_date as(
+            select 
+                nickname,
+                symbol,
+                max(trade_date) latest_date
+            from transactions
+            where symbol is not null
+            group by 
+                nickname,
+                symbol
+        ),
+        dividends as (
+            select 
+                nickname,
+                symbol,
+                max(dividend_balance) dividend_balance
+            from transactions
+            where (nickname, symbol, trade_date) in (
+                select 
+                    nickname,
+                    symbol,
+                    latest_date 
+                from latest_date
+            )
+            group by 
+                nickname,
+                symbol 
+        ),
+        totals as (
             select 
                 account_id,
                 sum(holdings * cost_basis) total_bought, 
@@ -357,27 +385,30 @@ def get_ratios_from_positions(conn):
         select
             nickname, 
             p.account_id,
-            symbol,
+            p.symbol,
             holdings,
             cost_basis,
             current_price,
+            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
             round(holdings * cost_basis, 4) bought_balance,
             round(total_bought, 4) total_bought,
-            round(holdings * cost_basis*100 / total_bought, 2) bought_percentage,
-            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+            round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
             round(holdings * current_price, 4) current_balance,
             round(total_current, 4) total_current,
-            round(holdings * current_price*100 / total_current, 2) current_percentage,
-            rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_percentage_rnk,
-            rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_percentage_rnk,
-            rank() over(partition by account_id order by holdings * cost_basis desc) bought_balance_rnk,
-            rank() over(partition by account_id order by holdings * current_price desc) current_balance_rnk,
-            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
-            p.last_successful_sync
+            round(holdings * current_price*100 / total_current, 2) current_ratio,
+            dividend_balance,
+            rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
+            rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
+            rank() over(partition by nickname order by holdings * cost_basis desc) bought_balance_rnk,
+            rank() over(partition by nickname order by holdings * current_price desc) current_balance_rnk,
+            rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+        p.last_successful_sync
         from positions p
-        join totals
+        join totals t
             using(account_id)
         join accounts
-            on p.account_id = id;
+            on p.account_id = id
+        join dividends
+            using(nickname, symbol);
     """).fetchall()
     return [dict(r) for r in rows]
