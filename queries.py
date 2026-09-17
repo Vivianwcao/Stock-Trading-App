@@ -344,16 +344,16 @@ def get_last_fetched(conn):
     return [dict(r) for r in rows]
 
 
-def get_positions(conn):
+def get_ratios_from_positions(conn):
     rows = conn.execute("""
         select 
             *,
             round(holdings * cost_basis, 4) bought_balance,
-            round(holdings * current_price, 4) current_balance
-            round((current_price - cost_basis)*100 / cost_basis, 4) growth_percentage
-            rank() over(partition by nickname order by bought_balance desc) bought_balance_rnk,
-            rank() over(partition by nickname ordr by current_balance desc) current_balance_rnk,
-            rank() over(partition by nickname ordr by growth_percentage desc) growth_percentage_rnk
-        from positions p
+            round(holdings * current_price, 4) current_balance,
+            round((current_price - cost_basis)*100 / cost_basis, 4) growth_percentage,
+            rank() over(partition by account_id order by holdings * cost_basis desc) bought_balance_rnk,
+            rank() over(partition by account_id order by holdings * current_price desc) current_balance_rnk,
+            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk
+        from positions;
     """).fetchall()
     return [dict(r) for r in rows]
