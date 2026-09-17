@@ -1,6 +1,7 @@
 import os
 import logging
 from datetime import datetime, timezone, timedelta
+from re import M
 from dotenv import load_dotenv
 import libsql_client
 
@@ -30,41 +31,9 @@ def x_days_ago(x):
     return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
-# The * means everything after it must be passed as named arguments
-# only one of the three (hours, minutes, seconds) should be passed
-def calculate_wait_time(
-    conn, *, api_source, account_id=None, hours=0, minutes=0, seconds=0
-):
-    cursor = conn.cursor()
-    if account_id is None:
-        # activities, check all accounts
-        row = cursor.execute(
-            """
-            select
-                max(fetched_at) fetched_at
-            from last_fetched
-            where api_source = ?
-        """,
-            (api_source,),
-        ).fetchone()
-    else:
-        # orders, check by account
-        row = cursor.execute(
-            """
-            select
-                max(fetched_at) fetched_at
-            from last_fetched
-            where account_id = ?
-        """,
-            (account_id,),
-        ).fetchone()
-
-    # If never fetched before, no wait time is required
-    if not row or not row["fetched_at"]:
-        return 0, 0, 0
-
+def time_delta_calculator(timestamp_str, *, hours=0, minutes=0, seconds=0):
     current_time = datetime.now(timezone.utc)
-    last_fetch_time = datetime.fromisoformat(row["fetched_at"].replace("Z", "+00:00"))
+    last_fetch_time = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
     elapsed = current_time - last_fetch_time
 
     total_seconds = hours * 3600 + minutes * 60 + seconds - int(elapsed.total_seconds())
@@ -74,6 +43,58 @@ def calculate_wait_time(
     mins = total_seconds % 3600 // 60
     secs = total_seconds % 3600 % 60
     return hrs, mins, secs
+
+
+# The * means everything after it must be passed as named arguments
+# only one of the three (hours, minutes, seconds) should be passed
+def calculate_wait_time(
+    conn,
+    *,
+    is_activities=False,
+    account_id=None,
+    hours=0,
+    minutes=0,
+    seconds=0,
+    activities_hours=0,
+):
+    cursor = conn.cursor()
+    # pre-check, per Snaptrade account
+    latest = cursor.execute(
+        """
+        select
+            max(fetched_at) fetched_at
+        from last_fetched
+    """
+    ).fetchone()
+
+    # If never fetched from API ever before, no wait time is required
+    if not latest or not latest["fetched_at"]:
+        return 0, 0, 0
+    times = time_delta_calculator(
+        latest["fetched_at"], hours=hours, minutes=minutes, seconds=seconds
+    )
+
+    if is_activities is False:
+        return times
+
+    else:
+        # go to next step
+        # activities batch, check all accounts, update accounts table
+        row = cursor.execute(
+            """
+            select
+                max(fetched_at) fetched_at
+            from last_fetched
+            where api_source = 'activities'
+            and account_id = ?
+        """,
+            (account_id,),
+        ).fetchone()
+
+        # If never fetched before, no wait time is required
+        if not row or not row["fetched_at"]:
+            return 0, 0, 0
+        return time_delta_calculator(latest["fetched_at"], hours=activities_hours)
 
 
 def get_turso_client():

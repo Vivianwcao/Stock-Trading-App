@@ -1,6 +1,7 @@
 import logging
 
 from datetime import datetime, timedelta, timezone
+import time
 
 from queries import (
     get_all_active_accounts,
@@ -14,6 +15,7 @@ from update_tables import (
     update_accounts,
     update_activities,
     update_recent_orders,
+    update_positions_per_account,
 )
 from utils import calculate_wait_time
 
@@ -30,8 +32,10 @@ logging.basicConfig(level=logging.INFO)  # required for local
 # }
 
 
-def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
-    hrs, mins, secs = calculate_wait_time(conn, api_source="activities", hours=hours)
+def click_update_all_activities(
+    snaptrade, conn, hours=0, minutes=0, seconds=0, activities_hours=0, is_bulk=False
+):
+    hrs, mins, secs = calculate_wait_time(conn, is_activities=False, seconds=seconds)
     if hrs == mins == secs == 0:
         # ready tp update:
         update_accounts(snaptrade, conn)
@@ -44,7 +48,10 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
         for account_id, info in account_ids.items():
             try:
                 hrs, mins, secs = calculate_wait_time(
-                    conn, api_source="activities", account_id=account_id, hours=hours
+                    conn,
+                    is_activities=True,
+                    account_id=account_id,
+                    activities_hours=activities_hours,
                 )
                 if hrs == mins == secs == 0:
                     # ready tp update:
@@ -54,9 +61,13 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
                     )
                     info["status"] = "success"
                     info["data"] = {"rows_updated": rows_updated}
+
+                    logger.info("Sleep for 20 secs ...")
+                    time.sleep(20)
                 else:
                     info["status"] = "cooldown"
                     info["data"] = {"hours": hrs, "minutes": mins, "seconds": secs}
+
             except Exception as e:
                 logger.exception(
                     f"Failed to sync account: {account_id}. Continuing to next account."
@@ -72,13 +83,41 @@ def click_update_all_activities(snaptrade, conn, hours=4, is_bulk=False):
     }
 
 
-def click_update_orders_by_account(snaptrade, conn, account_id, seconds=60):
+def click_update_orders_by_account(
+    snaptrade,
+    conn,
+    account_id,
+    hours=0,
+    minutes=0,
+    seconds=0,
+):
     hrs, mins, secs = calculate_wait_time(
-        conn, api_source="orders", account_id=account_id, seconds=seconds
+        conn, is_activities=False, account_id=account_id, seconds=seconds
     )
     if hrs == mins == secs == 0:
         # ready tp update:
         rows_updated = update_recent_orders(snaptrade, conn, account_id)
+        return {"status": "success", "data": {"rows_updated": rows_updated}}
+    return {
+        "status": "cooldown",
+        "data": {"hours": hrs, "minutes": mins, "seconds": secs},
+    }
+
+
+def click_update_positions_by_account(
+    snaptrade,
+    conn,
+    account_id,
+    hours=0,
+    minutes=0,
+    seconds=0,
+):
+    hrs, mins, secs = calculate_wait_time(
+        conn, is_activities=False, account_id=account_id, seconds=seconds
+    )
+    if hrs == mins == secs == 0:
+        # ready tp update:
+        rows_updated = update_positions_per_account(snaptrade, conn, account_id)
         return {"status": "success", "data": {"rows_updated": rows_updated}}
     return {
         "status": "cooldown",
