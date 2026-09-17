@@ -258,6 +258,78 @@ def init_db(conn):
         """
     )
 
+    cursor.executescript(
+        """   
+        DROP VIEW IF EXISTS analysis;
+
+        CREATE VIEW IF NOT EXISTS analysis AS
+        with latest_date as(
+            select 
+                nickname,
+                symbol,
+                max(trade_date) latest_date
+            from transactions
+            where symbol is not null
+            group by 
+                nickname,
+                symbol
+        ),
+        dividends as (
+            select 
+                nickname,
+                symbol,
+                max(dividend_balance) dividend_balance
+            from transactions
+            where (nickname, symbol, trade_date) in (
+                select 
+                    nickname,
+                    symbol,
+                    latest_date 
+                from latest_date
+            )
+            group by 
+                nickname,
+                symbol 
+        ),
+        totals as (
+            select 
+                account_id,
+                sum(holdings * cost_basis) total_bought, 
+                sum(holdings * current_price) total_current
+            from positions
+            group by account_id
+        )
+        select
+            nickname, 
+            p.account_id,
+            p.symbol,
+            holdings,
+            cost_basis,
+            current_price,
+            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+            round(holdings * cost_basis, 4) bought_balance,
+            round(total_bought, 4) total_bought,
+            round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
+            round(holdings * current_price, 4) current_balance,
+            round(total_current, 4) total_current,
+            round(holdings * current_price*100 / total_current, 2) current_ratio,
+            dividend_balance,
+            rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
+            rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
+            rank() over(partition by nickname order by holdings * cost_basis desc) bought_balance_rnk,
+            rank() over(partition by nickname order by holdings * current_price desc) current_balance_rnk,
+            rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+        p.last_successful_sync
+        from positions p
+        join totals t
+            using(account_id)
+        join accounts
+            on p.account_id = id
+        join dividends
+            using(nickname, symbol);
+        """
+    )
+
 
 def create_tables(conn):
     cursor = conn.cursor()
@@ -345,70 +417,5 @@ def get_last_fetched(conn):
 
 
 def get_positions_analysis(conn):
-    rows = conn.execute("""
-        with latest_date as(
-            select 
-                nickname,
-                symbol,
-                max(trade_date) latest_date
-            from transactions
-            where symbol is not null
-            group by 
-                nickname,
-                symbol
-        ),
-        dividends as (
-            select 
-                nickname,
-                symbol,
-                max(dividend_balance) dividend_balance
-            from transactions
-            where (nickname, symbol, trade_date) in (
-                select 
-                    nickname,
-                    symbol,
-                    latest_date 
-                from latest_date
-            )
-            group by 
-                nickname,
-                symbol 
-        ),
-        totals as (
-            select 
-                account_id,
-                sum(holdings * cost_basis) total_bought, 
-                sum(holdings * current_price) total_current
-            from positions
-            group by account_id
-        )
-        select
-            nickname, 
-            p.account_id,
-            p.symbol,
-            holdings,
-            cost_basis,
-            current_price,
-            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
-            round(holdings * cost_basis, 4) bought_balance,
-            round(total_bought, 4) total_bought,
-            round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
-            round(holdings * current_price, 4) current_balance,
-            round(total_current, 4) total_current,
-            round(holdings * current_price*100 / total_current, 2) current_ratio,
-            dividend_balance,
-            rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
-            rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-            rank() over(partition by nickname order by holdings * cost_basis desc) bought_balance_rnk,
-            rank() over(partition by nickname order by holdings * current_price desc) current_balance_rnk,
-            rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
-        p.last_successful_sync
-        from positions p
-        join totals t
-            using(account_id)
-        join accounts
-            on p.account_id = id
-        join dividends
-            using(nickname, symbol);
-    """).fetchall()
+    rows = conn.execute("select * from analysis").fetchall()
     return [dict(r) for r in rows]
