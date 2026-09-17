@@ -346,14 +346,38 @@ def get_last_fetched(conn):
 
 def get_ratios_from_positions(conn):
     rows = conn.execute("""
-        select 
-            *,
+        with totals as (
+            select 
+                account_id,
+                sum(holdings * cost_basis) total_bought, 
+                sum(holdings * current_price) total_current
+            from positions
+            group by account_id
+        )
+        select
+            nickname, 
+            p.account_id,
+            symbol,
+            holdings,
+            cost_basis,
+            current_price,
             round(holdings * cost_basis, 4) bought_balance,
+            round(total_bought, 4) total_bought,
+            round(holdings * cost_basis*100 / total_bought, 2) bought_percentage,
+            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
             round(holdings * current_price, 4) current_balance,
-            round((current_price - cost_basis)*100 / cost_basis, 4) growth_percentage,
+            round(total_current, 4) total_current,
+            round(holdings * current_price*100 / total_current, 2) current_percentage,
+            rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_percentage_rnk,
+            rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_percentage_rnk,
             rank() over(partition by account_id order by holdings * cost_basis desc) bought_balance_rnk,
             rank() over(partition by account_id order by holdings * current_price desc) current_balance_rnk,
-            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk
-        from positions;
+            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+            p.last_successful_sync
+        from positions p
+        join totals
+            using(account_id)
+        join accounts
+            on p.account_id = id;
     """).fetchall()
     return [dict(r) for r in rows]
