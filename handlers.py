@@ -115,7 +115,7 @@ def click_update_orders_and_get_transactions_by_accounts(
     if hrs == mins == secs == 0:
         # ready tp update:
         rows_updated = update_recent_orders(snaptrade, conn, account_id)
-        fetched_at = get_last_fetched(conn, "activities", account_id)
+        fetched_at = get_last_fetched(conn, "orders", account_id)
         transactions = get_transactions(conn, {"account_ids": [account_id]})
         return {
             "status": "success",

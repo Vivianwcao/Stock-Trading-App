@@ -186,7 +186,7 @@ def update_recent_orders(snaptrade, conn, account_id):
             insert_activities_query,
             records,
         ).rowcount
-    update_last_fetched(conn, "orders", account_id)
+        update_last_fetched(conn, "orders", account_id)
     logger.info(
         f"Successfully synced {row_count} orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
