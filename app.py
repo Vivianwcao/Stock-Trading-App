@@ -42,7 +42,7 @@ def handle_update_activities(snaptrade, conn, data):
         snaptrade,
         conn,
         data.get("account_id"),
-        seconds=20,
+        seconds=60,
         activities_hours=4,
         is_bulk=False,
     )
