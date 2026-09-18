@@ -272,7 +272,10 @@ on act.account_id = acc.id
 group by nickname;
 
 
-with latest_date as(
+DROP VIEW IF EXISTS analysis;
+
+CREATE VIEW IF NOT EXISTS analysis AS
+  with latest_date as(
 	select 
 		nickname,
 		symbol,
@@ -319,14 +322,12 @@ select
 	round(holdings * cost_basis, 4) cost,
 	round(total_bought, 4) total_bought,
 	round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
-	round(holdings * current_price, 4) current_balance,
+	round(holdings * current_price, 4) current_value,
 	round(total_current, 4) total_current,
 	round(holdings * current_price*100 / total_current, 2) current_ratio,
 	dividend_balance,
 	rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
 	rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-	rank() over(partition by nickname order by holdings * cost_basis desc) cost_rnk,
-	rank() over(partition by nickname order by holdings * current_price desc) current_balance_rnk,
 	rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
   p.last_successful_sync
 from positions p
