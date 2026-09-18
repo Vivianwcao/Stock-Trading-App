@@ -134,10 +134,10 @@ WITH recursive
       rn,
       case when type = 'BUY' then amount
         else 0
-      end bought_balance,
+      end cost,
       case when type = 'BUY' then price
         else 0
-      end avg_bought_price
+      end avg_cost
     from partitioned
     -- seeds condition
     where rn = 1
@@ -155,14 +155,14 @@ WITH recursive
       p.cycles,
       p.holdings_per_cycle,
       p.rn,
-      case when p.type = 'BUY' then t.bought_balance + p.amount
-      when p.type = 'SELL' then t.bought_balance - t.avg_bought_price * p.units
-      else t.bought_balance
-      end as bought_balance,
+      case when p.type = 'BUY' then t.cost + p.amount
+      when p.type = 'SELL' then t.cost - t.avg_cost * p.units
+      else t.cost
+      end as cost,
 
-      case when p.type = 'BUY' then abs(coalesce((t.bought_balance + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
-      else t.avg_bought_price
-      end as avg_bought_price
+      case when p.type = 'BUY' then abs(coalesce((t.cost + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
+      else t.avg_cost
+      end as avg_cost
     from partitioned p
     join tree t 
     on p.nickname = t.nickname
@@ -183,16 +183,16 @@ WITH recursive
     t.cycles,
     t.holdings_per_cycle,
     round(p.dividend_balance, 4) AS dividend_balance,
-    round(bought_balance, 4) AS bought_balance,
-    round(avg_bought_price, 4) AS avg_bought_price,
+    round(cost, 4) AS cost,
+    round(avg_cost, 4) AS avg_cost,
     CASE
       WHEN t.type = 'SELL' THEN round(
-        (t.price - avg_bought_price) * 100 / nullif(avg_bought_price, 0),
+        (t.price - avg_cost) * 100 / nullif(avg_cost, 0),
         2
       )
     END AS return_percentage,
     CASE
-      WHEN t.type = 'SELL' THEN round((t.price - avg_bought_price) * abs(t.units), 2)
+      WHEN t.type = 'SELL' THEN round((t.price - avg_cost) * abs(t.units), 2)
     END AS realized_profit
   FROM tree t
   join partitioned p
