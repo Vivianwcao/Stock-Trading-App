@@ -41,10 +41,9 @@ def click_get_latest_accounts(snaptrade, conn, *, hours=0, minutes=0, seconds=0)
         # ready tp update:
         update_accounts(snaptrade, conn)
         accounts = get_all_active_accounts(conn)
-        balances = get_accounts_balances(conn)
         return {
             "status": "success",
-            "data": {"accounts": accounts, "balances": balances},
+            "data": {"accounts": accounts},
         }
     return {
         "status": "cooldown",
@@ -169,3 +168,20 @@ def get_transactions(conn, data):
     return get_active_transactions(
         conn, nicknames_placeholder, nicknames, start_date, end_date
     )
+
+
+def on_page_load(conn):
+    transactions = get_transactions(conn, {})
+    analysis = get_analysis(conn)
+    accounts = get_all_active_accounts(conn)
+    rows = conn.execute("select * from last_fetched").fetchall()
+    last_fetched = [dict(row) for row in rows]
+    return {
+        "status": "success",
+        "data": {
+            "transactions": transactions,
+            "analysis": analysis,
+            "accounts": accounts,
+            "last_fetched": last_fetched,
+        },
+    }
