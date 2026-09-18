@@ -394,21 +394,6 @@ def get_active_transactions(
     return [dict(r) for r in rows]
 
 
-def get_accounts_balances(conn):
-    rows = conn.execute(
-        """
-        select
-            nickname,
-            sum(amount) balance
-        from activities act
-        join accounts acc 
-        on act.account_id = acc.id
-        group by nickname;
-    """
-    ).fetchall()
-    return [dict(r) for r in rows]
-
-
 def get_last_fetched(conn, api_source, account_id):
     row = conn.execute(
         """

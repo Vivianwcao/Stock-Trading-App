@@ -4,6 +4,7 @@ from snaptrade import get_snaptrade_auth
 import logging
 import json
 from handlers import (
+    on_page_load,
     click_update_activities_by_account,
     click_update_orders_and_get_transactions_by_accounts,
     get_transactions,
@@ -32,6 +33,10 @@ HEADERS = {
 
 
 # ── Action Controllers ───────────────────────────────────────────────────────
+def handle_on_page_load(snaptrade, conn, data):
+    return on_page_load(conn)
+
+
 def handle_update_activities(snaptrade, conn, data):
     return click_update_activities_by_account(
         snaptrade,
@@ -92,6 +97,7 @@ def handle_update_account_nickname(snaptrade, conn, data):
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
     "init_db": handle_init_db,
+    "on_page_load": handle_on_page_load,
     "update_activities_by_account": handle_update_activities,
     "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
     "update_and_get_accounts": handle_update_and_get_accounts,
