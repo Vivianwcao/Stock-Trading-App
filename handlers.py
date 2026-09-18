@@ -7,9 +7,10 @@ from queries import (
     get_all_active_accounts,
     get_all_nicknames,
     get_active_transactions,
-    get_accounts_balance_by_nickname,
+    get_accounts_balances,
     get_nicknames_by_ids,
     get_last_fetched,
+    get_analysis,
 )
 from update_tables import (
     update_accounts,
@@ -32,79 +33,96 @@ logging.basicConfig(level=logging.INFO)  # required for local
 # }
 
 
-def click_update_all_activities(
-    snaptrade, conn, hours=0, minutes=0, seconds=0, activities_hours=0, is_bulk=False
-):
-    hrs, mins, secs = calculate_wait_time(conn, is_activities=False, seconds=seconds)
+def click_get_latest_accounts(snaptrade, conn, *, hours=0, minutes=0, seconds=0):
+    hrs, mins, secs = calculate_wait_time(
+        conn, is_activities=False, hours=hours, minutes=minutes, seconds=seconds
+    )
     if hrs == mins == secs == 0:
         # ready tp update:
         update_accounts(snaptrade, conn)
-
         accounts = get_all_active_accounts(conn)
-        if not accounts:
-            return {"status": "fail", "error": "No active accounts found"}
-
-        account_ids = {account["id"]: {} for account in accounts}
-        for account_id, info in account_ids.items():
-            try:
-                hrs, mins, secs = calculate_wait_time(
-                    conn,
-                    is_activities=True,
-                    account_id=account_id,
-                    activities_hours=activities_hours,
-                )
-                if hrs == mins == secs == 0:
-                    # ready tp update:
-
-                    rows_updated = update_activities(
-                        snaptrade, conn, account_id, is_bulk
-                    )
-                    info["status"] = "success"
-                    info["data"] = {"rows_updated": rows_updated}
-
-                    logger.info("Sleep for 20 secs ...")
-                    time.sleep(20)
-                else:
-                    info["status"] = "cooldown"
-                    info["data"] = {"hours": hrs, "minutes": mins, "seconds": secs}
-
-            except Exception as e:
-                logger.exception(
-                    f"Failed to sync account: {account_id}. Continuing to next account."
-                )
-                info["status"] = "fail"
-                info["error"] = f"{type(e).__name__}: {str(e)}"
-
-        return {"status": "success", "data": account_ids}
-
+        balances = get_accounts_balances(conn)
+        return {
+            "status": "success",
+            "data": {"accounts": accounts, "balances": balances},
+        }
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
     }
 
 
-def click_update_orders_by_account(
+def click_update_activities_by_account(
     snaptrade,
     conn,
     account_id,
+    *,
+    hours=0,
+    minutes=0,
+    seconds=0,
+    activities_hours=0,
+    is_bulk=False,
+):
+    hrs, mins, secs = calculate_wait_time(
+        conn,
+        is_activities=True,
+        account_id=account_id,
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds,
+        activities_hours=activities_hours,
+    )
+    if hrs == mins == secs == 0:
+        # ready tp update:
+        rows_updated = update_activities(snaptrade, conn, account_id, is_bulk)
+        fetched_at = get_last_fetched(conn, "activities", account_id)
+        return {
+            "status": "success",
+            "data": {"rows_updated": rows_updated, "fetched_at": fetched_at},
+        }
+    return {
+        "status": "cooldown",
+        "data": {"hours": hrs, "minutes": mins, "seconds": secs},
+    }
+
+
+def click_update_orders_and_get_transactions_by_accounts(
+    snaptrade,
+    conn,
+    account_id,
+    *,
     hours=0,
     minutes=0,
     seconds=0,
 ):
     hrs, mins, secs = calculate_wait_time(
-        conn, is_activities=False, account_id=account_id, seconds=seconds
+        conn,
+        is_activities=False,
+        account_id=account_id,
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds,
     )
     if hrs == mins == secs == 0:
         # ready tp update:
         rows_updated = update_recent_orders(snaptrade, conn, account_id)
-        return {"status": "success", "data": {"rows_updated": rows_updated}}
+        fetched_at = get_last_fetched(conn, "activities", account_id)
+        transactions = get_transactions(conn, {"account_ids": [account_id]})
+        return {
+            "status": "success",
+            "data": {
+                "rows_updated": rows_updated,
+                "fetched_at": fetched_at,
+                "transactions": transactions,
+            },
+        }
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
     }
 
 
-def click_update_positions_by_account(
+def click_update_positions_by_account_and_get_analysis_by_account(
     snaptrade,
     conn,
     account_id,
@@ -113,19 +131,25 @@ def click_update_positions_by_account(
     seconds=0,
 ):
     hrs, mins, secs = calculate_wait_time(
-        conn, is_activities=False, account_id=account_id, seconds=seconds
+        conn,
+        is_activities=False,
+        account_id=account_id,
+        hours=hours,
+        minutes=minutes,
+        seconds=seconds,
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        rows_updated = update_positions_per_account(snaptrade, conn, account_id)
-        return {"status": "success", "data": {"rows_updated": rows_updated}}
+        update_positions_per_account(snaptrade, conn, account_id)
+        rows = get_analysis(conn)
+        return {"status": "success", "data": rows}
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
     }
 
 
-def get_transactions_and_balances(conn, data):
+def get_transactions(conn, data):
     # a list or tuple
     account_ids = data.get("account_ids")
 
@@ -142,14 +166,6 @@ def get_transactions_and_balances(conn, data):
         datetime.now(timezone.utc) + timedelta(days=1)
     ).strftime("%Y-%m-%d")
 
-    transactions = get_active_transactions(
+    return get_active_transactions(
         conn, nicknames_placeholder, nicknames, start_date, end_date
     )
-    balances = get_accounts_balance_by_nickname(conn, nicknames_placeholder, nicknames)
-    last_fetched_timestamps = get_last_fetched(conn)
-    return {
-        "status": "success",
-        "transactions": transactions,
-        "accounts_balance": balances,
-        "last_fetched": last_fetched_timestamps,
-    }
