@@ -63,20 +63,31 @@ def click_update_activities_by_account(
 ):
     hrs, mins, secs = calculate_wait_time(
         conn,
-        is_activities=True,
+        is_activities=False,
         account_id=account_id,
         hours=hours,
         minutes=minutes,
         seconds=seconds,
-        activities_hours=activities_hours,
     )
     if hrs == mins == secs == 0:
-        # ready tp update:
-        rows_updated = update_activities(snaptrade, conn, account_id, is_bulk)
-        fetched_at = get_last_fetched(conn, "activities", account_id)
+        # okay to make another API call:
+        act_hrs, act_mins, act_secs = calculate_wait_time(
+            conn,
+            is_activities=True,
+            account_id=account_id,
+            hours=activities_hours,
+        )
+        if act_hrs == act_mins == act_secs == 0:
+            # ready to update
+            rows_updated = update_activities(snaptrade, conn, account_id, is_bulk)
+            fetched_at = get_last_fetched(conn, "activities", account_id)
+            return {
+                "status": "success",
+                "data": {"rows_updated": rows_updated, "fetched_at": fetched_at},
+            }
         return {
-            "status": "success",
-            "data": {"rows_updated": rows_updated, "fetched_at": fetched_at},
+            "status": "cooldown",
+            "data": {"hours": act_hrs, "minutes": act_mins, "seconds": act_secs},
         }
     return {
         "status": "cooldown",
