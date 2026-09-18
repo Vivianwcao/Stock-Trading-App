@@ -394,28 +394,36 @@ def get_active_transactions(
     return [dict(r) for r in rows]
 
 
-def get_accounts_balance_by_nickname(conn, nicknames_placeholder, nicknames):
+def get_accounts_balances(conn):
     rows = conn.execute(
-        f"""
+        """
         select
             nickname,
             sum(amount) balance
         from activities act
         join accounts acc 
         on act.account_id = acc.id
-        where nickname in ({nicknames_placeholder})
         group by nickname;
-    """,
-        (*nicknames,),
+    """
     ).fetchall()
     return [dict(r) for r in rows]
 
 
-def get_last_fetched(conn):
-    rows = conn.execute("select * from last_fetched").fetchall()
-    return [dict(r) for r in rows]
+def get_last_fetched(conn, api_source, account_id):
+    row = conn.execute(
+        """
+        select
+            account_id,
+            fetched_at
+        from last_fetched 
+        where api_source = ?
+        and account_id = ?
+        """,
+        (api_source, account_id),
+    ).fetchone()
+    return dict(row) if row else None
 
 
-def get_positions_analysis(conn):
+def get_analysis(conn):
     rows = conn.execute("select * from analysis").fetchall()
     return [dict(r) for r in rows]

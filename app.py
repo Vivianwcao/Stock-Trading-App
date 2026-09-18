@@ -4,17 +4,18 @@ from snaptrade import get_snaptrade_auth
 import logging
 import json
 from handlers import (
-    click_update_all_activities,
-    click_update_orders_by_account,
-    get_transactions_and_balances,
-    click_update_positions_by_account,
+    click_update_activities_by_account,
+    click_update_orders_and_get_transactions_by_accounts,
+    get_transactions,
+    click_update_positions_by_account_and_get_analysis_by_account,
+    click_get_latest_accounts,
 )
 from update_tables import (
     update_accounts,
     update_account_nickname,
     update_wealth_simple_account_id,
 )
-from queries import create_tables, get_all_active_accounts, get_positions_analysis
+from queries import create_tables, get_all_active_accounts, get_analysis
 import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -31,20 +32,25 @@ HEADERS = {
 
 
 # ── Action Controllers ───────────────────────────────────────────────────────
-def handle_update_all_activities(snaptrade, conn, data):
-    return click_update_all_activities(
-        snaptrade, conn, seconds=20, activities_hours=4, is_bulk=False
+def handle_update_activities(snaptrade, conn, data):
+    return click_update_activities_by_account(
+        snaptrade,
+        conn,
+        data.get("account_id"),
+        seconds=20,
+        activities_hours=4,
+        is_bulk=False,
     )
 
 
-def handle_update_orders(snaptrade, conn, data):
-    return click_update_orders_by_account(
+def handle_update_orders_and_get_transactions(snaptrade, conn, data):
+    return click_update_orders_and_get_transactions_by_accounts(
         snaptrade, conn, data.get("account_id"), seconds=60
     )
 
 
-def handle_update_positions(snaptrade, conn, data):
-    return click_update_positions_by_account(
+def handle_update_positions_and_get_analysis(snaptrade, conn, data):
+    return click_update_positions_by_account_and_get_analysis_by_account(
         snaptrade, conn, data.get("account_id"), seconds=60
     )
 
@@ -55,11 +61,12 @@ def handle_get_accounts(snaptrade, conn, data):
 
 
 def handle_get_transactions(snaptrade, conn, data):
-    return get_transactions_and_balances(conn, data)
+    transactions = get_transactions(conn, data)
+    return {"status": "success", "data": transactions}
 
 
-def handle_get_positions_analysis(snaptrade, conn, data):
-    return get_positions_analysis(conn)
+def handle_get_analysis(snaptrade, conn, data):
+    return get_analysis(conn)
 
 
 def handle_init_db(snaptrade, conn, data):
@@ -67,9 +74,8 @@ def handle_init_db(snaptrade, conn, data):
     return {"status": "success"}
 
 
-def handle_update_accounts(snaptrade, conn, data):
-    update_accounts(snaptrade, conn)
-    return {"status": "success"}
+def handle_update_and_get_accounts(snaptrade, conn, data):
+    return click_get_latest_accounts(snaptrade, conn, minutes=10)
 
 
 def handle_update_wealth_simple_account_id(snaptrade, conn, data):
@@ -86,15 +92,15 @@ def handle_update_account_nickname(snaptrade, conn, data):
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
     "init_db": handle_init_db,
-    "update_all_activities": handle_update_all_activities,
-    "update_orders_by_account": handle_update_orders,
-    "update_accounts": handle_update_accounts,
-    "update_positions_by_account": handle_update_positions,
-    "update_nickname": handle_update_account_nickname,
-    "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
+    "update_activities_by_account": handle_update_activities,
+    "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
+    "update_and_get_accounts": handle_update_and_get_accounts,
+    "update_positions_and_get_analysis": handle_update_positions_and_get_analysis,
     "get_all_accounts": handle_get_accounts,
     "get_transactions": handle_get_transactions,
-    "get_positions_analysis": handle_get_positions_analysis,
+    "get_analysis": handle_get_analysis,
+    "update_nickname": handle_update_account_nickname,
+    "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }
 
 
@@ -153,16 +159,19 @@ def app_handler(event, context):
 
 if __name__ == "__main__":
     app_handler(
-        # {"action": "update_accounts"},
+        # {"action": "update_and_get_accounts"},
         # {
-        #     "action": "update_orders_by_account",
+        #     "action": "update_orders_and_get_transactions_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        # {"action": "update_all_activities"},
         {
-            "action": "update_positions_by_account",
+            "action": "update_activities_by_account",
             "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         },
+        # {
+        #     "action": "update_positions_and_get_analysis",
+        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
+        # },
         # {"action": "get_all_accounts"},
         # {
         #     "action": "update_account_nickname",
