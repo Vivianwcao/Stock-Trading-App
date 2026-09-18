@@ -7,7 +7,6 @@ from queries import (
     get_all_active_accounts,
     get_all_nicknames,
     get_active_transactions,
-    get_accounts_balances,
     get_nicknames_by_ids,
     get_last_fetched,
     get_analysis,
