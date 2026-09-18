@@ -55,32 +55,20 @@ def calculate_wait_time(
     hours=0,
     minutes=0,
     seconds=0,
-    activities_hours=0,
 ):
     cursor = conn.cursor()
-    # pre-check, per Snaptrade account
-    latest = cursor.execute(
-        """
-        select
-            max(fetched_at) fetched_at
-        from last_fetched
-    """
-    ).fetchone()
-
-    # If never fetched from API ever before, no wait time is required
-    if not latest or not latest["fetched_at"]:
-        return 0, 0, 0
-    times = time_delta_calculator(
-        latest["fetched_at"], hours=hours, minutes=minutes, seconds=seconds
-    )
-
     if is_activities is False:
-        return times
-
+        # check per Snaptrade account
+        latest = cursor.execute(
+            """
+            select
+                max(fetched_at) fetched_at
+            from last_fetched
+        """
+        ).fetchone()
     else:
-        # go to next step
         # activities batch, check all accounts, update accounts table
-        row = cursor.execute(
+        latest = cursor.execute(
             """
             select
                 max(fetched_at) fetched_at
@@ -91,10 +79,12 @@ def calculate_wait_time(
             (account_id,),
         ).fetchone()
 
-        # If never fetched before, no wait time is required
-        if not row or not row["fetched_at"]:
-            return 0, 0, 0
-        return time_delta_calculator(latest["fetched_at"], hours=activities_hours)
+    # If never fetched from API ever before, no wait time is required
+    if not latest or not latest["fetched_at"]:
+        return 0, 0, 0
+    return time_delta_calculator(
+        latest["fetched_at"], hours=hours, minutes=minutes, seconds=seconds
+    )
 
 
 def get_turso_client():
