@@ -7,6 +7,8 @@ from retrieve_snaptrade_data import (
     get_account_positions,
 )
 from utils import x_days_ago
+import json
+from snaptrade_client.exceptions import ApiException
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -49,7 +51,16 @@ TRANSPORT_TYPES = (
 
 
 def update_accounts(snaptrade, conn):
-    accounts_list = get_accounts(snaptrade)
+    try:
+        accounts = get_accounts(snaptrade)
+    except ApiException as e:
+        try:
+            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
+            error = body.get("detail") or body.get("error") or str(e)
+        except (json.JSONDecodeError, TypeError):
+            error = str(e)
+        return {"status": "fail", "error": error}
+
     with conn:
         conn.executemany(
             """
@@ -63,9 +74,9 @@ def update_accounts(snaptrade, conn):
                     balance = excluded.balance,
                     last_successful_sync = excluded.last_successful_sync;
                 """,
-            (
+            [
                 (
-                    account["id"],
+                    account["id"],  # type: ignore
                     account["number"],
                     account["meta"]["type"],
                     account["meta"]["status"],
@@ -75,10 +86,11 @@ def update_accounts(snaptrade, conn):
                     account["meta"]["currency"],
                     account["sync_status"]["holdings"]["last_successful_sync"],
                 )
-                for account in accounts_list
-            ),
+                for account in accounts
+            ],
         )
     logger.info("Updated accounts table successfully via HTTP batch.")
+    return {"status": "success"}
 
 
 def update_last_fetched(conn, api_source: str, account_id: str):
@@ -116,13 +128,22 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
         else (to_api_date(latest_transaction_date) or x_days_ago(2))
     )
     # API fetch activities per WS account
-    activities_list = get_activities(
-        snaptrade, account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
-    )
+    try:
+        activities = get_activities(
+            snaptrade, account_id, ",".join(TRANSPORT_TYPES), start_date=start_date
+        )["data"]
+    except ApiException as e:
+        try:
+            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
+            error = body.get("detail") or body.get("error") or str(e)
+        except (json.JSONDecodeError, TypeError):
+            error = str(e)
+        return {"status": "fail", "error": error}
+
     with conn:
         cursor.executemany(
             insert_activities_query,
-            (
+            [
                 (
                     activity["id"],
                     account_id,
@@ -136,14 +157,14 @@ def update_activities(snaptrade, conn, account_id, is_bulk=False):
                     activity["trade_date"],
                     "api_activities",
                 )
-                for activity in activities_list
-            ),
+                for activity in activities
+            ],
         )
         update_last_fetched(conn, "activities", account_id)
     logger.info(
         f"Successfully synced {cursor.rowcount} activities for account: {account_id} from {start_date}, and updated last_fetched successfully"
     )
-    return cursor.rowcount
+    return {"status": "success", "data": cursor.rowcount}
 
 
 # update activities with recent orders (per WS account)
@@ -152,10 +173,18 @@ def update_recent_orders(snaptrade, conn, account_id):
     # from orders (real time update)
     # API fetch orders per WS account
 
-    orders_list = get_orders_last_24hrs(snaptrade, account_id)
+    try:
+        orders = get_orders_last_24hrs(snaptrade, account_id)["orders"]
+    except ApiException as e:
+        try:
+            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
+            error = body.get("detail") or body.get("error") or str(e)
+        except (json.JSONDecodeError, TypeError):
+            error = str(e)
+        return {"status": "fail", "error": error}
 
     records = []
-    for order in orders_list:
+    for order in orders:
         type = order["action"]
         price = float(order["execution_price"])
         qty = float(order["filled_quantity"])
@@ -186,63 +215,69 @@ def update_recent_orders(snaptrade, conn, account_id):
             insert_activities_query,
             records,
         ).rowcount
+
         update_last_fetched(conn, "orders", account_id)
     logger.info(
         f"Successfully synced {row_count} orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
-    return row_count
+    return {"status": "success", "data": row_count}
 
 
-def update_positions_per_account(snaptrade, conn, account_id):
-    positions, sync_date = get_account_positions(snaptrade, account_id).values()
+def update_positions_per_account(snaptrade, conn, account_id, trigger):
+    try:
+        res = get_account_positions(snaptrade, account_id)
+
+    except ApiException as e:
+        try:
+            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
+            error = body.get("detail") or body.get("error") or str(e)
+        except (json.JSONDecodeError, TypeError):
+            error = str(e)
+        return {"status": "fail", "error": error}
+
+    positions, sync_date = res.values()
     cursor = conn.cursor()
     with conn:
         cursor.executemany(
             """
             insert into positions (account_id, symbol, holdings, 
-            current_price, cost_basis, last_successful_sync
+            current_price, cost_basis, trigger, last_successful_sync
             )
-            values(?, ?, ?, ?, ?, ?)
-            on conflict (account_id, symbol) do update set
-            holdings = excluded.holdings, 
-            current_price = excluded.current_price, 
-            cost_basis = excluded.cost_basis, 
-            last_successful_sync = excluded.last_successful_sync
+            values(?, ?, ?, ?, ?, ?, ?)
         """,
-            (
+            [
                 (
                     account_id,
                     position["instrument"]["raw_symbol"],
                     round(float(position["units"]), 4),
                     round(float(position["price"]), 4),
                     round(float(position["cost_basis"]), 4),
+                    trigger,
                     sync_date["as_of"],
                 )
                 for position in positions
-            ),
+            ],
         )
         update_last_fetched(conn, "positions", account_id)
 
+    return {"status": "success"}
+
 
 def update_account_nickname(conn, account_id: str, nickname: str | None):
-    try:
-        clean_nickname = nickname.strip() or None if nickname else None
-        with conn:
-            conn.execute(
-                """
+    clean_nickname = nickname.strip() or None if nickname else None
+    with conn:
+        conn.execute(
+            """
                 update accounts
                 set nickname = ?
                 where id = ?
                 """,
-                (clean_nickname, account_id),
-            )
-        return {
-            "status": "success",
-            "data": {"account_id": account_id, "nickname": clean_nickname},
-        }
-    except Exception as e:
-        logger.exception(f"Failed to update nickname for account {account_id}")
-        return {"status": "fail", "error": f"{type(e).__name__}: {str(e)}"}
+            (clean_nickname, account_id),
+        )
+    return {
+        "status": "success",
+        "data": {"account_id": account_id, "nickname": clean_nickname},
+    }
 
 
 def update_wealth_simple_account_id(conn, account_id: str, ws_account_id: str | None):

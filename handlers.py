@@ -38,12 +38,16 @@ def click_get_latest_accounts(snaptrade, conn, *, hours=0, minutes=0, seconds=0)
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_accounts(snaptrade, conn)
+        res = update_accounts(snaptrade, conn)
+
         accounts = get_all_active_accounts(conn)
-        return {
+        response = {
             "status": "success",
             "data": {"accounts": accounts},
         }
+        if res.get("status") == "fail":
+            response["data"]["snaptrade_response"] = res.get("error")
+        return response
     return {
         "status": "cooldown",
         "data": {"hours": hrs, "minutes": mins, "seconds": secs},
@@ -79,11 +83,15 @@ def click_update_activities_by_account(
         )
         if act_hrs == act_mins == act_secs == 0:
             # ready to update
-            rows_updated = update_activities(snaptrade, conn, account_id, is_bulk)
+            res = update_activities(snaptrade, conn, account_id, is_bulk)
+
+            if res.get("status") == "fail":
+                return res
+
             fetched_at = get_last_fetched(conn, "activities", account_id)
             return {
                 "status": "success",
-                "data": {"rows_updated": rows_updated, "fetched_at": fetched_at},
+                "data": {"rows_updated": res.get("data"), "fetched_at": fetched_at},
             }
         return {
             "status": "cooldown",
@@ -114,13 +122,17 @@ def click_update_orders_and_get_transactions_by_accounts(
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        rows_updated = update_recent_orders(snaptrade, conn, account_id)
+        res = update_recent_orders(snaptrade, conn, account_id)
+
+        if res.get("status") == "fail":
+            return res
+
         fetched_at = get_last_fetched(conn, "orders", account_id)
         transactions = get_transactions(conn, {"account_ids": [account_id]})
         return {
             "status": "success",
             "data": {
-                "rows_updated": rows_updated,
+                "rows_updated": res.get("data"),
                 "fetched_at": fetched_at,
                 "transactions": transactions,
             },
@@ -131,10 +143,18 @@ def click_update_orders_and_get_transactions_by_accounts(
     }
 
 
-def click_update_positions_by_account_and_get_analysis_by_account(
+def trigger_update_positions_bulk(snaptrade, conn, trigger):
+    accounts = get_all_active_accounts(conn)
+    for account in accounts:
+        update_positions_per_account(snaptrade, conn, account["id"], trigger)
+        time.sleep(30)
+
+
+def click_update_positions_and_get_analysis_by_account(
     snaptrade,
     conn,
     account_id,
+    trigger,
     hours=0,
     minutes=0,
     seconds=0,
@@ -149,7 +169,11 @@ def click_update_positions_by_account_and_get_analysis_by_account(
     )
     if hrs == mins == secs == 0:
         # ready tp update:
-        update_positions_per_account(snaptrade, conn, account_id)
+        res = update_positions_per_account(snaptrade, conn, account_id, trigger)
+
+        if res.get("status") == "fail":
+            return res
+
         rows = get_analysis(conn)
         return {"status": "success", "data": rows}
     return {

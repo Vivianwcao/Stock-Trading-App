@@ -4,18 +4,18 @@ sqlite3 stocks.db "PRAGMA journal_mode = DELETE;"
 sqlite3 stocks.db "PRAGMA journal_mode;"
 
 create table if not exists positions(
+    id integer primary key,
     account_id text,
     symbol text,
     holdings real not null,
     current_price real not null,
     cost_basis real not null,
+    trigger text not null,
     last_successful_sync text,
 
-    primary key (account_id, symbol),
-
     Foreign Key (account_id) 
-      REFERENCES accounts(id)
-  );
+    REFERENCES accounts(id)
+);
 
 CREATE INDEX IF NOT EXISTS idx_transactions ON activities(account_id, symbol, trade_date);
 
@@ -270,7 +270,6 @@ from activities act
 join accounts acc 
 on act.account_id = acc.id
 group by nickname;
-
 
 DROP VIEW IF EXISTS analysis;
 

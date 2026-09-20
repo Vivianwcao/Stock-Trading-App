@@ -7,9 +7,7 @@ def get_accounts(snaptrade):
     return res.body
 
 
-def get_activities(
-    snaptrade, account_id, transaction_types, start_date=None
-) -> list[dict]:
+def get_activities(snaptrade, account_id, transaction_types, start_date=None) -> dict:
     # bulk
     arguments = {
         "account_id": account_id,
@@ -22,7 +20,7 @@ def get_activities(
         #  from last certain (eg. 2) days (updates every 24 hours + 1 day delay)
         arguments["start_date"] = start_date
     res = snaptrade.account_information.get_account_activities(**arguments)
-    return res.body["data"]
+    return res.body
 
 
 def get_orders_last_24hrs(snaptrade, account_id):
@@ -30,7 +28,7 @@ def get_orders_last_24hrs(snaptrade, account_id):
     res = snaptrade.account_information.get_user_account_recent_orders(
         account_id=account_id, only_executed=True
     )
-    return res.body["orders"]
+    return res.body
 
 
 def get_account_positions(snaptrade, account_id):

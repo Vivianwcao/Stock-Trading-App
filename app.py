@@ -1,5 +1,3 @@
-from snaptrade_client.exceptions import ApiException
-
 from snaptrade import get_snaptrade_auth
 import logging
 import json
@@ -8,7 +6,8 @@ from handlers import (
     click_update_activities_by_account,
     click_update_orders_and_get_transactions_by_accounts,
     get_transactions,
-    click_update_positions_by_account_and_get_analysis_by_account,
+    click_update_positions_and_get_analysis_by_account,
+    trigger_update_positions_bulk,
     click_get_latest_accounts,
 )
 from update_tables import (
@@ -54,9 +53,13 @@ def handle_update_orders_and_get_transactions(snaptrade, conn, data):
     )
 
 
+def handle_update_positions_event_bridge(snaptrade, conn, data):
+    return trigger_update_positions_bulk(snaptrade, conn, "event_bridge")
+
+
 def handle_update_positions_and_get_analysis(snaptrade, conn, data):
-    return click_update_positions_by_account_and_get_analysis_by_account(
-        snaptrade, conn, data.get("account_id"), seconds=60
+    return click_update_positions_and_get_analysis_by_account(
+        snaptrade, conn, data.get("account_id"), "manual", seconds=60
     )
 
 
@@ -101,6 +104,7 @@ ACTION_REGISTRY = {
     "update_activities_by_account": handle_update_activities,
     "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
     "update_and_get_accounts": handle_update_and_get_accounts,
+    "update_positions_event_bridge": handle_update_positions_event_bridge,
     "update_positions_and_get_analysis": handle_update_positions_and_get_analysis,
     "get_all_accounts": handle_get_accounts,
     "get_transactions": handle_get_transactions,
@@ -140,17 +144,6 @@ def app_handler(event, context):
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
         finally:
             conn.close()
-    except ApiException as e:
-        try:
-            body = e.body if isinstance(e.body, dict) else json.loads(e.body)
-            detail = body.get("detail", str(e))
-        except Exception:
-            detail = str(e)
-        return {
-            "statusCode": 500,
-            "headers": HEADERS,
-            "body": json.dumps({"status": "fail", "error": detail}),
-        }
 
     except Exception as e:
         logger.exception("Request failed.")

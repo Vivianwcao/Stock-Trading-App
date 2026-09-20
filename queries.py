@@ -51,18 +51,19 @@ def init_db(conn):
         );
 
         create table if not exists positions(
+            id integer primary key,
             account_id text,
             symbol text,
             holdings real not null,
             current_price real not null,
             cost_basis real not null,
+            trigger text not null,
             last_successful_sync text,
-
-            primary key (account_id, symbol),
 
             Foreign Key (account_id) 
             REFERENCES accounts(id)
         );
+        
 
         CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_api_dedup 
                 ON activities (trade_date, account_id, symbol, type, price, units)
