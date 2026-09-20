@@ -291,7 +291,7 @@ latest_positions as (
     from latest_positions_dates
   )
 ),
-totals as (
+account_totals as (
 	select 
 		account_id,
 		sum(holdings * cost_basis) total_bought, 
@@ -349,55 +349,66 @@ select
 	rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
   p.last_successful_sync
 from latest_positions p
-join totals
+join account_totals
 	using(account_id)
 left join dividends
 	using(account_id, symbol);
 
-
-
-  CREATE VIEW IF NOT EXISTS analysis AS
-  with latest_date as(
+-- query analysis for a single account
+with latest_positions_date as (
+  SELECT
+    max(last_successful_sync) latest_pos_date
+  from positions
+  where account_id = ?  
+),
+latest_positions as (
+  select *
+  from positions
+  where account_id = ?  
+    and last_successful_sync = (
+      SELECT
+        latest_pos_date
+      from latest_positions_date
+    )
+),
+account_totals as (
+	select
+		sum(holdings * cost_basis) total_bought, 
+		sum(holdings * current_price) total_current
+	from latest_positions
+  where account_id = ?
+),
+latest_valid_dates as(
 	select 
-		nickname,
 		symbol,
-		max(trade_date) latest_date
-	from transactions
-	where symbol is not null
-	group by 
-		nickname,
+		max(trade_date) latest_valid_date
+	from activities
+  where account_id = ?
+    and symbol is not null
+    and trade_date <= (
+      select 
+        latest_pos_date
+      from latest_positions_date
+    )
+	group by
 		symbol
 ),
 dividends as (
-	select 
-		nickname,
+	select
 		symbol,
 		max(dividend_balance) dividend_balance
 	from transactions
-	where (nickname, symbol, trade_date) in (
-		select 
-			nickname,
-			symbol,
-			latest_date 
-		from latest_date
-	)
-	group by 
-		nickname,
+  where account_id = ?
+    and (symbol, trade_date) in (
+      select
+        symbol,
+        latest_valid_date 
+      from latest_valid_dates
+    )
+	group by
 		symbol 
-),
-totals as (
-	select 
-		account_id,
-		sum(holdings * cost_basis) total_bought, 
-		sum(holdings * current_price) total_current
-	from positions
-  where trigger = 'event_bridge'
-	group by 
-    account_id,
-    last_successful_sync
 )
-select
-	nickname, 
+select 
 	p.account_id,
 	p.symbol,
 	holdings,
@@ -411,14 +422,97 @@ select
 	round(total_current, 4) total_current,
 	round(holdings * current_price*100 / total_current, 2) current_ratio,
 	dividend_balance,
-	rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
-	rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-	rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+	rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
+	rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
+	rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
   p.last_successful_sync
-from positions p
-join totals t
+from latest_positions p
+cross join account_totals
+left join dividends
+	using(symbol)
+where account_id = ?;
+
+
+CREATE VIEW IF NOT EXISTS analysis AS
+with latest_positions_dates as (
+  SELECT
+    account_id,
+    max(last_successful_sync) latest_pos_date
+  from positions
+  group by account_id  
+),
+latest_positions as (
+  select *
+  from positions
+  where (account_id, last_successful_sync) in (
+    SELECT
+      account_id,
+      latest_pos_date
+    from latest_positions_dates
+  )
+),
+totals as (
+	select 
+		account_id,
+		sum(holdings * cost_basis) total_bought, 
+		sum(holdings * current_price) total_current
+	from positions
+  where trigger = 'event_bridge'
+	group by 
+    account_id,
+    last_successful_sync
+),
+latest_valid_dates as(
+	select 
+		account_id,
+		symbol,
+		max(trade_date) latest_valid_date
+	from activities
+  join latest_positions_dates
+  using(account_id)
+	where symbol is not null
+  and trade_date <= last_successful_sync
+	group by 
+		account_id,
+		symbol
+),
+dividends as (
+	select 
+		account_id,
+		symbol,
+		max(dividend_balance) dividend_balance
+	from transactions
+	where (account_id, symbol, trade_date) in (
+		select 
+			account_id,
+			symbol,
+			latest_valid_date 
+		from latest_valid_dates
+	)
+	group by 
+		account_id,
+		symbol 
+)
+select 
+	p.account_id,
+	p.symbol,
+	holdings,
+	cost_basis,
+	current_price,
+	round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+	round(holdings * cost_basis, 4) cost,
+	round(total_bought, 4) total_bought,
+	round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
+	round(holdings * current_price, 4) current_value,
+	round(total_current, 4) total_current,
+	round(holdings * current_price*100 / total_current, 2) current_ratio,
+	dividend_balance,
+	rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
+	rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
+	rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+  p.last_successful_sync
+from latest_positions p
+join totals
 	using(account_id)
-join accounts
-	on p.account_id = id
-join dividends
-	using(nickname, symbol);
+left join dividends
+	using(account_id, symbol);
