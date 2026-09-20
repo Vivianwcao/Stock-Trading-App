@@ -198,6 +198,177 @@ WITH recursive
   join partitioned p
   using(id);
 
+-- query "transactions" by account_id
+WITH recursive
+  cleaned AS (
+    SELECT
+      act.id,
+      account_id,
+      trade_date,
+      symbol,
+      type,
+      price,
+      units,
+      amount,
+      sum(units) OVER (
+        PARTITION BY symbol
+        ORDER BY trade_date
+      ) AS holdings_per_stock
+    from accounts acc
+    join activities act
+    on acc.id = act.account_id
+    WHERE nickname = ?
+  ),
+  with_pres AS (
+    SELECT
+      *,
+      lag(type) OVER (
+        PARTITION BY symbol
+        ORDER BY trade_date
+      ) AS pre_type,
+      
+      substr(
+        max(
+          CASE
+            WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+          END
+        ) OVER (
+          PARTITION BY symbol
+          ORDER BY trade_date 
+          ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ),
+        instr(
+          max(
+            CASE
+              WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+            END
+          ) OVER (
+            PARTITION BY symbol
+            ORDER BY trade_date 
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+          ),
+          '#'
+        ) + 1
+      ) AS pre_trade_type,
+      
+      lag(holdings_per_stock) OVER (
+        PARTITION BY symbol
+        ORDER BY trade_date
+      ) AS pre_holdings_per_stock
+    FROM cleaned
+  ),
+  grouped AS (
+    SELECT
+      *,
+      count(*) FILTER (
+        WHERE
+          pre_trade_type = 'SELL'
+          AND type = 'BUY'
+          AND pre_holdings_per_stock <= 0
+      ) OVER (
+        PARTITION BY symbol
+        ORDER BY trade_date
+      ) AS cycles
+    FROM with_pres 
+  ),
+  partitioned AS (
+    SELECT
+      *,
+      -- ideally this should equal to holdings_per_stock as there shouldn't be negative holdings
+      -- For safety in case negative holdings due to missing data or calculating errors.
+      sum(units) OVER (
+        PARTITION BY symbol, cycles
+        ORDER BY trade_date
+      ) AS holdings_per_cycle,
+      
+      sum(amount) FILTER (
+        WHERE type = 'DIVIDEND'
+      ) OVER (
+        PARTITION BY symbol, cycles
+        ORDER BY trade_date
+      ) AS dividend_balance,
+
+    row_number() over(
+      PARTITION BY symbol, cycles
+      ORDER BY trade_date, id) rn
+
+    FROM grouped
+  ),
+  tree as (
+    select
+      id,
+      symbol,
+      type,
+      price,
+      units,
+      amount,
+      cycles,
+      holdings_per_cycle,
+      rn,
+      case when type = 'BUY' then amount
+        else 0
+      end cost,
+      case when type = 'BUY' then price
+        else 0
+      end avg_cost
+    from partitioned
+    -- seeds condition
+    where rn = 1
+
+    union all
+
+    select
+      p.id,
+      p.symbol,
+      p.type,
+      p.price,
+      p.units,
+      p.amount,
+      p.cycles,
+      p.holdings_per_cycle,
+      p.rn,
+      case when p.type = 'BUY' then t.cost + p.amount
+      when p.type = 'SELL' then t.cost - t.avg_cost * p.units
+      else t.cost
+      end as cost,
+
+      case when p.type = 'BUY' then abs(coalesce((t.cost + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
+      else t.avg_cost
+      end as avg_cost
+    from partitioned p
+    join tree t 
+    on p.symbol = t.symbol
+    and p.cycles = t.cycles
+    and p.rn = t.rn + 1
+  )
+  SELECT
+    ? nickname,
+    p.account_id,
+    p.trade_date,
+    t.symbol,
+    t.type,
+    t.price,
+    t.units,
+    t.amount,
+    t.cycles,
+    t.holdings_per_cycle,
+    round(p.dividend_balance, 4) AS dividend_balance,
+    round(cost, 4) AS cost,
+    round(avg_cost, 4) AS avg_cost,
+    CASE
+      WHEN t.type = 'SELL' THEN round(
+        (t.price - avg_cost) * 100 / nullif(avg_cost, 0),
+        2
+      )
+    END AS return_percentage,
+    CASE
+      WHEN t.type = 'SELL' THEN round((t.price - avg_cost) * abs(t.units), 2)
+    END AS realized_profit
+  FROM tree t
+  join partitioned p
+  using(id);
+
+  
 -- in terminal run sqlite3 stocks.db, .exit or .quit to exit sqlite mode in terminal
 -- Investigate after csv bulk import and the first activities update
 -- We need to keep the last row from api_activities because it has the accurate microseconds for later update
@@ -432,65 +603,58 @@ left join dividends
 	using(symbol)
 where account_id = ?;
 
-
-CREATE VIEW IF NOT EXISTS analysis AS
-with latest_positions_dates as (
+-- event bridge
+with latest_positions_date as (
   SELECT
-    account_id,
     max(last_successful_sync) latest_pos_date
   from positions
-  group by account_id  
+  where account_id = ?  
 ),
 latest_positions as (
   select *
   from positions
-  where (account_id, last_successful_sync) in (
-    SELECT
-      account_id,
-      latest_pos_date
-    from latest_positions_dates
-  )
+  where account_id = ?  
+    and last_successful_sync = (
+      SELECT
+        latest_pos_date
+      from latest_positions_date
+    )
 ),
-totals as (
-	select 
-		account_id,
+account_totals as (
+	select
 		sum(holdings * cost_basis) total_bought, 
 		sum(holdings * current_price) total_current
-	from positions
-  where trigger = 'event_bridge'
-	group by 
-    account_id,
-    last_successful_sync
+	from latest_positions
+  where account_id = ?
 ),
 latest_valid_dates as(
 	select 
-		account_id,
 		symbol,
 		max(trade_date) latest_valid_date
 	from activities
-  join latest_positions_dates
-  using(account_id)
-	where symbol is not null
-  and trade_date <= last_successful_sync
-	group by 
-		account_id,
+  where account_id = ?
+    and symbol is not null
+    and trade_date <= (
+      select 
+        latest_pos_date
+      from latest_positions_date
+    )
+	group by
 		symbol
 ),
 dividends as (
-	select 
-		account_id,
+	select
 		symbol,
 		max(dividend_balance) dividend_balance
 	from transactions
-	where (account_id, symbol, trade_date) in (
-		select 
-			account_id,
-			symbol,
-			latest_valid_date 
-		from latest_valid_dates
-	)
-	group by 
-		account_id,
+  where account_id = ?
+    and (symbol, trade_date) in (
+      select
+        symbol,
+        latest_valid_date 
+      from latest_valid_dates
+    )
+	group by
 		symbol 
 )
 select 
@@ -512,7 +676,7 @@ select
 	rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
   p.last_successful_sync
 from latest_positions p
-join totals
-	using(account_id)
+cross join account_totals
 left join dividends
-	using(account_id, symbol);
+	using(symbol)
+where account_id = ?;

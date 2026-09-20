@@ -6,11 +6,11 @@ import time
 from queries import (
     get_all_active_accounts,
     get_all_nicknames,
-    get_active_transactions,
-    get_nicknames_by_ids,
+    get_transactions_all_accounts,
+    get_transactions_by_nickname,
     get_last_fetched,
-    get_analysis,
-    get_analysis_by_account,
+    get_latest_analysis_all_accounts,
+    get_latest_analysis_by_account,
 )
 from update_tables import (
     update_accounts,
@@ -129,7 +129,7 @@ def click_update_orders_and_get_transactions_by_accounts(
             return res
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
-        transactions = get_transactions(conn, {"account_ids": [account_id]})
+        transactions = get_transactions_by_nickname(conn, account_id)
         return {
             "status": "success",
             "data": {
@@ -151,7 +151,7 @@ def trigger_update_positions_bulk(snaptrade, conn, trigger):
         time.sleep(30)
 
 
-def click_update_positions_and_get_analysis_by_account(
+def click_update_positions_and_get_latest_analysis_by_account(
     snaptrade,
     conn,
     account_id,
@@ -175,7 +175,7 @@ def click_update_positions_and_get_analysis_by_account(
         if res.get("status") == "fail":
             return res
 
-        rows = get_analysis_by_account(conn, account_id)
+        rows = get_latest_analysis_by_account(conn, account_id)
         return {"status": "success", "data": rows}
     return {
         "status": "cooldown",
@@ -183,31 +183,9 @@ def click_update_positions_and_get_analysis_by_account(
     }
 
 
-def get_transactions(conn, data):
-    # a list or tuple
-    account_ids = data.get("account_ids")
-
-    if not account_ids:
-        nicknames = get_all_nicknames(conn)
-    else:
-        nicknames = get_nicknames_by_ids(conn, account_ids)
-
-    nicknames_placeholder = ",".join("?" for _ in nicknames)
-
-    start_date = data.get("start_date") or "2018-01-01"
-    # use tomorrow's date if no end_date provided
-    end_date = data.get("end_date") or (
-        datetime.now(timezone.utc) + timedelta(days=1)
-    ).strftime("%Y-%m-%d")
-
-    return get_active_transactions(
-        conn, nicknames_placeholder, nicknames, start_date, end_date
-    )
-
-
 def on_page_load(conn):
-    transactions = get_transactions(conn, {})
-    analysis = get_analysis(conn)
+    transactions = get_transactions_all_accounts(conn)
+    analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
     rows = conn.execute("select * from last_fetched").fetchall()
     last_fetched = [dict(row) for row in rows]

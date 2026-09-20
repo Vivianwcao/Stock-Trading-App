@@ -5,8 +5,7 @@ from handlers import (
     on_page_load,
     click_update_activities_by_account,
     click_update_orders_and_get_transactions_by_accounts,
-    get_transactions,
-    click_update_positions_and_get_analysis_by_account,
+    click_update_positions_and_get_latest_analysis_by_account,
     trigger_update_positions_bulk,
     click_get_latest_accounts,
 )
@@ -15,7 +14,12 @@ from update_tables import (
     update_account_nickname,
     update_wealth_simple_account_id,
 )
-from queries import create_tables, get_all_active_accounts, get_analysis
+from queries import (
+    create_tables,
+    get_all_active_accounts,
+    get_latest_analysis_all_accounts,
+    get_transactions_all_accounts,
+)
 import sqlite3
 
 # ── Logging ─────────────────────────────────────────────────────────────────
@@ -57,8 +61,8 @@ def handle_update_positions_event_bridge(snaptrade, conn, data):
     return trigger_update_positions_bulk(snaptrade, conn, "event_bridge")
 
 
-def handle_update_positions_and_get_analysis(snaptrade, conn, data):
-    return click_update_positions_and_get_analysis_by_account(
+def handle_update_positions_and_get_latest_analysis_by_account(snaptrade, conn, data):
+    return click_update_positions_and_get_latest_analysis_by_account(
         snaptrade, conn, data.get("account_id"), "manual", seconds=60
     )
 
@@ -68,13 +72,13 @@ def handle_get_accounts(snaptrade, conn, data):
     return {"status": "success", "data": accounts}
 
 
-def handle_get_transactions(snaptrade, conn, data):
-    transactions = get_transactions(conn, data)
+def handle_get_transactions_all_accounts(snaptrade, conn, data):
+    transactions = get_transactions_all_accounts(conn)
     return {"status": "success", "data": transactions}
 
 
-def handle_get_analysis(snaptrade, conn, data):
-    return get_analysis(conn)
+def handle_get_latest_analysis_all_accounts(snaptrade, conn, data):
+    return get_latest_analysis_all_accounts(conn)
 
 
 def handle_init_db(snaptrade, conn, data):
@@ -105,10 +109,10 @@ ACTION_REGISTRY = {
     "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
     "update_and_get_accounts": handle_update_and_get_accounts,
     "update_positions_event_bridge": handle_update_positions_event_bridge,
-    "update_positions_and_get_analysis": handle_update_positions_and_get_analysis,
+    "update_positions_and_get_latest_analysis_by_account": handle_update_positions_and_get_latest_analysis_by_account,
     "get_all_accounts": handle_get_accounts,
-    "get_transactions": handle_get_transactions,
-    "get_analysis": handle_get_analysis,
+    "get_transactions_all_accounts": handle_get_transactions_all_accounts,
+    "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
     "update_nickname": handle_update_account_nickname,
     "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }
@@ -168,7 +172,7 @@ if __name__ == "__main__":
             "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         },
         # {
-        #     "action": "update_positions_and_get_analysis",
+        #     "action": "update_positions_and_get_latest_analysis_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
         # {"action": "get_all_accounts"},
