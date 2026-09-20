@@ -11,6 +11,7 @@ from queries import (
     get_last_fetched,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
+    get_all_positions_snapshot_dates_all_accounts,
 )
 from update_tables import (
     update_accounts,
@@ -185,6 +186,7 @@ def click_update_positions_and_get_latest_analysis_by_account(
 
 def on_page_load(conn):
     transactions = get_transactions_all_accounts(conn)
+    positions_snapshots = get_all_positions_snapshot_dates_all_accounts((conn))
     analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
     rows = conn.execute("select * from last_fetched").fetchall()
@@ -193,6 +195,7 @@ def on_page_load(conn):
         "status": "success",
         "data": {
             "transactions": transactions,
+            "positions_snapshots": positions_snapshots,
             "analysis": analysis,
             "accounts": accounts,
             "last_fetched": last_fetched,

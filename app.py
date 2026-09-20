@@ -19,6 +19,7 @@ from queries import (
     get_all_active_accounts,
     get_latest_analysis_all_accounts,
     get_transactions_all_accounts,
+    get_all_positions_snapshot_dates_all_accounts,
 )
 import sqlite3
 
@@ -58,7 +59,7 @@ def handle_update_orders_and_get_transactions(snaptrade, conn, data):
 
 
 def handle_update_positions_event_bridge(snaptrade, conn, data):
-    return trigger_update_positions_bulk(snaptrade, conn, "event_bridge")
+    return trigger_update_positions_bulk(snaptrade, conn, "scheduled")
 
 
 def handle_update_positions_and_get_latest_analysis_by_account(snaptrade, conn, data):
@@ -75,6 +76,11 @@ def handle_get_accounts(snaptrade, conn, data):
 def handle_get_transactions_all_accounts(snaptrade, conn, data):
     transactions = get_transactions_all_accounts(conn)
     return {"status": "success", "data": transactions}
+
+
+def handle_get_all_positions_snapshot_dates_all_accounts(snaptrade, conn, data):
+    snapshots = get_all_positions_snapshot_dates_all_accounts(conn)
+    return {"status": "success", "data": snapshots}
 
 
 def handle_get_latest_analysis_all_accounts(snaptrade, conn, data):
@@ -113,6 +119,7 @@ ACTION_REGISTRY = {
     "get_all_accounts": handle_get_accounts,
     "get_transactions_all_accounts": handle_get_transactions_all_accounts,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
+    "get_all_positions_snapshot_dates_all_accounts": handle_get_all_positions_snapshot_dates_all_accounts,
     "update_nickname": handle_update_account_nickname,
     "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }

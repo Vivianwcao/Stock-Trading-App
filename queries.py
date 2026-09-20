@@ -85,7 +85,6 @@ def init_db(conn):
         cleaned AS (
             SELECT
             act.id,
-            wealth_simple_account_id,
             account_id,
             nickname,
             trade_date,
@@ -230,7 +229,6 @@ def init_db(conn):
             and p.rn = t.rn + 1
         )
         SELECT
-            p.wealth_simple_account_id,
             p.account_id,
             t.nickname,
             p.trade_date,
@@ -334,9 +332,6 @@ def init_db(conn):
             round(total_current, 4) total_current,
             round(holdings * current_price*100 / total_current, 2) current_ratio,
             dividend_balance,
-            rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
-            rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
         p.last_successful_sync
         from latest_positions p
         join totals
@@ -606,7 +601,6 @@ def get_latest_analysis_by_account(conn, account_id):
                 sum(holdings * cost_basis) total_bought, 
                 sum(holdings * current_price) total_current
             from latest_positions
-        where account_id = ?
         ),
         latest_valid_dates as(
             select 
@@ -652,15 +646,95 @@ def get_latest_analysis_by_account(conn, account_id):
             round(total_current, 4) total_current,
             round(holdings * current_price*100 / total_current, 2) current_ratio,
             dividend_balance,
-            rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
-            rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-            rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
-        p.last_successful_sync
+            p.last_successful_sync
         from latest_positions p
         cross join account_totals
         left join dividends
             using(symbol);
         """,
         (account_id, account_id, account_id, account_id, account_id),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_all_positions_snapshot_dates_all_accounts(conn):
+    snapshots = conn.execute(
+        """
+        SELECT DISTINCT 
+            account_id, 
+            last_successful_sync, 
+            trigger
+        FROM positions
+        ORDER BY 
+            account_id, 
+            last_successful_sync DESC
+        """
+    ).fetchall()
+    return [dict(sn) for sn in snapshots]
+
+
+def get_analysis_by_account_by_snapshot(conn, account_id, sync_date):
+    rows = conn.execute(
+        """
+        with latest_positions as (
+        select *
+        from positions
+        where account_id = ?  
+            and last_successful_sync = ?
+        ),
+        account_totals as (
+            select
+                sum(holdings * cost_basis) total_bought, 
+                sum(holdings * current_price) total_current
+            from latest_positions
+        ),
+        latest_valid_dates as(
+            select 
+                symbol,
+                max(trade_date) latest_valid_date
+            from activities
+        where account_id = ?
+            and symbol is not null
+            and trade_date <= ?
+            group by
+                symbol
+        ),
+        dividends as (
+            select
+                symbol,
+                max(dividend_balance) dividend_balance
+            from transactions
+        where account_id = ?
+            and (symbol, trade_date) in (
+            select
+                symbol,
+                latest_valid_date 
+            from latest_valid_dates
+            )
+            group by
+                symbol 
+        )
+        select 
+            p.account_id,
+            p.symbol,
+            holdings,
+            cost_basis,
+            current_price,
+            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+            round(holdings * cost_basis, 4) cost,
+            round(total_bought, 4) total_bought,
+            round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
+            round(holdings * current_price, 4) current_value,
+            round(total_current, 4) total_current,
+            round(holdings * current_price*100 / total_current, 2) current_ratio,
+            dividend_balance,
+            p.last_successful_sync
+        from latest_positions p
+        cross join account_totals
+        left join dividends
+            using(symbol)
+        where account_id = ?;
+        """,
+        (account_id, sync_date, account_id, sync_date, account_id, account_id),
     ).fetchall()
     return [dict(r) for r in rows]
