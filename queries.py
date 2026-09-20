@@ -298,6 +298,13 @@ def init_db(conn):
                 sum(holdings * cost_basis) total_bought, 
                 sum(holdings * current_price) total_current
             from positions
+        where (account_id, last_successful_sync) in (
+            SELECT
+            account_id,
+            max(last_successful_sync)
+            from positions
+            group by account_id
+        )
             group by account_id
         )
         select
