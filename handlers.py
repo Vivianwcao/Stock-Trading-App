@@ -10,6 +10,7 @@ from queries import (
     get_nicknames_by_ids,
     get_last_fetched,
     get_analysis,
+    get_analysis_by_account,
 )
 from update_tables import (
     update_accounts,
@@ -174,7 +175,7 @@ def click_update_positions_and_get_analysis_by_account(
         if res.get("status") == "fail":
             return res
 
-        rows = get_analysis(conn)
+        rows = get_analysis_by_account(conn, account_id)
         return {"status": "success", "data": rows}
     return {
         "status": "cooldown",

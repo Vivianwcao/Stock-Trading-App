@@ -418,3 +418,15 @@ def get_last_fetched(conn, api_source, account_id):
 def get_analysis(conn):
     rows = conn.execute("select * from analysis").fetchall()
     return [dict(r) for r in rows]
+
+
+def get_analysis_by_account(conn, account_id):
+    rows = conn.execute(
+        """
+        select * 
+        from analysis
+        where account_id = ?
+        """,
+        (account_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]

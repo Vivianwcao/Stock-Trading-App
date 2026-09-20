@@ -299,38 +299,38 @@ totals as (
 	from latest_positions
 	group by account_id
 ),
-latest_date as(
+latest_valid_dates as(
 	select 
-		nickname,
+		account_id,
 		symbol,
-		max(trade_date) latest_date
-	from activities act
-  join accounts acc
-  on act.account_id = acc.id
+		max(trade_date) latest_valid_date
+	from activities
+  join latest_positions_dates
+  using(account_id)
 	where symbol is not null
+  and trade_date <= last_successful_sync
 	group by 
-		nickname,
+		account_id,
 		symbol
 ),
 dividends as (
 	select 
-		nickname,
+		account_id,
 		symbol,
 		max(dividend_balance) dividend_balance
 	from transactions
-	where (nickname, symbol, trade_date) in (
+	where (account_id, symbol, trade_date) in (
 		select 
-			nickname,
+			account_id,
 			symbol,
-			latest_date 
-		from latest_date
+			latest_valid_date 
+		from latest_valid_dates
 	)
 	group by 
-		nickname,
+		account_id,
 		symbol 
 )
-select
-	nickname, 
+select 
 	p.account_id,
 	p.symbol,
 	holdings,
@@ -344,17 +344,15 @@ select
 	round(total_current, 4) total_current,
 	round(holdings * current_price*100 / total_current, 2) current_ratio,
 	dividend_balance,
-	rank() over(partition by nickname order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
-	rank() over(partition by nickname order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
-	rank() over(partition by nickname order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
+	rank() over(partition by account_id order by holdings * cost_basis*100 / total_bought desc) bought_ratio_rnk,
+	rank() over(partition by account_id order by holdings * current_price*100 / total_current desc) current_ratio_rnk,
+	rank() over(partition by account_id order by (current_price - cost_basis)*100 / cost_basis desc) growth_percentage_rnk,
   p.last_successful_sync
 from latest_positions p
 join totals
 	using(account_id)
-join accounts
-	on p.account_id = id
-join dividends
-	using(nickname, symbol);
+left join dividends
+	using(account_id, symbol);
 
 
 
