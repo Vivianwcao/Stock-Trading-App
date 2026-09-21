@@ -132,7 +132,7 @@ def click_update_orders_and_get_transactions_by_account(
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
         row = conn.execute(
-            "select nickname from accounts where account_id = ?", (account_id,)
+            "select nickname from accounts where id = ?", (account_id,)
         ).fetchone()
         nickname = row["nickname"] if row else None
         transactions = get_transactions_by_nickname(conn, nickname) if nickname else []
