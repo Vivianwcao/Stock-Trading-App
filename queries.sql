@@ -667,71 +667,71 @@ where account_id = ?;
 
 -- analysis on a single account across all snap dates
 with account_totals as (
-	select
-    account_id,
-    last_successful_sync,
-		sum(holdings * cost_basis) total_bought, 
-		sum(holdings * current_price) total_current
-	from positions
-  where account_id = ? 
-    and last_successful_sync in ()
-  group by
-    account_id,
-    last_successful_sync
+    select
+        account_id,
+        last_successful_sync,
+        sum(holdings * cost_basis) total_bought, 
+        sum(holdings * current_price) total_current
+    from positions
+    where account_id = ? 
+        and last_successful_sync in ({placeholder})
+    group by
+        account_id,
+        last_successful_sync
 ),
 latest_valid_dates as(
-	select
-    account_id,
-    symbol,
-    last_successful_sync,
-		max(trade_date) latest_valid_date
-	from account_totals t
-  join activities a
-    using(account_id)
-  where account_id = ? 
-    and symbol is not null
-    and trade_date <= last_successful_sync
-	group by
-    account_id,
-    symbol,
-    last_successful_sync
+    select
+        account_id,
+        symbol,
+        last_successful_sync,
+        max(trade_date) latest_valid_date
+    from account_totals t
+    join activities a
+        using(account_id)
+    where account_id = ? 
+        and symbol is not null
+        and trade_date <= last_successful_sync
+    group by
+        account_id,
+        symbol,
+        last_successful_sync
 ),
 dividends as (
-	select
-    account_id,
-		symbol,
-    last_successful_sync,
-		max(dividend_balance) dividend_balance
-	from transactions t
-  join latest_valid_dates d
-  on t.account_id = d.account_id
-    and t.symbol = d.symbol
-    and trade_date = latest_valid_date
-  where account_id = ?
-	group by
-    account_id,
-		symbol,
-    last_successful_sync
+    select
+        d.account_id,
+        d.symbol,
+        last_successful_sync,
+        max(dividend_balance) dividend_balance
+    from latest_valid_dates d
+    join transactions t
+    on t.account_id = d.account_id
+        and t.symbol = d.symbol
+        and trade_date = latest_valid_date
+    where d.account_id = ?
+    group by
+        d.account_id,
+        d.symbol,
+        last_successful_sync
 )
 select 
-	account_id,
-	symbol,
-  last_successful_sync,
-	holdings,
-	cost_basis,
-	current_price,
-	round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
-	round(holdings * cost_basis, 4) cost,
-	round(total_bought, 4) total_bought,
-	round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
-	round(holdings * current_price, 4) current_value,
-	round(total_current, 4) total_current,
-	round(holdings * current_price*100 / total_current, 2) current_ratio,
-	dividend_balance
+    account_id,
+    symbol,
+    last_successful_sync,
+    holdings,
+    cost_basis,
+    current_price,
+    round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+    round(holdings * cost_basis, 4) cost,
+    round(total_bought, 4) total_bought,
+    round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
+    round(holdings * current_price, 4) current_value,
+    round(total_current, 4) total_current,
+    round(holdings * current_price*100 / total_current, 2) current_ratio,
+    dividend_balance
 from positions
 join account_totals
-  using(account_id, last_successful_sync)
+    using(account_id, last_successful_sync)
 left join dividends
-	using(account_id, symbol, last_successful_sync)
-where positions.account_id = ? 
-  and last_successful_sync in ();
+    using(account_id, symbol, last_successful_sync)
+where account_id = ? 
+and last_successful_sync in ({placeholder});

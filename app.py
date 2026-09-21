@@ -19,6 +19,7 @@ from queries import (
     get_all_active_accounts,
     get_latest_analysis_all_accounts,
     get_transactions_all_accounts,
+    get_latest_analysis_by_account,
     get_analysis_by_account_by_snapshot,
     compare_analysis_by_account_across_snapshots,
 )
@@ -61,6 +62,11 @@ def handle_update_orders_and_get_transactions(snaptrade, conn, data):
 
 def handle_update_positions_event_bridge(snaptrade, conn, data):
     return trigger_update_positions_bulk(snaptrade, conn, data.get("trigger"))
+
+
+def handle_get_latest_analysis_by_account(snaptrade, conn, data):
+    analysis = get_latest_analysis_by_account(conn, data.get("account_id"))
+    return {"status": "success", "data": analysis}
 
 
 def handle_update_positions_and_get_latest_analysis_by_account(snaptrade, conn, data):
@@ -129,6 +135,7 @@ ACTION_REGISTRY = {
     "get_all_accounts": handle_get_accounts,
     "get_transactions_all_accounts": handle_get_transactions_all_accounts,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
+    "get_latest_analysis_by_account": handle_get_latest_analysis_by_account,
     "get_analysis_by_account_by_snapshot": handle_get_analysis_by_account_by_date,
     "compare_analysis_by_account_across_snapshots": handle_compare_analysis_by_account_across_snapshots,
     "update_nickname": handle_update_account_nickname,

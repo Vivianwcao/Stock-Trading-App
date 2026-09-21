@@ -707,7 +707,7 @@ def get_analysis_by_account_by_snapshot(conn, account_id, sync_date):
                 symbol,
                 max(trade_date) latest_valid_date
             from activities
-        where account_id = ?
+            where account_id = ?
             and symbol is not null
             and trade_date <= ?
             group by
@@ -718,7 +718,7 @@ def get_analysis_by_account_by_snapshot(conn, account_id, sync_date):
                 symbol,
                 max(dividend_balance) dividend_balance
             from transactions
-        where account_id = ?
+            where account_id = ?
             and (symbol, trade_date) in (
             select
                 symbol,
@@ -764,55 +764,55 @@ def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates=No
         f"""
         with account_totals as (
             select
-            account_id,
-            last_successful_sync,
+                account_id,
+                last_successful_sync,
                 sum(holdings * cost_basis) total_bought, 
                 sum(holdings * current_price) total_current
             from positions
-        where account_id = ? 
-            and last_successful_sync in ({placeholder})
-        group by
-            account_id,
-            last_successful_sync
+            where account_id = ? 
+                and last_successful_sync in ({placeholder})
+            group by
+                account_id,
+                last_successful_sync
         ),
         latest_valid_dates as(
             select
-            account_id,
-            symbol,
-            last_successful_sync,
+                account_id,
+                symbol,
+                last_successful_sync,
                 max(trade_date) latest_valid_date
             from account_totals t
-        join activities a
-            using(account_id)
-        where account_id = ? 
-            and symbol is not null
-            and trade_date <= last_successful_sync
+            join activities a
+                using(account_id)
+            where account_id = ? 
+                and symbol is not null
+                and trade_date <= last_successful_sync
             group by
-            account_id,
-            symbol,
-            last_successful_sync
+                account_id,
+                symbol,
+                last_successful_sync
         ),
         dividends as (
             select
-            account_id,
-                symbol,
-            last_successful_sync,
+                d.account_id,
+                d.symbol,
+                last_successful_sync,
                 max(dividend_balance) dividend_balance
-            from transactions t
-        join latest_valid_dates d
-        on t.account_id = d.account_id
-            and t.symbol = d.symbol
-            and trade_date = latest_valid_date
-        where account_id = ?
+            from latest_valid_dates d
+            join transactions t
+            on t.account_id = d.account_id
+                and t.symbol = d.symbol
+                and trade_date = latest_valid_date
+            where d.account_id = ?
             group by
-            account_id,
-                symbol,
-            last_successful_sync
+                d.account_id,
+                d.symbol,
+                last_successful_sync
         )
         select 
             account_id,
             symbol,
-        last_successful_sync,
+            last_successful_sync,
             holdings,
             cost_basis,
             current_price,
@@ -826,10 +826,10 @@ def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates=No
             dividend_balance
         from positions
         join account_totals
-        using(account_id, last_successful_sync)
+            using(account_id, last_successful_sync)
         left join dividends
             using(account_id, symbol, last_successful_sync)
-        where positions.account_id = ? 
+        where account_id = ? 
         and last_successful_sync in ({placeholder});
         """,
         (account_id, *sync_dates, account_id, account_id, account_id, *sync_dates),
