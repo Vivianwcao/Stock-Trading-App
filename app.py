@@ -60,7 +60,7 @@ def handle_update_orders_and_get_transactions(snaptrade, conn, data):
 
 
 def handle_update_positions_event_bridge(snaptrade, conn, data):
-    return trigger_update_positions_bulk(snaptrade, conn, "scheduled")
+    return trigger_update_positions_bulk(snaptrade, conn, data.get("trigger"))
 
 
 def handle_update_positions_and_get_latest_analysis_by_account(snaptrade, conn, data):
@@ -185,10 +185,10 @@ if __name__ == "__main__":
         #     "action": "update_orders_and_get_transactions_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
-        {
-            "action": "update_activities_by_account",
-            "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
-        },
+        # {
+        #     "action": "update_activities_by_account",
+        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
+        # },
         # {
         #     "action": "update_positions_and_get_latest_analysis_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
@@ -208,5 +208,6 @@ if __name__ == "__main__":
         #         "ws_account_id": "HC05761K0CAD",
         #     },
         # },
+        {"action": "update_positions_event_bridge", "trigger": "manual"},
         None,
     )

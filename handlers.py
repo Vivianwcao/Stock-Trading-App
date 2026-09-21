@@ -135,10 +135,7 @@ def click_update_orders_and_get_transactions_by_account(
             "select nickname from accounts where account_id = ?", (account_id,)
         ).fetchone()
         nickname = row["nickname"] if row else None
-        if nickname:
-            transactions = get_transactions_by_nickname(conn, nickname)
-        else:
-            transactions = []
+        transactions = get_transactions_by_nickname(conn, nickname) if nickname else []
         return {
             "status": "success",
             "data": {
@@ -156,7 +153,9 @@ def click_update_orders_and_get_transactions_by_account(
 def trigger_update_positions_bulk(snaptrade, conn, trigger):
     accounts = get_all_active_accounts(conn)
     for account in accounts:
-        update_positions_per_account(snaptrade, conn, account["id"], trigger)
+        account_id = account["id"]
+        update_positions_per_account(snaptrade, conn, account_id, trigger)
+        logger.info(f"Successfully updated positions for account: {account_id}.")
         time.sleep(30)
 
 
