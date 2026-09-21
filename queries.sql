@@ -477,7 +477,7 @@ latest_valid_dates as(
   join latest_positions_dates
   using(account_id)
 	where symbol is not null
-  and trade_date <= last_successful_sync
+  and trade_date <= latest_pos_date
 	group by 
 		account_id,
 		symbol
