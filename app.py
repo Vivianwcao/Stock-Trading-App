@@ -19,7 +19,8 @@ from queries import (
     get_all_active_accounts,
     get_latest_analysis_all_accounts,
     get_transactions_all_accounts,
-    get_all_positions_snapshot_dates_all_accounts,
+    get_analysis_by_account_by_snapshot,
+    compare_analysis_by_account_across_snapshots,
 )
 import sqlite3
 
@@ -78,9 +79,18 @@ def handle_get_transactions_all_accounts(snaptrade, conn, data):
     return {"status": "success", "data": transactions}
 
 
-def handle_get_all_positions_snapshot_dates_all_accounts(snaptrade, conn, data):
-    snapshots = get_all_positions_snapshot_dates_all_accounts(conn)
-    return {"status": "success", "data": snapshots}
+def handle_get_analysis_by_account_by_date(snaptrade, conn, data):
+    analysis = get_analysis_by_account_by_snapshot(
+        conn, data.get("account_id"), data.get("sync_date")
+    )
+    return {"status": "success", "data": analysis}
+
+
+def handle_compare_analysis_by_account_across_snapshots(snaptrade, conn, data):
+    analysis = compare_analysis_by_account_across_snapshots(
+        conn, data.get("account_id"), data.get("sync_dates")
+    )
+    return {"status": "success", "data": analysis}
 
 
 def handle_get_latest_analysis_all_accounts(snaptrade, conn, data):
@@ -119,7 +129,8 @@ ACTION_REGISTRY = {
     "get_all_accounts": handle_get_accounts,
     "get_transactions_all_accounts": handle_get_transactions_all_accounts,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
-    "get_all_positions_snapshot_dates_all_accounts": handle_get_all_positions_snapshot_dates_all_accounts,
+    "get_analysis_by_account_by_snapshot": handle_get_analysis_by_account_by_date,
+    "compare_analysis_by_account_across_snapshots": handle_compare_analysis_by_account_across_snapshots,
     "update_nickname": handle_update_account_nickname,
     "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }

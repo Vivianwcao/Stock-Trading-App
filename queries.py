@@ -577,6 +577,36 @@ def get_latest_analysis_all_accounts(conn):
     return [dict(r) for r in rows]
 
 
+def get_snapshot_dates_all_accounts(conn):
+    snapshots = conn.execute(
+        """
+        SELECT DISTINCT 
+            account_id, 
+            last_successful_sync, 
+            trigger
+        FROM positions
+        ORDER BY 
+            account_id, 
+            last_successful_sync DESC
+        """
+    ).fetchall()
+    return [dict(sn) for sn in snapshots]
+
+
+def get_snapshot_dates_by_account(conn, account_id):
+    dates = conn.execute(
+        """
+        select 
+            last_successful_sync 
+        from positions 
+        where account_id = ?
+            and trigger = 'scheduled'
+        """,
+        (account_id,),
+    ).fetchall()
+    return [dict(sn) for sn in dates]
+
+
 def get_latest_analysis_by_account(conn, account_id):
     rows = conn.execute(
         """
@@ -657,22 +687,6 @@ def get_latest_analysis_by_account(conn, account_id):
     return [dict(r) for r in rows]
 
 
-def get_all_positions_snapshot_dates_all_accounts(conn):
-    snapshots = conn.execute(
-        """
-        SELECT DISTINCT 
-            account_id, 
-            last_successful_sync, 
-            trigger
-        FROM positions
-        ORDER BY 
-            account_id, 
-            last_successful_sync DESC
-        """
-    ).fetchall()
-    return [dict(sn) for sn in snapshots]
-
-
 def get_analysis_by_account_by_snapshot(conn, account_id, sync_date):
     rows = conn.execute(
         """
@@ -736,5 +750,88 @@ def get_analysis_by_account_by_snapshot(conn, account_id, sync_date):
         where account_id = ?;
         """,
         (account_id, sync_date, account_id, sync_date, account_id, account_id),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates=None):
+    if not sync_dates:
+        rows = get_snapshot_dates_by_account(conn, account_id)
+        sync_dates = [row["last_successful_sync"] for row in rows]
+    placeholder = ",".join("?" for _ in sync_dates)
+
+    rows = conn.execute(
+        f"""
+        with account_totals as (
+            select
+            account_id,
+            last_successful_sync,
+                sum(holdings * cost_basis) total_bought, 
+                sum(holdings * current_price) total_current
+            from positions
+        where account_id = ? 
+            and last_successful_sync in ({placeholder})
+        group by
+            account_id,
+            last_successful_sync
+        ),
+        latest_valid_dates as(
+            select
+            account_id,
+            symbol,
+            last_successful_sync,
+                max(trade_date) latest_valid_date
+            from account_totals t
+        join activities a
+            using(account_id)
+        where account_id = ? 
+            and symbol is not null
+            and trade_date <= last_successful_sync
+            group by
+            account_id,
+            symbol,
+            last_successful_sync
+        ),
+        dividends as (
+            select
+            account_id,
+                symbol,
+            last_successful_sync,
+                max(dividend_balance) dividend_balance
+            from transactions t
+        join latest_valid_dates d
+        on t.account_id = d.account_id
+            and t.symbol = d.symbol
+            and trade_date = latest_valid_date
+        where account_id = ?
+            group by
+            account_id,
+                symbol,
+            last_successful_sync
+        )
+        select 
+            account_id,
+            symbol,
+        last_successful_sync,
+            holdings,
+            cost_basis,
+            current_price,
+            round((current_price - cost_basis)*100 / cost_basis, 2) growth_percentage,
+            round(holdings * cost_basis, 4) cost,
+            round(total_bought, 4) total_bought,
+            round(holdings * cost_basis*100 / total_bought, 2) bought_ratio,
+            round(holdings * current_price, 4) current_value,
+            round(total_current, 4) total_current,
+            round(holdings * current_price*100 / total_current, 2) current_ratio,
+            dividend_balance
+        from positions
+        join account_totals
+        using(account_id, last_successful_sync)
+        left join dividends
+            using(account_id, symbol, last_successful_sync)
+        where positions.account_id = ? 
+        and last_successful_sync in ();
+        """,
+        (account_id, *sync_dates, account_id, account_id, account_id),
     ).fetchall()
     return [dict(r) for r in rows]

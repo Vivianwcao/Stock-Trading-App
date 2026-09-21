@@ -674,7 +674,7 @@ with account_totals as (
 		sum(holdings * current_price) total_current
 	from positions
   where account_id = ? 
-    and trigger = 'scheduled'
+    and last_successful_sync in ()
   group by
     account_id,
     last_successful_sync
@@ -689,7 +689,6 @@ latest_valid_dates as(
   join activities a
     using(account_id)
   where account_id = ? 
-    and trigger = 'scheduled'
     and symbol is not null
     and trade_date <= last_successful_sync
 	group by
@@ -735,4 +734,4 @@ join account_totals
 left join dividends
 	using(account_id, symbol, last_successful_sync)
 where positions.account_id = ? 
-  and trigger = 'scheduled';
+  and last_successful_sync in ();
