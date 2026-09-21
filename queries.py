@@ -596,7 +596,7 @@ def get_snapshot_dates_all_accounts(conn):
 def get_snapshot_dates_by_account(conn, account_id):
     dates = conn.execute(
         """
-        select 
+        select distinct
             last_successful_sync 
         from positions 
         where account_id = ?
@@ -682,7 +682,7 @@ def get_latest_analysis_by_account(conn, account_id):
         left join dividends
             using(symbol);
         """,
-        (account_id, account_id, account_id, account_id, account_id),
+        (account_id, account_id, account_id, account_id),
     ).fetchall()
     return [dict(r) for r in rows]
 
@@ -830,8 +830,8 @@ def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates=No
         left join dividends
             using(account_id, symbol, last_successful_sync)
         where positions.account_id = ? 
-        and last_successful_sync in ();
+        and last_successful_sync in ({placeholder});
         """,
-        (account_id, *sync_dates, account_id, account_id, account_id),
+        (account_id, *sync_dates, account_id, account_id, account_id, *sync_dates),
     ).fetchall()
     return [dict(r) for r in rows]

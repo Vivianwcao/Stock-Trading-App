@@ -106,7 +106,7 @@ def click_update_activities_by_account(
     }
 
 
-def click_update_orders_and_get_transactions_by_accounts(
+def click_update_orders_and_get_transactions_by_account(
     snaptrade,
     conn,
     account_id,
@@ -131,7 +131,14 @@ def click_update_orders_and_get_transactions_by_accounts(
             return res
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
-        transactions = get_transactions_by_nickname(conn, account_id)
+        row = conn.execute(
+            "select nickname from accounts where account_id = ?", (account_id,)
+        ).fetchone()
+        nickname = row["nickname"] if row else None
+        if nickname:
+            transactions = get_transactions_by_nickname(conn, nickname)
+        else:
+            transactions = []
         return {
             "status": "success",
             "data": {

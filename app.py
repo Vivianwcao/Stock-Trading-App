@@ -4,7 +4,7 @@ import json
 from handlers import (
     on_page_load,
     click_update_activities_by_account,
-    click_update_orders_and_get_transactions_by_accounts,
+    click_update_orders_and_get_transactions_by_account,
     click_update_positions_and_get_latest_analysis_by_account,
     trigger_update_positions_bulk,
     click_get_latest_accounts,
@@ -54,7 +54,7 @@ def handle_update_activities(snaptrade, conn, data):
 
 
 def handle_update_orders_and_get_transactions(snaptrade, conn, data):
-    return click_update_orders_and_get_transactions_by_accounts(
+    return click_update_orders_and_get_transactions_by_account(
         snaptrade, conn, data.get("account_id"), seconds=60
     )
 
