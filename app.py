@@ -3,7 +3,7 @@ import logging
 import json
 from handlers import (
     on_page_load,
-    click_update_activities_by_account,
+    click_update_activities_and_get_transactions_by_account,
     click_update_orders_and_get_transactions_by_account,
     click_update_positions_and_get_latest_analysis_by_account,
     trigger_update_positions_bulk,
@@ -13,6 +13,7 @@ from update_tables import update_accounts, update_account_nickname
 from queries import (
     create_tables,
     get_all_active_accounts,
+    get_transactions_by_stocks_by_nickname,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
     get_analysis_by_account_by_snapshot,
@@ -38,8 +39,8 @@ def handle_on_page_load(snaptrade, conn, data):
     return on_page_load(conn)
 
 
-def handle_update_activities(snaptrade, conn, data):
-    return click_update_activities_by_account(
+def handle_update_activities_and_get_transactions_by_account(snaptrade, conn, data):
+    return click_update_activities_and_get_transactions_by_account(
         snaptrade,
         conn,
         data.get("account_id"),
@@ -73,6 +74,13 @@ def handle_update_positions_and_get_latest_analysis_by_account(snaptrade, conn, 
 def handle_get_accounts(snaptrade, conn, data):
     accounts = get_all_active_accounts(conn)
     return {"status": "success", "data": accounts}
+
+
+def handle_get_transactions_on_recent_active_stocks_by_nickname(snaptrade, conn, data):
+    transactions = get_transactions_by_stocks_by_nickname(
+        conn, data.get("nickname"), data.get("stocks")
+    )
+    return {"status": "success", "data": transactions}
 
 
 def handle_get_analysis_by_account_by_date(snaptrade, conn, data):
@@ -110,12 +118,13 @@ def handle_update_account_nickname(snaptrade, conn, data):
 ACTION_REGISTRY = {
     "init_db": handle_init_db,
     "on_page_load": handle_on_page_load,
-    "update_activities_by_account": handle_update_activities,
+    "update_activities_and_get_transactions_by_account": handle_update_activities_and_get_transactions_by_account,
     "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
     "update_and_get_accounts": handle_update_and_get_accounts,
     "update_positions_event_bridge": handle_update_positions_event_bridge,
     "update_positions_and_get_latest_analysis_by_account": handle_update_positions_and_get_latest_analysis_by_account,
     "get_all_accounts": handle_get_accounts,
+    "get_transactions_on_recent_active_stocks_by_nickname": handle_get_transactions_on_recent_active_stocks_by_nickname,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
     "get_latest_analysis_by_account": handle_get_latest_analysis_by_account,
     "get_analysis_by_account_by_snapshot": handle_get_analysis_by_account_by_date,
@@ -174,7 +183,7 @@ if __name__ == "__main__":
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
         # {
-        #     "action": "update_activities_by_account",
+        #     "action": "update_activities_and_get_transactions_by_account",
         #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
         # },
         # {

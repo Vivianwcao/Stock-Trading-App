@@ -6,7 +6,6 @@ import time
 from queries import (
     get_all_active_accounts,
     get_all_nicknames,
-    get_transactions_all_accounts,
     get_transactions_by_stocks_by_nickname,
     get_last_fetched,
     get_latest_analysis_all_accounts,
@@ -59,7 +58,7 @@ def click_get_latest_accounts(snaptrade, conn, *, hours=0, minutes=0, seconds=0)
     }
 
 
-def click_update_activities_by_account(
+def click_update_activities_and_get_transactions_by_account(
     snaptrade,
     conn,
     account_id,
@@ -78,6 +77,18 @@ def click_update_activities_by_account(
         minutes=minutes,
         seconds=seconds,
     )
+
+    nickname_row = conn.execute(
+        "select nickname from accounts where id = ?", (account_id,)
+    ).fetchone()
+
+    nickname = nickname_row["nickname"] if nickname_row else None
+    if not nickname:
+        return {
+            "status": "fail",
+            "error": "Missing nickname, can't generate transactions.",
+        }
+
     if hrs == mins == secs == 0:
         # okay to make another API call:
         act_hrs, act_mins, act_secs = calculate_wait_time(
@@ -94,10 +105,25 @@ def click_update_activities_by_account(
                 return res
 
             fetched_at = get_last_fetched(conn, "activities", account_id)
+
+            stocks = get_recently_active_stocks_by_nickname(conn, nickname, days=90)
+
+            stock_names = [stock["symbol"] for stock in stocks] if stocks else None
+            transactions = (
+                get_transactions_by_stocks_by_nickname(conn, nickname, stock_names)
+                if stock_names
+                else []
+            )
+
             return {
                 "status": "success",
-                "data": {"rows_updated": res.get("data"), "fetched_at": fetched_at},
+                "data": {
+                    "rows_updated": res.get("data"),
+                    "fetched_at": fetched_at,
+                    "transactions": transactions,
+                },
             }
+
         return {
             "status": "cooldown",
             "data": {"hours": act_hrs, "minutes": act_mins, "seconds": act_secs},
@@ -129,12 +155,13 @@ def click_update_orders_and_get_transactions_by_account(
     nickname_row = conn.execute(
         "select nickname from accounts where id = ?", (account_id,)
     ).fetchone()
-    if not nickname_row:
+
+    nickname = nickname_row["nickname"] if nickname_row else None
+    if not nickname:
         return {
             "status": "fail",
-            "error": "Missing nickname, can't generate transactions",
+            "error": "Missing nickname, can't generate transactions.",
         }
-    nickname = nickname_row["nickname"]
 
     if hrs == mins == secs == 0:
         # ready tp update:
@@ -145,11 +172,7 @@ def click_update_orders_and_get_transactions_by_account(
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
 
-        stocks = (
-            get_recently_active_stocks_by_nickname(conn, nickname, days=90)
-            if nickname
-            else None
-        )
+        stocks = get_recently_active_stocks_by_nickname(conn, nickname, days=90)
         stock_names = [stock["symbol"] for stock in stocks] if stocks else None
         transactions = (
             get_transactions_by_stocks_by_nickname(conn, nickname, stock_names)
