@@ -278,22 +278,3 @@ def update_account_nickname(conn, account_id: str, nickname: str | None):
         "status": "success",
         "data": {"account_id": account_id, "nickname": clean_nickname},
     }
-
-
-def update_wealth_simple_account_id(conn, account_id: str, ws_account_id: str | None):
-    clean_ws_account_id = ws_account_id.strip() or None if ws_account_id else None
-    with conn:
-        conn.execute(
-            """
-            update accounts
-            set wealth_simple_account_id = ?
-            where id = ?
-            """,
-            (clean_ws_account_id, account_id),
-        )
-    logger.info(
-        "Updated wealth_simple_account_id: %s for account: %s.",
-        clean_ws_account_id,
-        account_id,
-    )
-    return clean_ws_account_id

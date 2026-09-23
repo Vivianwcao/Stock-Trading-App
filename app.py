@@ -9,16 +9,11 @@ from handlers import (
     trigger_update_positions_bulk,
     click_get_latest_accounts,
 )
-from update_tables import (
-    update_accounts,
-    update_account_nickname,
-    update_wealth_simple_account_id,
-)
+from update_tables import update_accounts, update_account_nickname
 from queries import (
     create_tables,
     get_all_active_accounts,
     get_latest_analysis_all_accounts,
-    get_transactions_all_accounts,
     get_latest_analysis_by_account,
     get_analysis_by_account_by_snapshot,
     compare_analysis_by_account_across_snapshots,
@@ -80,11 +75,6 @@ def handle_get_accounts(snaptrade, conn, data):
     return {"status": "success", "data": accounts}
 
 
-def handle_get_transactions_all_accounts(snaptrade, conn, data):
-    transactions = get_transactions_all_accounts(conn)
-    return {"status": "success", "data": transactions}
-
-
 def handle_get_analysis_by_account_by_date(snaptrade, conn, data):
     analysis = get_analysis_by_account_by_snapshot(
         conn, data.get("account_id"), data.get("sync_date")
@@ -112,13 +102,6 @@ def handle_update_and_get_accounts(snaptrade, conn, data):
     return click_get_latest_accounts(snaptrade, conn, minutes=10)
 
 
-def handle_update_wealth_simple_account_id(snaptrade, conn, data):
-    update_wealth_simple_account_id(
-        conn, data.get("account_id"), data.get("ws_account_id")
-    )
-    return {"status": "success"}
-
-
 def handle_update_account_nickname(snaptrade, conn, data):
     return update_account_nickname(conn, data.get("account_id"), data.get("nickname"))
 
@@ -133,13 +116,11 @@ ACTION_REGISTRY = {
     "update_positions_event_bridge": handle_update_positions_event_bridge,
     "update_positions_and_get_latest_analysis_by_account": handle_update_positions_and_get_latest_analysis_by_account,
     "get_all_accounts": handle_get_accounts,
-    "get_transactions_all_accounts": handle_get_transactions_all_accounts,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
     "get_latest_analysis_by_account": handle_get_latest_analysis_by_account,
     "get_analysis_by_account_by_snapshot": handle_get_analysis_by_account_by_date,
     "compare_analysis_by_account_across_snapshots": handle_compare_analysis_by_account_across_snapshots,
     "update_nickname": handle_update_account_nickname,
-    "update_wealth_simple_account_id": handle_update_wealth_simple_account_id,
 }
 
 
@@ -206,13 +187,6 @@ if __name__ == "__main__":
         #     "data": {
         #         "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
         #         "nickname": "vivian_fhsa",
-        #     },
-        # },
-        # {
-        #     "action": "update_wealth_simple_account_id",
-        #     "data": {
-        #         "account_id": "8bbc2e4f-feef-457d-b9a7-476a28f9fbc8",
-        #         "ws_account_id": "HC05761K0CAD",
         #     },
         # },
         {"action": "update_positions_event_bridge", "trigger": "manual"},

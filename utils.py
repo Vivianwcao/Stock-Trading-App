@@ -1,7 +1,6 @@
 import os
 import logging
 from datetime import datetime, timezone, timedelta
-from re import M
 from dotenv import load_dotenv
 import libsql_client
 

@@ -1,3 +1,6 @@
+from datetime import date, datetime, timedelta
+
+
 # one time
 def init_db(conn):
     cursor = conn.cursor()
@@ -353,7 +356,15 @@ def create_tables(conn):
 def get_all_active_accounts(conn):
     cursor = conn.cursor()
     rows = cursor.execute("""
-        select *
+        select
+            id,
+            nickname,
+            account_type,
+            status,
+            balance,
+            first_transaction_date,
+            institution,
+            last_successful_sync
         from accounts
         where status='open'
         and balance > 10
@@ -380,9 +391,58 @@ def get_transactions_all_accounts(conn):
     return [dict(r) for r in rows]
 
 
-def get_transactions_by_nickname(conn, nickname):
+# get the recently active stocks for all nicknames
+def get_recently_active_stocks_all_nicknames(conn, days=90):
+    recent_date = (date.today() + timedelta(days=days)).strftime("%Y-%m-%d")
     rows = conn.execute(
         """
+        SELECT
+            nickname,
+            symbol,
+            max(trade_date) latest_date,
+            sum(units) holding
+        from activities act
+        join accounts acc
+        on act.account_id = acc.id
+        group by
+            nickname,
+            symbol
+        having holding > 0
+        and latest_date > ?;
+    """,
+        (recent_date),
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
+# get the recently active stocks for given nicknames
+def get_recently_active_stocks_by_nickname(conn, nickname, days=90):
+    recent_date = (date.today() + timedelta(days=days)).strftime("%Y-%m-%d")
+    rows = conn.execute(
+        """
+        SELECT
+            symbol,
+            max(trade_date) latest_date,
+            sum(units) holding
+        from activities act
+        join accounts acc
+        on act.account_id = acc.id
+        where nickname = ?
+        group by
+            symbol
+        having holding > 0
+        and latest_date > ?;
+    """,
+        (nickname, recent_date),
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
+# get transactions on selected stocks by a single nickname
+def get_transactions_by_stocks_by_nickname(conn, nickname, stocks):
+    placeholder = ",".join("?" for _ in stocks)
+    rows = conn.execute(
+        f"""
         WITH recursive
         cleaned AS (
             SELECT
@@ -402,6 +462,7 @@ def get_transactions_by_nickname(conn, nickname):
             join activities act
             on acc.id = act.account_id
             WHERE nickname = ?
+                and symbol in ({placeholder})
         ),
         with_pres AS (
             SELECT
@@ -480,21 +541,21 @@ def get_transactions_by_nickname(conn, nickname):
         ),
         tree as (
             select
-            id,
-            symbol,
-            type,
-            price,
-            units,
-            amount,
-            cycles,
-            holdings_per_cycle,
-            rn,
-            case when type = 'BUY' then amount
-                else 0
-            end cost,
-            case when type = 'BUY' then price
-                else 0
-            end avg_cost
+                id,
+                symbol,
+                type,
+                price,
+                units,
+                amount,
+                cycles,
+                holdings_per_cycle,
+                rn,
+                case when type = 'BUY' then amount
+                    else 0
+                end cost,
+                case when type = 'BUY' then price
+                    else 0
+                end avg_cost
             from partitioned
             -- seeds condition
             where rn = 1
@@ -502,28 +563,28 @@ def get_transactions_by_nickname(conn, nickname):
             union all
 
             select
-            p.id,
-            p.symbol,
-            p.type,
-            p.price,
-            p.units,
-            p.amount,
-            p.cycles,
-            p.holdings_per_cycle,
-            p.rn,
-            case when p.type = 'BUY' then t.cost + p.amount
-            when p.type = 'SELL' then t.cost - t.avg_cost * p.units
-            else t.cost
-            end as cost,
+                p.id,
+                p.symbol,
+                p.type,
+                p.price,
+                p.units,
+                p.amount,
+                p.cycles,
+                p.holdings_per_cycle,
+                p.rn,
+                case when p.type = 'BUY' then t.cost + p.amount
+                when p.type = 'SELL' then t.cost - t.avg_cost * p.units
+                else t.cost
+                end as cost,
 
-            case when p.type = 'BUY' then abs(coalesce((t.cost + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
-            else t.avg_cost
-            end as avg_cost
+                case when p.type = 'BUY' then abs(coalesce((t.cost + p.amount)/nullif(p.holdings_per_cycle, 0), p.price))
+                else t.avg_cost
+                end as avg_cost
             from partitioned p
             join tree t 
             on p.symbol = t.symbol
-            and p.cycles = t.cycles
-            and p.rn = t.rn + 1
+                and p.cycles = t.cycles
+                and p.rn = t.rn + 1
         )
         SELECT
             ? nickname,
@@ -552,7 +613,7 @@ def get_transactions_by_nickname(conn, nickname):
         join partitioned p
         using(id);
         """,
-        (nickname, nickname),
+        (nickname, *stocks, nickname),
     ).fetchall()
     return [dict(r) for r in rows]
 

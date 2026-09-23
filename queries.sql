@@ -735,3 +735,19 @@ left join dividends
     using(account_id, symbol, last_successful_sync)
 where account_id = ? 
 and last_successful_sync in ({placeholder});
+
+
+-- get recently active stocks with balance
+SELECT
+  nickname,
+  symbol,
+  max(trade_date) latest_date,
+  sum(units) holding
+from activities act
+join accounts acc
+on act.account_id = acc.id
+group by 
+  nickname, 
+  symbol
+having holding > 0
+  and latest_date > '2026-06-01';

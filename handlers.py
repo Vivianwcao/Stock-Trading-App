@@ -7,12 +7,14 @@ from queries import (
     get_all_active_accounts,
     get_all_nicknames,
     get_transactions_all_accounts,
-    get_transactions_by_nickname,
+    get_transactions_by_stocks_by_nickname,
     get_last_fetched,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
     get_snapshot_dates_all_accounts,
     get_snapshot_dates_by_account,
+    get_recently_active_stocks_all_nicknames,
+    get_recently_active_stocks_by_nickname,
 )
 from update_tables import (
     update_accounts,
@@ -123,6 +125,17 @@ def click_update_orders_and_get_transactions_by_account(
         minutes=minutes,
         seconds=seconds,
     )
+
+    nickname_row = conn.execute(
+        "select nickname from accounts where id = ?", (account_id,)
+    ).fetchone()
+    if not nickname_row:
+        return {
+            "status": "fail",
+            "error": "Missing nickname, can't generate transactions",
+        }
+    nickname = nickname_row["nickname"]
+
     if hrs == mins == secs == 0:
         # ready tp update:
         res = update_recent_orders(snaptrade, conn, account_id)
@@ -131,11 +144,18 @@ def click_update_orders_and_get_transactions_by_account(
             return res
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
-        row = conn.execute(
-            "select nickname from accounts where id = ?", (account_id,)
-        ).fetchone()
-        nickname = row["nickname"] if row else None
-        transactions = get_transactions_by_nickname(conn, nickname) if nickname else []
+
+        stocks = (
+            get_recently_active_stocks_by_nickname(conn, nickname, days=90)
+            if nickname
+            else None
+        )
+        stock_names = [stock["symbol"] for stock in stocks] if stocks else None
+        transactions = (
+            get_transactions_by_stocks_by_nickname(conn, nickname, stock_names)
+            if stock_names
+            else []
+        )
         return {
             "status": "success",
             "data": {
@@ -195,7 +215,7 @@ def click_update_positions_and_get_latest_analysis_by_account(
 
 
 def on_page_load(conn):
-    transactions = get_transactions_all_accounts(conn)
+    stocks = get_recently_active_stocks_all_nicknames(conn, days=90)
     snapshots = get_snapshot_dates_all_accounts(conn)
     analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
@@ -204,7 +224,7 @@ def on_page_load(conn):
     return {
         "status": "success",
         "data": {
-            "transactions": transactions,
+            "stocks": stocks,
             "snapshots": snapshots,
             "analysis": analysis,
             "accounts": accounts,
