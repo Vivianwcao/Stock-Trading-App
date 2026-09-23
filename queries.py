@@ -384,6 +384,19 @@ def get_all_nicknames(conn):
     return [n["nickname"] for n in nicknames]
 
 
+def get_latest_trade_date_by_account(conn, account_id):
+    row = conn.execute(
+        """
+            select 
+                max(trade_date) latest_date
+            from activities
+            where account_id = ?
+        """,
+        (account_id,),
+    ).fetchone()
+    return row["latest_date"] if row else None
+
+
 # get the recently active stocks for all nicknames
 def get_recently_active_stocks_all_nicknames(conn, days=90):
     recent_date = (date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -397,6 +410,7 @@ def get_recently_active_stocks_all_nicknames(conn, days=90):
         from activities act
         join accounts acc
         on act.account_id = acc.id
+        where symbol is not null
         group by
             nickname,
             symbol
@@ -412,9 +426,8 @@ def get_recently_active_stocks_all_nicknames(conn, days=90):
     return [dict(row) for row in rows]
 
 
-# get the recently active stocks for given nicknames
-def get_recently_active_stocks_by_nickname(conn, nickname, days=90):
-    recent_date = (date.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+# get the stocks with updates for a given nickname
+def get_stocks_with_updates_by_nickname(conn, nickname, last_trade_date):
     rows = conn.execute(
         """
         SELECT
@@ -425,16 +438,16 @@ def get_recently_active_stocks_by_nickname(conn, nickname, days=90):
         join accounts acc
         on act.account_id = acc.id
         where nickname = ?
+            and symbol is not null
         group by
             symbol
         having latest_date > ?
-        order by 
-            nickname,
+        order by
             symbol,
             latest_date,
             holding;
     """,
-        (nickname, recent_date),
+        (nickname, last_trade_date),
     ).fetchall()
     return [dict(row) for row in rows]
 

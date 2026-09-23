@@ -6,20 +6,12 @@ from retrieve_snaptrade_data import (
     get_orders_last_24hrs,
     get_account_positions,
 )
-from utils import x_days_ago
+from utils import
 import json
 from snaptrade_client.exceptions import ApiException
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
-
-
-# date helpers
-def to_api_date(timestamp: str) -> str:
-    if not timestamp:
-        return None
-    return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date().isoformat()
-
 
 insert_activities_query = """
             insert or ignore into activities (
@@ -106,27 +98,9 @@ def update_last_fetched(conn, api_source: str, account_id: str):
 
 
 # get activities by account
-def update_activities(snaptrade, conn, account_id, is_bulk=False):
-    latest_transaction_date = None
-    cursor = conn.cursor()
-    if not is_bulk:
-        # find the latest transaction_date obtained from API
-        row = cursor.execute(
-            """
-            select 
-                max(trade_date) latest_date
-            from activities
-            where account_id = ?
-        """,
-            (account_id,),
-        ).fetchone()
-        latest_transaction_date = row["latest_date"] if row else None
+def update_activities(snaptrade, conn, account_id, start_date):
 
-    start_date = (
-        None
-        if is_bulk or not latest_transaction_date
-        else (to_api_date(latest_transaction_date) or x_days_ago(2))
-    )
+    cursor = conn.cursor()
     # API fetch activities per WS account
     try:
         activities = get_activities(

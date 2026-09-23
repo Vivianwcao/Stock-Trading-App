@@ -13,7 +13,8 @@ from queries import (
     get_snapshot_dates_all_accounts,
     get_snapshot_dates_by_account,
     get_recently_active_stocks_all_nicknames,
-    get_recently_active_stocks_by_nickname,
+    get_stocks_with_updates_by_nickname,
+    get_latest_trade_date_by_account,
 )
 from update_tables import (
     update_accounts,
@@ -21,7 +22,7 @@ from update_tables import (
     update_recent_orders,
     update_positions_per_account,
 )
-from utils import calculate_wait_time
+from utils import calculate_wait_time, to_api_date, x_days_ago
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -99,14 +100,27 @@ def click_update_activities_and_get_transactions_by_account(
         )
         if act_hrs == act_mins == act_secs == 0:
             # ready to update
-            res = update_activities(snaptrade, conn, account_id, is_bulk)
+            last_trade_date = None
+
+            if not is_bulk:
+                # find the latest transaction_date obtained from API
+                last_trade_date = get_latest_trade_date_by_account(conn, account_id)
+
+            start_date = (
+                None
+                if is_bulk or not last_trade_date
+                else (to_api_date(last_trade_date) or x_days_ago(2))
+            )
+            res = update_activities(snaptrade, conn, account_id, start_date)
 
             if res.get("status") == "fail":
                 return res
 
             fetched_at = get_last_fetched(conn, "activities", account_id)
-
-            stocks = get_recently_active_stocks_by_nickname(conn, nickname, days=90)
+            # re-fetch transactions - get stocks with updates only
+            stocks = get_stocks_with_updates_by_nickname(
+                conn, nickname, last_trade_date
+            )
 
             stock_names = [stock["symbol"] for stock in stocks] if stocks else None
             transactions = (
@@ -119,6 +133,7 @@ def click_update_activities_and_get_transactions_by_account(
                 "status": "success",
                 "data": {
                     "rows_updated": res.get("data"),
+                    "stocks": stocks,
                     "fetched_at": fetched_at,
                     "transactions": transactions,
                 },
@@ -165,6 +180,9 @@ def click_update_orders_and_get_transactions_by_account(
 
     if hrs == mins == secs == 0:
         # ready tp update:
+        # find the latest transaction_date obtained from API
+        last_trade_date = get_latest_trade_date_by_account(conn, account_id)
+
         res = update_recent_orders(snaptrade, conn, account_id)
 
         if res.get("status") == "fail":
@@ -172,7 +190,8 @@ def click_update_orders_and_get_transactions_by_account(
 
         fetched_at = get_last_fetched(conn, "orders", account_id)
 
-        stocks = get_recently_active_stocks_by_nickname(conn, nickname, days=90)
+        # re-fetch transactions - get stocks with updates only
+        stocks = get_stocks_with_updates_by_nickname(conn, nickname, last_trade_date)
         stock_names = [stock["symbol"] for stock in stocks] if stocks else None
         transactions = (
             get_transactions_by_stocks_by_nickname(conn, nickname, stock_names)
@@ -183,6 +202,7 @@ def click_update_orders_and_get_transactions_by_account(
             "status": "success",
             "data": {
                 "rows_updated": res.get("data"),
+                "stocks": stocks,
                 "fetched_at": fetched_at,
                 "transactions": transactions,
             },

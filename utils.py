@@ -11,6 +11,13 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
+# date helpers
+def to_api_date(timestamp: str) -> str:
+    if not timestamp:
+        return None
+    return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date().isoformat()
+
+
 # result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
 # result_set.rows: A list of tuples containing positional values (e.g., [("acc_123", "TFSA", 1500.0)], ...).
 def to_dicts(result_set):
