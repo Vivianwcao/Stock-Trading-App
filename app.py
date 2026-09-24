@@ -1,6 +1,8 @@
 from snaptrade import get_snaptrade_auth
 import logging
 import json
+import os
+from dotenv import load_dotenv
 from handlers import (
     on_page_load,
     click_update_activities_and_get_transactions_by_account,
@@ -30,8 +32,9 @@ logging.basicConfig(level=logging.INFO)  # required for local
 HEADERS = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",  # Allows Netlify frontend to fetch data
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization,x-app-password",
     "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+    "Access-Control-Max-Age": "86400",  # Keep OPTION cache for up to max 24 hours
 }
 
 
@@ -150,6 +153,17 @@ ACTION_REGISTRY = {
 def app_handler(event, context):
     try:
         logger.info(json.dumps(event))
+        if event.get("httpMethod") == "OPTIONS":
+            return {"statusCode": 200, "headers": HEADERS, "body": ""}
+        if (event.get("headers") or {}).get("x-app-password") != os.environ.get(
+            "APP_PASSWORD"
+        ):
+            return {
+                "statusCode": 401,
+                "headers": HEADERS,
+                "body": json.dumps({"status": "fail", "error": "Incorrect password"}),
+            }
+
         action = event.get("action")
         data = event.get("data", {})
 
