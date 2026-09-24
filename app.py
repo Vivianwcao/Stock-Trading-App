@@ -8,12 +8,12 @@ from handlers import (
     click_update_positions_and_get_latest_analysis_by_account,
     trigger_update_positions_bulk,
     click_get_latest_accounts,
+    click_get_transactions_active_stocks_by_nickname,
 )
-from update_tables import update_accounts, update_account_nickname
+from update_tables import update_account_nickname
 from queries import (
     create_tables,
     get_all_active_accounts,
-    get_transactions_by_stocks_by_nickname,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
     get_analysis_by_account_by_snapshot,
@@ -77,10 +77,7 @@ def handle_get_accounts(snaptrade, conn, data):
 
 
 def handle_get_transactions_on_recent_active_stocks_by_nickname(snaptrade, conn, data):
-    transactions = get_transactions_by_stocks_by_nickname(
-        conn, data.get("nickname"), data.get("stocks")
-    )
-    return {"status": "success", "data": transactions}
+    return click_get_transactions_active_stocks_by_nickname(conn, data.get("nickname"))
 
 
 def handle_get_analysis_by_account_by_date(snaptrade, conn, data):

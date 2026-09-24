@@ -5,14 +5,15 @@ import time
 
 from queries import (
     get_all_active_accounts,
-    get_all_nicknames,
+    get_nickname_by_account,
+    get_recently_active_stocks_by_nickname,
     get_transactions_by_stocks_by_nickname,
     get_last_fetched,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
     get_snapshot_dates_all_accounts,
     get_snapshot_dates_by_account,
-    get_recently_active_stocks_all_nicknames,
+    get_all_stocks_all_nicknames,
     get_stocks_with_updates_by_account,
     get_latest_trade_date_by_account,
 )
@@ -257,8 +258,16 @@ def click_update_positions_and_get_latest_analysis_by_account(
     }
 
 
+def click_get_transactions_active_stocks_by_nickname(conn, nickname):
+    stocks = get_recently_active_stocks_by_nickname(conn, nickname)
+    transactions = (
+        get_transactions_by_stocks_by_nickname(conn, nickname, stocks) if stocks else []
+    )
+    return {"status": "success", "data": transactions}
+
+
 def on_page_load(conn):
-    stocks = get_recently_active_stocks_all_nicknames(conn, days=90)
+    stocks = get_all_stocks_all_nicknames(conn)
     snapshots = get_snapshot_dates_all_accounts(conn)
     analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
