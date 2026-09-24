@@ -18,6 +18,7 @@ from queries import (
     get_latest_analysis_by_account,
     get_analysis_by_account_by_snapshot,
     compare_analysis_by_account_across_snapshots,
+    get_transactions_by_stocks_by_nickname,
 )
 import sqlite3
 
@@ -80,16 +81,31 @@ def handle_get_transactions_on_recent_active_stocks_by_nickname(snaptrade, conn,
     return click_get_transactions_active_stocks_by_nickname(conn, data.get("nickname"))
 
 
+def handle_get_all_transactions_by_symbol_by_nickname(snaptrade, conn, data):
+    nickname = data.get("nickname")
+    symbol = data.get("symbol")
+    if not nickname or not symbol:
+        return {"status": "fail", "error": "nickname and symbol required"}
+    transactions = get_transactions_by_stocks_by_nickname(conn, nickname, [symbol])
+    return {"status": "success", "data": transactions}
+
+
 def handle_get_analysis_by_account_by_date(snaptrade, conn, data):
-    analysis = get_analysis_by_account_by_snapshot(
-        conn, data.get("account_id"), data.get("sync_date")
-    )
+    account_id = data.get("account_id")
+    sync_dates = data.get("sync_dates")
+    if not account_id or not sync_dates:
+        return {"status": "fail", "error": "nickname and sync_dates required"}
+    analysis = get_analysis_by_account_by_snapshot(conn, account_id, sync_dates)
     return {"status": "success", "data": analysis}
 
 
 def handle_compare_analysis_by_account_across_snapshots(snaptrade, conn, data):
+    account_id = data.get("account_id")
+    sync_dates = data.get("sync_dates")
+    if not account_id or not sync_dates:
+        return {"status": "fail", "error": "nickname and sync_dates required"}
     analysis = compare_analysis_by_account_across_snapshots(
-        conn, data.get("account_id"), data.get("sync_dates")
+        conn, account_id, sync_dates
     )
     return {"status": "success", "data": analysis}
 
