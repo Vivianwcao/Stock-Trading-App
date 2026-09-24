@@ -421,13 +421,13 @@ def get_recently_active_stocks_all_nicknames(conn, days=90):
             latest_date,
             holding;
     """,
-        (recent_date),
+        (recent_date,),
     ).fetchall()
     return [dict(row) for row in rows]
 
 
-# get the stocks with updates for a given nickname
-def get_stocks_with_updates_by_nickname(conn, nickname, last_trade_date):
+# get the stocks with updates for a given account
+def get_stocks_with_updates_by_account(conn, account_id, last_trade_date):
     rows = conn.execute(
         """
         SELECT
@@ -435,19 +435,17 @@ def get_stocks_with_updates_by_nickname(conn, nickname, last_trade_date):
             max(trade_date) latest_date,
             sum(units) holding
         from activities act
-        join accounts acc
-        on act.account_id = acc.id
-        where nickname = ?
+        where account_id = ?
             and symbol is not null
         group by
             symbol
-        having latest_date > ?
+        having latest_date > coalesce(?, '2017-01-01')
         order by
             symbol,
             latest_date,
             holding;
     """,
-        (nickname, last_trade_date),
+        (account_id, last_trade_date),
     ).fetchall()
     return [dict(row) for row in rows]
 

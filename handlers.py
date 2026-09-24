@@ -13,7 +13,7 @@ from queries import (
     get_snapshot_dates_all_accounts,
     get_snapshot_dates_by_account,
     get_recently_active_stocks_all_nicknames,
-    get_stocks_with_updates_by_nickname,
+    get_stocks_with_updates_by_account,
     get_latest_trade_date_by_account,
 )
 from update_tables import (
@@ -118,8 +118,8 @@ def click_update_activities_and_get_transactions_by_account(
 
             fetched_at = get_last_fetched(conn, "activities", account_id)
             # re-fetch transactions - get stocks with updates only
-            stocks = get_stocks_with_updates_by_nickname(
-                conn, nickname, last_trade_date
+            stocks = get_stocks_with_updates_by_account(
+                conn, account_id, last_trade_date
             )
 
             stock_names = [stock["symbol"] for stock in stocks] if stocks else None
@@ -191,7 +191,7 @@ def click_update_orders_and_get_transactions_by_account(
         fetched_at = get_last_fetched(conn, "orders", account_id)
 
         # re-fetch transactions - get stocks with updates only
-        stocks = get_stocks_with_updates_by_nickname(conn, nickname, last_trade_date)
+        stocks = get_stocks_with_updates_by_account(conn, account_id, last_trade_date)
         stock_names = [stock["symbol"] for stock in stocks] if stocks else None
         transactions = (
             get_transactions_by_stocks_by_nickname(conn, nickname, stock_names)

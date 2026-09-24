@@ -6,7 +6,6 @@ from retrieve_snaptrade_data import (
     get_orders_last_24hrs,
     get_account_positions,
 )
-from utils import
 import json
 from snaptrade_client.exceptions import ApiException
 
