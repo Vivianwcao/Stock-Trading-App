@@ -92,10 +92,10 @@ def handle_get_all_transactions_by_symbol_by_nickname(snaptrade, conn, data):
 
 def handle_get_analysis_by_account_by_date(snaptrade, conn, data):
     account_id = data.get("account_id")
-    sync_dates = data.get("sync_dates")
-    if not account_id or not sync_dates:
-        return {"status": "fail", "error": "nickname and sync_dates required"}
-    analysis = get_analysis_by_account_by_snapshot(conn, account_id, sync_dates)
+    sync_date = data.get("sync_date")
+    if not account_id or not sync_date:
+        return {"status": "fail", "error": "nickname and sync_date required"}
+    analysis = get_analysis_by_account_by_snapshot(conn, account_id, sync_date)
     return {"status": "success", "data": analysis}
 
 
@@ -103,7 +103,7 @@ def handle_compare_analysis_by_account_across_snapshots(snaptrade, conn, data):
     account_id = data.get("account_id")
     sync_dates = data.get("sync_dates")
     if not account_id or not sync_dates:
-        return {"status": "fail", "error": "nickname and sync_dates required"}
+        return {"status": "fail", "error": "account_id and sync_dates required"}
     analysis = compare_analysis_by_account_across_snapshots(
         conn, account_id, sync_dates
     )
@@ -138,6 +138,7 @@ ACTION_REGISTRY = {
     "update_positions_and_get_latest_analysis_by_account": handle_update_positions_and_get_latest_analysis_by_account,
     "get_all_accounts": handle_get_accounts,
     "get_transactions_on_recent_active_stocks_by_nickname": handle_get_transactions_on_recent_active_stocks_by_nickname,
+    "get_all_transactions_by_symbol_by_nickname": handle_get_all_transactions_by_symbol_by_nickname,
     "get_latest_analysis_all_accounts": handle_get_latest_analysis_all_accounts,
     "get_latest_analysis_by_account": handle_get_latest_analysis_by_account,
     "get_analysis_by_account_by_snapshot": handle_get_analysis_by_account_by_date,
