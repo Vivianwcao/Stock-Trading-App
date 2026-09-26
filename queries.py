@@ -15,7 +15,7 @@ def init_db(conn):
         account_type varchar(50) not null,
         status varchar(20),
         balance numeric(16, 6),
-        first_transaction_date timestamptz,
+        first_transaction_date date,
         institution varchar(50),
         currency varchar(10),
         last_successful_sync timestamptz not null -- utc timestamp from api
@@ -77,7 +77,8 @@ def init_db(conn):
         WHERE source <> 'wealth_simple_csv';
         """)
 
-    cursor.execute("""create index if not exists idx_transactions
+    cursor.execute("""
+        create index if not exists idx_transactions
         on activities(account_id, symbol, trade_date);""")
 
     # 2. View Creation
