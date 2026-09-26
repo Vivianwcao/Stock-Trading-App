@@ -23,7 +23,7 @@ from update_tables import (
     update_recent_orders,
     update_positions_per_account,
 )
-from utils import calculate_wait_time, to_api_date, x_days_ago
+from utils import calculate_wait_time
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ def click_get_latest_accounts(snaptrade, conn, *, hours=0, minutes=0, seconds=0)
     if hrs == mins == secs == 0:
         # ready tp update:
         res = update_accounts(snaptrade, conn)
-
+        print(res)
         accounts = get_all_active_accounts(conn)
         response = {
             "status": "success",
@@ -79,9 +79,9 @@ def click_update_activities_and_get_transactions_by_account(
         minutes=minutes,
         seconds=seconds,
     )
-
-    nickname_row = conn.execute(
-        "select nickname from accounts where id = ?", (account_id,)
+    cursor = conn.cursor()
+    nickname_row = cursor.execute(
+        "select nickname from accounts where id = %s", (account_id,)
     ).fetchone()
 
     nickname = nickname_row["nickname"] if nickname_row else None
@@ -107,11 +107,7 @@ def click_update_activities_and_get_transactions_by_account(
                 # find the latest transaction_date obtained from API
                 last_trade_date = get_latest_trade_date_by_account(conn, account_id)
 
-            start_date = (
-                None
-                if is_bulk or not last_trade_date
-                else (to_api_date(last_trade_date) or x_days_ago(2))
-            )
+            start_date = None if is_bulk or not last_trade_date else last_trade_date
             res = update_activities(snaptrade, conn, account_id, start_date)
 
             if res.get("status") == "fail":
@@ -167,9 +163,9 @@ def click_update_orders_and_get_transactions_by_account(
         minutes=minutes,
         seconds=seconds,
     )
-
-    nickname_row = conn.execute(
-        "select nickname from accounts where id = ?", (account_id,)
+    cursor = conn.cursor()
+    nickname_row = cursor.execute(
+        "select nickname from accounts where id = %s", (account_id,)
     ).fetchone()
 
     nickname = nickname_row["nickname"] if nickname_row else None
@@ -271,7 +267,8 @@ def on_page_load(conn):
     snapshots = get_snapshot_dates_all_accounts(conn)
     analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
-    rows = conn.execute("select * from last_fetched").fetchall()
+    cursor = conn.cursor()
+    rows = cursor.execute("select * from last_fetched").fetchall()
     last_fetched = [dict(row) for row in rows]
     return {
         "status": "success",

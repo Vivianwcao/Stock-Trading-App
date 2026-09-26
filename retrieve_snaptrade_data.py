@@ -1,4 +1,5 @@
 import json
+from snaptrade import get_snaptrade_auth
 
 
 def get_accounts(snaptrade):
@@ -56,3 +57,10 @@ def get_account_positions(snaptrade, account_id):
 # with open("./test/all_orders.json", "w", encoding="utf-8") as f:
 #     # returns a list
 #     json.dump(res5.body, f, indent=2, default=str)
+
+
+if __name__ == "__main__":
+    snaptrade = get_snaptrade_auth()
+    obj = get_accounts(snaptrade)
+    with open("./test/accounts.json", "w", encoding="utf-8") as f:
+        json.dump(obj, f, indent=2, default=str)

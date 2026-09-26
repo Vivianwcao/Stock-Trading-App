@@ -22,7 +22,10 @@ from queries import (
     compare_analysis_by_account_across_snapshots,
     get_transactions_by_stocks_by_nickname,
 )
-import sqlite3
+from utils import json_default
+import psycopg2
+import psycopg2.extras
+
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logger = logging.getLogger(__name__)
@@ -172,16 +175,13 @@ def app_handler(event, context):
             }
 
         snaptrade = get_snaptrade_auth()
-        # Connect to local database file (creates stocks.db automatically)
-        conn = sqlite3.connect("stocks.db")
+
+        conn = psycopg2.connect(
+            os.environ["DATABASE_URL_POOLED"],
+            cursor_factory=psycopg2.extras.RealDictCursor,
+        )
 
         try:
-            conn.row_factory = sqlite3.Row
-
-            conn.execute("PRAGMA foreign_keys = ON")
-            # writes commit straight to stocks.db, and temporary files are automatically deleted instantly
-            conn.execute("PRAGMA journal_mode = DELETE;")
-
             res = controller(snaptrade, conn, data)
 
             return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
@@ -194,34 +194,7 @@ def app_handler(event, context):
             "statusCode": 500,
             "headers": HEADERS,
             "body": json.dumps(
-                {"status": "fail", "error": f"{type(e).__name__}: {str(e)}"}
+                {"status": "fail", "error": f"{type(e).__name__}: {str(e)}"},
+                default=json_default,
             ),
         }
-
-
-if __name__ == "__main__":
-    app_handler(
-        # {"action": "update_and_get_accounts"},
-        # {
-        #     "action": "update_orders_and_get_transactions_by_account",
-        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
-        # },
-        # {
-        #     "action": "update_activities_and_get_transactions_by_account",
-        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
-        # },
-        # {
-        #     "action": "update_positions_and_get_latest_analysis_by_account",
-        #     "data": {"account_id": "4cd8021d-56b3-4b8d-93b6-12976d587a08"},
-        # },
-        # {"action": "get_all_accounts"},
-        # {
-        #     "action": "update_account_nickname",
-        #     "data": {
-        #         "account_id": "0170ad7d-dc73-48aa-a4b2-61767f8472fc",
-        #         "nickname": "vivian_fhsa",
-        #     },
-        # },
-        {"action": "update_positions_event_bridge", "trigger": "manual"},
-        None,
-    )

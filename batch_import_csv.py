@@ -1,19 +1,10 @@
-import sqlite3
+import os
+from dotenv import load_dotenv
 import duckdb
 from update_tables import insert_activities_query
+import psycopg2
+import psycopg2.extras
 
-
-get_cutoff_dates_query = """
-        SELECT
-            acc.id,
-            wealth_simple_account_id,
-            substr(min(trade_date), 1, 19) || '.000000Z' cutoff
-        from accounts acc
-        left join activities act
-            on acc.id = act.account_id
-        where wealth_simple_account_id is not null
-        group by wealth_simple_account_id
-    """
 
 # Wealth simple csv uses QQU, where SnapTrade API uses HQU
 import_csv_query_initial_batch = """
@@ -30,25 +21,19 @@ import_csv_query_initial_batch = """
             when activity_type = 'Trade' then activity_sub_type
             else upper(activity_type)
         end,
-        coalesce(unit_price, 0)::double,
+        coalesce(unit_price, 0)::decimal(16, 6),
         case
             when activity_type = 'Trade' then quantity
             when activity_type = 'InternalSecurityTransfer' then quantity
             when activity_type like '%CorporateAction%' then quantity
             else 0
-        end::double,
-        coalesce(net_cash_amount, 0)::double,
-        coalesce(commission, 0)::double,
+        end::decimal(16, 6),
+        coalesce(net_cash_amount, 0)::decimal(16, 6),
+        coalesce(commission, 0)::decimal(16, 6),
         currency,
-        strftime(
-            timezone(
-                'UTC', 
-                timezone(
-                    'America/Vancouver', 
-                    (effective_date::varchar || ' ' || effective_time::varchar)::timestamp
-                )
-            ),
-            '%Y-%m-%dT%H:%M:%S.%fZ'
+        timezone(
+            'America/Vancouver', 
+            (effective_date::varchar || ' ' || effective_time::varchar)::timestamp
         ) trade_date,
         'wealth_simple_csv'
     from read_csv_auto('activities.csv', header=True) csv
@@ -88,17 +73,28 @@ def check_csv_identical_rows(ddb_conn):
     """)
 
 
-def import_csv(sql_conn, ddb_conn, is_initial_batch=True):
+def import_csv(conn, ddb_conn, is_initial_batch=True):
 
-    # 1. Fetch cutoffs from sql
-    with sql_conn:
-        cutoffs = sql_conn.execute(get_cutoff_dates_query).fetchall()
+    # 1. Fetch cutoffs from postgresql
+    cursor = conn.cursor()
+    cutoffs = cursor.execute("""
+    SELECT
+        acc.id,
+        wealth_simple_account_id,
+        min(trade_date)::date cutoff
+    from accounts acc
+    left join activities act
+        on acc.id = act.account_id
+    where wealth_simple_account_id is not null
+    group by wealth_simple_account_id
+    """).fetchall()
+
     # 2. Create temporary mapping table in duckDB
     ddb_conn.execute("""
         create temp table cutoffs (
             account_id varchar,
             wealth_simple_account_id varchar,
-            cutoff varchar
+            cutoff date
         )
     """)
 
@@ -112,19 +108,23 @@ def import_csv(sql_conn, ddb_conn, is_initial_batch=True):
         # 4. Query CSV joined with Cutoffs
         rows = ddb_conn.execute(import_csv_query).fetchall()
 
-    with sql_conn:
-        row_count = sql_conn.executemany(insert_activities_query, rows).rowcount
+    with conn:  # auto-commit
+        # re-use the same cursor
+        cursor.executemany(insert_activities_query, rows)
+        row_count = cursor.rowcount
     print(f"Successfully synced {row_count} activities in total.")
 
 
 if __name__ == "__main__":
     ddb_conn = duckdb.connect()
-    sql_conn = sqlite3.connect("stocks.db")
-    sql_conn.execute("PRAGMA foreign_keys = ON")
+    conn = psycopg2.connect(
+        os.environ["DATABASE_URL_POOLED"],
+        cursor_factory=psycopg2.extras.RealDictCursor,
+    )
 
-    import_csv(sql_conn, ddb_conn, True)
+    import_csv(conn, ddb_conn, True)
 
     # check_csv_identical_rows(ddb_conn).show()
 
     ddb_conn.close()
-    sql_conn.close()
+    conn.close()

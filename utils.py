@@ -1,6 +1,6 @@
 import os
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, date, timezone, timedelta
 from dotenv import load_dotenv
 import libsql_client
 
@@ -11,11 +11,24 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-# date helpers
-def to_api_date(timestamp: str) -> str:
-    if not timestamp:
+def json_default(obj):
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError(f"Not serializable: {type(obj)}")
+
+
+def convert_utc_string_to_timestamp(str):
+    """API gives '2024-01-15T10:30:00.000Z' — convert to timezone-aware datetime."""
+    if not str:
         return None
-    return datetime.fromisoformat(timestamp.replace("Z", "+00:00")).date().isoformat()
+    return datetime.fromisoformat(str.replace("Z", "+00:00"))
+
+
+def convert_date_string_to_date(str):
+    """API gives '2024-01-15' — convert to a date object."""
+    if not str:
+        return None
+    return date.fromisoformat(str)
 
 
 # result_set.columns: A tuple/list of column names (e.g., ["id", "account_name", "balance"]).
@@ -30,11 +43,6 @@ def to_dict(result_set):
     if not result_set.rows:
         return None
     return dict(zip(result_set.columns, result_set.rows[0]))
-
-
-def x_days_ago(x):
-    """Returns a date string in YYYY-MM-DD format."""
-    return (datetime.now(timezone.utc).date() - timedelta(days=x)).isoformat()
 
 
 def time_delta_calculator(timestamp_str, *, hours=0, minutes=0, seconds=0):
@@ -80,7 +88,7 @@ def calculate_wait_time(
                 max(fetched_at) fetched_at
             from last_fetched
             where api_source = 'activities'
-            and account_id = ?
+            and account_id = %s
         """,
             (account_id,),
         ).fetchone()
