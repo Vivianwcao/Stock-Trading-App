@@ -14,7 +14,6 @@ from handlers import (
 )
 from update_tables import update_account_nickname
 from queries import (
-    create_tables,
     get_all_active_accounts,
     get_latest_analysis_all_accounts,
     get_latest_analysis_by_account,
@@ -112,11 +111,6 @@ def handle_get_latest_analysis_all_accounts(snaptrade, conn, data):
     return get_latest_analysis_all_accounts(conn)
 
 
-def handle_init_db(snaptrade, conn, data):
-    create_tables(conn)
-    return {"status": "success"}
-
-
 def handle_update_and_get_accounts(snaptrade, conn, data):
     return click_get_latest_accounts(snaptrade, conn, minutes=10)
 
@@ -127,7 +121,6 @@ def handle_update_account_nickname(snaptrade, conn, data):
 
 # ── Action Registry ──────────────────────────────────────────────────────────
 ACTION_REGISTRY = {
-    "init_db": handle_init_db,
     "on_page_load": handle_on_page_load,
     "update_activities_and_get_transactions_by_account": handle_update_activities_and_get_transactions_by_account,
     "update_orders_and_get_transactions_by_account": handle_update_orders_and_get_transactions,
@@ -176,15 +169,28 @@ def app_handler(event, context):
 
         snaptrade = get_snaptrade_auth()
 
+        # Local testing
         conn = psycopg2.connect(
-            os.environ["DATABASE_URL_POOLED"],
+            os.environ["DATABASE_URL"],
             cursor_factory=psycopg2.extras.RealDictCursor,
         )
+
+        # conn = psycopg2.connect(
+        #     os.environ["DATABASE_URL_POOLED"],
+        #     cursor_factory=psycopg2.extras.RealDictCursor,
+        # )
 
         try:
             res = controller(snaptrade, conn, data)
 
-            return {"statusCode": 200, "headers": HEADERS, "body": json.dumps(res)}
+            return {
+                "statusCode": 200,
+                "headers": HEADERS,
+                "body": json.dumps(
+                    res,
+                    default=json_default,
+                ),
+            }
         finally:
             conn.close()
 

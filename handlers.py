@@ -80,9 +80,8 @@ def click_update_activities_and_get_transactions_by_account(
         seconds=seconds,
     )
     cursor = conn.cursor()
-    nickname_row = cursor.execute(
-        "select nickname from accounts where id = %s", (account_id,)
-    ).fetchone()
+    cursor.execute("select nickname from accounts where id = %s", (account_id,))
+    nickname_row = cursor.fetchone()
 
     nickname = nickname_row["nickname"] if nickname_row else None
     if not nickname:
@@ -129,7 +128,6 @@ def click_update_activities_and_get_transactions_by_account(
             return {
                 "status": "success",
                 "data": {
-                    "rows_updated": res.get("data"),
                     "stocks": stocks,
                     "fetched_at": fetched_at,
                     "transactions": transactions,
@@ -164,9 +162,8 @@ def click_update_orders_and_get_transactions_by_account(
         seconds=seconds,
     )
     cursor = conn.cursor()
-    nickname_row = cursor.execute(
-        "select nickname from accounts where id = %s", (account_id,)
-    ).fetchone()
+    cursor.execute("select nickname from accounts where id = %s", (account_id,))
+    nickname_row = cursor.fetchone()
 
     nickname = nickname_row["nickname"] if nickname_row else None
     if not nickname:
@@ -198,7 +195,6 @@ def click_update_orders_and_get_transactions_by_account(
         return {
             "status": "success",
             "data": {
-                "rows_updated": res.get("data"),
                 "stocks": stocks,
                 "fetched_at": fetched_at,
                 "transactions": transactions,
@@ -268,7 +264,8 @@ def on_page_load(conn):
     analysis = get_latest_analysis_all_accounts(conn)
     accounts = get_all_active_accounts(conn)
     cursor = conn.cursor()
-    rows = cursor.execute("select * from last_fetched").fetchall()
+    cursor.execute("select * from last_fetched")
+    rows = cursor.fetchall()
     last_fetched = [dict(row) for row in rows]
     return {
         "status": "success",

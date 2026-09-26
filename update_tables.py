@@ -148,9 +148,9 @@ def update_activities(snaptrade, conn, account_id, start_date: None | datetime):
     update_last_fetched(conn, "activities", account_id)
 
     logger.info(
-        f"Successfully synced {cursor.rowcount} activities for account: {account_id} from {convert_utc_string_to_timestamp(start_date)}, and updated last_fetched successfully"
+        f"Successfully synced activities for account: {account_id} from {convert_utc_string_to_timestamp(start_date)}, and updated last_fetched successfully"
     )
-    return {"status": "success", "data": cursor.rowcount}
+    return {"status": "success"}
 
 
 # update activities with recent orders (per WS account)
@@ -201,14 +201,13 @@ def update_recent_orders(snaptrade, conn, account_id):
             cur.executemany(
                 insert_activities_query,
                 records,
-            ).rowcount
+            )
 
     update_last_fetched(conn, "orders", account_id)
-
     logger.info(
-        f"Successfully synced {cur.row_count} orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
+        f"Successfully synced recent orders for account: {account_id} from last 24 hours, and updated last_fetched successfully"
     )
-    return {"status": "success", "data": cur.row_count}
+    return {"status": "success"}
 
 
 def update_positions_per_account(snaptrade, conn, account_id, trigger):

@@ -77,9 +77,8 @@ def import_csv(conn, ddb_conn, is_initial_batch=True):
 
     # 1. Fetch cutoffs from postgresql
     cursor = conn.cursor()
-    cutoffs = cursor.execute("""
+    cursor.execute("""
     SELECT
-        acc.id,
         wealth_simple_account_id,
         min(trade_date)::date cutoff
     from accounts acc
@@ -87,7 +86,8 @@ def import_csv(conn, ddb_conn, is_initial_batch=True):
         on acc.id = act.account_id
     where wealth_simple_account_id is not null
     group by wealth_simple_account_id
-    """).fetchall()
+    """)
+    cutoffs = cursor.fetchall()
 
     # 2. Create temporary mapping table in duckDB
     ddb_conn.execute("""
@@ -117,6 +117,13 @@ def import_csv(conn, ddb_conn, is_initial_batch=True):
 
 if __name__ == "__main__":
     ddb_conn = duckdb.connect()
+
+    # # Local testing
+    # conn = psycopg2.connect(
+    #     os.environ["DATABASE_URL_POOLED"],
+    #     cursor_factory=psycopg2.extras.RealDictCursor,
+    # )
+
     conn = psycopg2.connect(
         os.environ["DATABASE_URL_POOLED"],
         cursor_factory=psycopg2.extras.RealDictCursor,

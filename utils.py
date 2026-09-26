@@ -1,8 +1,7 @@
 import os
 import logging
-from datetime import datetime, date, timezone, timedelta
+from datetime import datetime, date, timezone
 from dotenv import load_dotenv
-import libsql_client
 
 load_dotenv()
 
@@ -45,10 +44,8 @@ def to_dict(result_set):
     return dict(zip(result_set.columns, result_set.rows[0]))
 
 
-def time_delta_calculator(timestamp_str, *, hours=0, minutes=0, seconds=0):
-    current_time = datetime.now(timezone.utc)
-    last_fetch_time = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
-    elapsed = current_time - last_fetch_time
+def time_delta_calculator(last_fetch_time: datetime, *, hours=0, minutes=0, seconds=0):
+    elapsed = datetime.now(timezone.utc) - last_fetch_time
 
     total_seconds = hours * 3600 + minutes * 60 + seconds - int(elapsed.total_seconds())
     if total_seconds <= 0:
@@ -73,16 +70,17 @@ def calculate_wait_time(
     cursor = conn.cursor()
     if is_activities is False:
         # check per Snaptrade account
-        latest = cursor.execute(
+        cursor.execute(
             """
             select
                 max(fetched_at) fetched_at
             from last_fetched
         """
-        ).fetchone()
+        )
+        latest = cursor.fetchone()
     else:
         # activities batch, check all accounts, update accounts table
-        latest = cursor.execute(
+        cursor.execute(
             """
             select
                 max(fetched_at) fetched_at
@@ -91,18 +89,12 @@ def calculate_wait_time(
             and account_id = %s
         """,
             (account_id,),
-        ).fetchone()
+        )
+        latest = cursor.fetchone()
 
     # If never fetched from API ever before, no wait time is required
     if not latest or not latest["fetched_at"]:
         return 0, 0, 0
     return time_delta_calculator(
         latest["fetched_at"], hours=hours, minutes=minutes, seconds=seconds
-    )
-
-
-def get_turso_client():
-    return libsql_client.create_client_sync(
-        url=os.environ["TURSO_DATABASE_URL"],
-        auth_token=os.environ["TURSO_AUTH_TOKEN"],
     )

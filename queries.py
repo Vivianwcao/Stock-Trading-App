@@ -6,82 +6,84 @@ from utils import convert_utc_string_to_timestamp
 def init_db(conn):
     cursor = conn.cursor()
 
-    script = """
-        create table if not exists accounts (
-            id uuid primary key, --snaptrade account_id
-            wealth_simple_account_id varchar(50), --wealth simple account_id
-            account_name varchar(50) not null, --tfsa-absvdfh
-            nickname varchar(50), -- added custom/display nickname
-            account_type varchar(50) not null,
-            status varchar(20),
-            balance numeric(16, 6),
-            first_transaction_date timestamptz,
-            institution varchar(50),
-            currency varchar(10),
-            last_successful_sync timestamptz not null -- utc timestamp from api
-        );
+    cursor.execute("""
+    create table if not exists accounts (
+        id uuid primary key, --snaptrade account_id
+        wealth_simple_account_id varchar(50), --wealth simple account_id
+        account_name varchar(50) not null, --tfsa-absvdfh
+        nickname varchar(50), -- added custom/display nickname
+        account_type varchar(50) not null,
+        status varchar(20),
+        balance numeric(16, 6),
+        first_transaction_date timestamptz,
+        institution varchar(50),
+        currency varchar(10),
+        last_successful_sync timestamptz not null -- utc timestamp from api
+    );
+    """)
+
+    cursor.execute("""
+    create table if not exists activities (
+        id uuid primary key,
+        account_id uuid not null,
+        symbol varchar(12),
+        type varchar(50) not null,
+        price numeric(16, 6),
+        units numeric(16, 6),
+        amount numeric(16, 6),
+        fee numeric(16, 6),
+        currency varchar(10),
+        trade_date timestamptz not null,
+        source varchar(30) not null,
+        updated_at timestamptz not null
+            default now(),
+
+        foreign key (account_id)
+            references accounts(id)
+    );
+    """)
+
+    cursor.execute("""
+    create table if not exists last_fetched (
+        api_source varchar(30) not null,
+        account_id uuid not null,
+        fetched_at timestamptz not null
+            default now(),
+
+        primary key(api_source, account_id)            
         
-        create table if not exists activities (
-            id uuid primary key,
-            account_id uuid not null,
-            symbol varchar(12),
-            type varchar(50) not null,
-            price numeric(16, 6),
-            units numeric(16, 6),
-            amount numeric(16, 6),
-            fee numeric(16, 6),
-            currency varchar(10),
-            trade_date timestamptz not null,
-            source varchar(30) not null,
-            updated_at timestamptz not null
-                default now(),
+        Foreign Key (account_id) 
+        REFERENCES accounts(id)
+    );""")
 
-            foreign key (account_id)
-                references accounts(id)
-        );
+    cursor.execute("""
+    create table if not exists positions(
+        id serial primary key,
+        account_id uuid,
+        symbol varchar(12),
+        holdings numeric(16, 6) not null,
+        current_price numeric(16, 6) not null,
+        cost_basis numeric(16, 6) not null,
+        trigger varchar(30) not null,
+        last_successful_sync timestamptz,
 
-        create table if not exists last_fetched (
-            api_source varchar(30) not null,
-            account_id uuid not null,
-            fetched_at timestamptz not null
-                default now(),
+        Foreign Key (account_id) 
+        REFERENCES accounts(id)
+    );""")
 
-            primary key(api_source, account_id)            
-            
-            Foreign Key (account_id) 
-            REFERENCES accounts(id)
-        );
-
-        create table if not exists positions(
-            id serial primary key,
-            account_id uuid,
-            symbol varchar(12),
-            holdings numeric(16, 6) not null,
-            current_price numeric(16, 6) not null,
-            cost_basis numeric(16, 6) not null,
-            trigger varchar(30) not null,
-            last_successful_sync timestamptz,
-
-            Foreign Key (account_id) 
-            REFERENCES accounts(id)
-        );
-        
-
+    cursor.execute("""
         CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_api_dedup 
-                ON activities (trade_date, account_id, symbol, type, price, units)
-                WHERE source <> 'wealth_simple_csv';
+            ON activities (trade_date, account_id, symbol, type, price, units)
+        WHERE source <> 'wealth_simple_csv';
+        """)
 
-        create index if not exists idx_transactions
-        on activities(account_id, symbol, trade_date);            
-    """
-    cursor.execute(script)
+    cursor.execute("""create index if not exists idx_transactions
+        on activities(account_id, symbol, trade_date);""")
 
     # 2. View Creation
     cursor.execute(
         """
-        DROP VIEW IF EXISTS transactions;
-
-        CREATE VIEW IF NOT EXISTS transactions AS
+        create or replace view transactions AS
         WITH recursive
         cleaned AS (
             SELECT
@@ -115,20 +117,20 @@ def init_db(conn):
             substr(
                 max(
                 CASE
-                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                    WHEN type <> 'DIVIDEND' THEN trade_date::varchar || '#' || type
                 END
                 ) OVER (
-                PARTITION BY nickname, symbol
-                ORDER BY trade_date 
-                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                    PARTITION BY symbol
+                    ORDER BY trade_date 
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
                 ),
                 strpos(
                 max(
                     CASE
-                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                        WHEN type <> 'DIVIDEND' THEN trade_date::varchar || '#' || type
                     END
                 ) OVER (
-                    PARTITION BY nickname, symbol
+                    PARTITION BY symbol
                     ORDER BY trade_date 
                     ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
                 ),
@@ -258,11 +260,8 @@ def init_db(conn):
         """
     )
 
-    cursor.execute(
-        """   
-        DROP VIEW IF EXISTS analysis;
-
-        CREATE VIEW IF NOT EXISTS analysis AS
+    cursor.execute(""" 
+        create or replace view analysis AS
         with latest_positions_dates as (
         SELECT
             account_id,
@@ -339,21 +338,12 @@ def init_db(conn):
             using(account_id)
         left join dividends
             using(account_id, symbol);
-        """
-    )
-
-
-def create_tables(conn):
-    cursor = conn.cursor()
-    cursor.execute(
-        "drop table if exists activities; drop table if exists accounts; drop table if exists last_fetched;"
-    )
-    init_db(conn)  # run once
+        """)
 
 
 def get_all_active_accounts(conn):
     cursor = conn.cursor()
-    rows = cursor.execute("""
+    cursor.execute("""
         select
             id,
             nickname,
@@ -366,27 +356,29 @@ def get_all_active_accounts(conn):
         from accounts
         where status='open'
         and balance > 10
-    """).fetchall()
+    """)
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
 
 
 def get_nickname_by_account(conn, account_id):
     cursor = conn.cursor()
-    nickname = cursor.execute(
+    cursor.execute(
         """
         select 
             nickname
         from accounts
-        where account_id = %s;
+        where id = %s;
         """,
         (account_id,),
-    ).fetchone()
+    )
+    nickname = cursor.fetchone()
     return nickname["nickname"] if nickname else None
 
 
 def get_latest_trade_date_by_account(conn, account_id):
     cursor = conn.cursor()
-    row = cursor.execute(
+    cursor.execute(
         """
             select 
                 max(trade_date) latest_date
@@ -394,13 +386,14 @@ def get_latest_trade_date_by_account(conn, account_id):
             where account_id = %s
         """,
         (account_id,),
-    ).fetchone()
+    )
+    row = cursor.fetchone()
     return row["latest_date"] if row else None
 
 
 def get_all_stocks_all_nicknames(conn):
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         """
         SELECT
             nickname,
@@ -420,14 +413,15 @@ def get_all_stocks_all_nicknames(conn):
             latest_date,
             holding;
     """,
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(row) for row in rows]
 
 
 # get the recently active stocks for one account
 def get_recently_active_stocks_by_nickname(conn, nickname, days=90):
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         """
         SELECT
             symbol
@@ -442,7 +436,8 @@ def get_recently_active_stocks_by_nickname(conn, nickname, days=90):
             and sum(units) > 0;
         """,
         (nickname, days),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [row["symbol"] for row in rows]
 
 
@@ -451,7 +446,7 @@ def get_stocks_with_updates_by_account(
     conn, account_id, last_trade_date: datetime | None
 ):
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         """
         SELECT
             symbol,
@@ -462,14 +457,15 @@ def get_stocks_with_updates_by_account(
             and symbol is not null
         group by
             symbol
-        having latest_date > coalesce(%s, timestamptz'2017-01-01 00:00:00+00')
+        having max(trade_date) > coalesce(%s, timestamptz'2017-01-01 00:00:00+00')
         order by
             symbol,
             latest_date,
             holding;
     """,
         (account_id, last_trade_date),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(row) for row in rows]
 
 
@@ -477,7 +473,7 @@ def get_stocks_with_updates_by_account(
 def get_transactions_by_stocks_by_nickname(conn, nickname, stocks):
     placeholder = ",".join("%s" for _ in stocks)
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         f"""
         WITH recursive
         cleaned AS (
@@ -511,17 +507,17 @@ def get_transactions_by_stocks_by_nickname(conn, nickname, stocks):
             substr(
                 max(
                 CASE
-                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                    WHEN type <> 'DIVIDEND' THEN trade_date::varchar || '#' || type
                 END
                 ) OVER (
-                PARTITION BY symbol
-                ORDER BY trade_date 
-                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                    PARTITION BY symbol
+                    ORDER BY trade_date 
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
                 ),
                 strpos(
                 max(
                     CASE
-                    WHEN type <> 'DIVIDEND' THEN trade_date || '#' || type
+                        WHEN type <> 'DIVIDEND' THEN trade_date::varchar || '#' || type
                     END
                 ) OVER (
                     PARTITION BY symbol
@@ -650,13 +646,14 @@ def get_transactions_by_stocks_by_nickname(conn, nickname, stocks):
         using(id);
         """,
         (nickname, *stocks, nickname),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
 
 
 def get_last_fetched(conn, api_source, account_id):
     cursor = conn.cursor()
-    row = cursor.execute(
+    cursor.execute(
         """
         select
             account_id,
@@ -666,19 +663,21 @@ def get_last_fetched(conn, api_source, account_id):
         and account_id = %s
         """,
         (api_source, account_id),
-    ).fetchone()
+    )
+    row = cursor.fetchone()
     return dict(row) if row else None
 
 
 def get_latest_analysis_all_accounts(conn):
     cursor = conn.cursor()
-    rows = cursor.execute("select * from analysis").fetchall()
+    cursor.execute("select * from analysis")
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
 
 
 def get_snapshot_dates_all_accounts(conn):
     cursor = conn.cursor()
-    snapshots = cursor.execute(
+    cursor.execute(
         """
         SELECT DISTINCT 
             account_id, 
@@ -689,13 +688,14 @@ def get_snapshot_dates_all_accounts(conn):
             account_id, 
             last_successful_sync DESC
         """
-    ).fetchall()
+    )
+    snapshots = cursor.fetchall()
     return [dict(sn) for sn in snapshots]
 
 
 def get_snapshot_dates_by_account(conn, account_id):
     cursor = conn.cursor()
-    dates = cursor.execute(
+    cursor.execute(
         """
         select distinct
             last_successful_sync 
@@ -704,13 +704,14 @@ def get_snapshot_dates_by_account(conn, account_id):
             and trigger = 'scheduled'
         """,
         (account_id,),
-    ).fetchall()
+    )
+    dates = cursor.fetchall()
     return [dict(sn) for sn in dates]
 
 
 def get_latest_analysis_by_account(conn, account_id):
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         """
         with latest_positions_date as (
         SELECT
@@ -785,7 +786,8 @@ def get_latest_analysis_by_account(conn, account_id):
             using(symbol);
         """,
         (account_id, account_id, account_id, account_id),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
 
 
@@ -796,7 +798,7 @@ def get_analysis_by_account_by_snapshot(conn, account_id, sync_date_str):
     if sync_date is None:
         return []
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         """
         with latest_positions as (
         select *
@@ -858,7 +860,8 @@ def get_analysis_by_account_by_snapshot(conn, account_id, sync_date_str):
         where account_id = %s;
         """,
         (account_id, sync_date, account_id, sync_date, account_id, account_id),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
 
 
@@ -873,7 +876,7 @@ def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates_st
     placeholder = ",".join("%s" for _ in sync_dates)
 
     cursor = conn.cursor()
-    rows = cursor.execute(
+    cursor.execute(
         f"""
         with account_totals as (
             select
@@ -946,5 +949,6 @@ def compare_analysis_by_account_across_snapshots(conn, account_id, sync_dates_st
         and last_successful_sync in ({placeholder});
         """,
         (account_id, *sync_dates, account_id, account_id, account_id, *sync_dates),
-    ).fetchall()
+    )
+    rows = cursor.fetchall()
     return [dict(r) for r in rows]
